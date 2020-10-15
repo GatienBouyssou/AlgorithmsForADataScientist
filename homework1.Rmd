@@ -1,17 +1,16 @@
 ---
 subtitle: "Pattern Mining and Social Network Analysis"
 title: "Homework 1"
-author: "BOUYSSOU Gatien , de POURTALES Caroline"
+author: "BOUYSSOU Gatien , de POURTALES Caroline, LAMBA Ankit"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document:
     latex_engine: xelatex
 ---
-
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+                      cache=TRUE, size="scriptsize",fig.width=6, fig.height=5)
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -94,6 +93,31 @@ not in $\pi_1$ & c & d \\
 
 $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 
+## Criterions for best model 
+
+How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
+These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
+
+### Mallow’s Cp 
+
+TO DO
+
+If there are d predictors : 
+
+$$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
+
+### AIC : Akaike information criterion
+
+TO DO
+
+### BIC : Bayesian information criterion
+
+TO DO
+
+### Adjusted R statistic 
+
+TO DO
+
 ## Logistic Regression
 
 ### How it works
@@ -135,11 +159,16 @@ train = sample(c(1:n), replace = F)[1:n2]
 # reduction to two variables
 tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
+head(tennis)
 tennisTest = tennis[-train, ]
 tennisTrain = tennis[train, ]
 r.tennis2 = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomial")
 summary(r.tennis2)
+```
 
+With the model, we can draw the slope which indicates the category of a point.
+
+```{r, eval=TRUE, echo=TRUE}
 #We calculate the slope
 glm.b = -r.tennis2$coefficients[2]/r.tennis2$coefficients[3]
 glm.a = -r.tennis2$coefficients[1]/r.tennis2$coefficients[3]
@@ -148,6 +177,15 @@ ggplot() + geom_point(aes(ACEdiff, UFEdiff, color = factor(Result)), data = tenn
   geom_abline(slope = glm.b, intercept = glm.a) +
   theme_minimal()
 ```
+
+We can write : 
+
+$$ \begin{aligned}
+logit(p_i) = log(\frac{p_i}{1-p_i}) &= 0,31318 + 0,20856 * ACEDiff - 0,08272 * UFEDiff
+\end{aligned}$$
+
+
+We can observe AIC =  105.1
 
 
 The confusion matrix is :
@@ -187,18 +225,24 @@ glm.fmesure
 
 Implémenter une ou deux classification(s) de plus entre :
 
-## K-nearest neighbours
-
-## Decision trees
-
-## Linear and Quadratic discriminant Analysis
+## An other example 
 
 
 # Regression
 
 ## Overall
 
-### The Mean Squarred error
+### Supervised learning
+
+TO DO
+
+### Possibilities of models
+
+TO DO
+
+### The accuracy of a model 
+
+#### The Mean Squarred error
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
 There are two MSE : the train MSE and the test MSE. \\
@@ -225,47 +269,139 @@ $(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and ref
 
 $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. If the variance is high, there is a large uncertainty associated with the prediction.
 
-### PARTIE GATIEN AUTRE MÉTHODES DE MESURE
+#### RSS : residual sum of squares
 
+We define the residual sum of squares (RSS) as :
+
+$$RSS = \Sigma (y_i - \hat{y}_i)^2$$ 
+
+We want to minimize the RSS.
+
+#### RSE : residual standard error
+
+$$RSE = \sqrt{\frac{1}{n-2}RSS}$$
+
+#### R statistic
+
+$$R^2 = 1 - \frac{RSS}{TSS}$$
+$$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y.
+
+TSS − RSS measures the amount of variability in the response that is explained.
+
+$R^2$ measures the proportion of variability in Y that can be explained using X.
+
+#### F statistic
+
+TO - DO
 
 ## Simple Linear Regression
 
 ### Definition
 
-Rapidement
-Quel indicateur pour la validité ?
+TO DO
+
+DEFINITION 
+
+WHICH INDICATORS CAN WE USE 
+
+Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as
+$$Y ≈ \beta_0 + \beta_1 * X$$
 
 ###  An example in R
 
-Description dataset
+The next dataset (source F. E. Harrell, Regression Modeling Strategies) contains the total hospital costs of 9105 patients with certain diseases in American hospitals between 1989 and 1991. The different variables are :
 
 ```{r, eval=TRUE, echo=TRUE}
-id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
-d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
-head(d.worm)
+id <- "1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO" # google file ID
+data <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",  id), header = T)
+head(data)
+```
 
-modelA = lm(GEWICHT^(1/3) ~ MAGENUMF + as.factor(Gattung), data = d.worm)
-summary(modelA)
-anova(modelA)
+We would like to build models that help us to understand which predictors are mostly driving the total cost.
+
+```{r, eval=TRUE, echo=TRUE}
+# We only look at complete cases
+data <- data[complete.cases(data), ]
+data <- data[data$totcst > 0, ]
+
+# histograms
+par(mfrow = c(3, 3))
+hist(data$age, main = 'age')
+hist(data$num.co, main = 'num.co')
+hist(data$edu, main = 'edu')
+hist(data$scoma, main = 'scoma')
+hist(data$totcst, main = 'totcst')
+hist(data$meanbp, main = 'meanbp')
+hist(data$hrt, main = 'hrt')
+hist(data$resp, main = 'resp')
+hist(data$temp, main = 'temp')
+hist(data$pafi, main = 'pafi')
+
+#transformation
+par(mfrow = c(1, 2))
+hist(data$totcst, main = 'totcst')
+hist(log(data$totcst), main = 'log(totcst)')
+```
+
+Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. Moreover it seems that only age and disease have an impact.
+
+```{r, eval=TRUE, echo=TRUE}
+set.seed(12345)
+train.proportion = 0.8
+train.ind = sample(1:nrow(data), train.proportion* nrow(data))
+data.train = data[train.ind, ]
+data.test = data[-train.ind, ]
+
+fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = data.train)
+summary(fit)
+```
+
+We can write : 
+
+$$log(totcost) = 8.0823597 -0.0069950 * age + x_{ij} * \beta_j$$
+where $x_{ij}$ is 1 if patient i has disease j and $\beta_j$ is the coefficient matchinf the disease in the previous tab.
+
+
+We can calculate the MSE on the test set to evaluate the simple linear regression model. 
+```{r, eval=TRUE, echo=TRUE}
+y = predict(fit, newdata = data.test,
+            newx=model.matrix(log(totcst)~. , data.test)[,-1]) 
+mse = mean((y - log(data.test$totcst))^2)
+mse
 ```
 
 ## Multiple linear regression
 
 ### Definition
 
-Rapidement
-Quel indicateur pour la validité ?
+TO DO 
+
+
+DEFINITION 
+
+WHICH INDICATORS ?
 
 ###  An example in R
 
-Description dataset
+We use the same example than for simple linear regression. 
 
 ```{r, eval=TRUE, echo=TRUE}
-modelB = lm(GEWICHT^(1/3) ~ MAGENUMF*as.factor(Gattung), data = d.worm)
-summary(modelB)
-anova(modelB)
+fit_multiple = lm(log(totcst)~age*as.factor(dzgroup), data = data.train)
+summary(fit_multiple)
 ```
 
+We can calculate the MSE on the test set to evaluate the multiple linear regression model. 
+
+```{r, eval=TRUE, echo=TRUE}
+y = predict(fit_multiple, newdata = data.test,
+            newx=model.matrix(log(totcst)~age*as.factor(dzgroup) , data.test)[,-1]) 
+mse = mean((y - log(data.test$totcst))^2)
+mse
+```
+
+The MSE-test for multiple linear regression is worst than for simple linear regression.
+
+Simple linear regression is the best model so far for this problem.
 
 # Comparaison between R and sckit-learn in python
 
@@ -273,11 +409,20 @@ anova(modelB)
 
 ### Logistic Regression
 
-### AUTRE MODELE
+TO DO  : comparaison between R and python
+
+### TO - DO : AN OTHER MODEL FOR THE SAME DATA SET 
+
+TO DO  : comparaison between R and python
+
+either knn, or decsion trees, or linear discriminant analysis or quadratic discriminant analysis
 
 ## On Regression
 
 ### Simple Linear Regression
 
+TO DO : comparaison between R and python
+
 ### Multiple Linear Regression
 
+TO DO : comparaison between R and python
