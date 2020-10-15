@@ -110,13 +110,19 @@ $$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
 
 TO DO
 
+$$ AIC = \frac{RSS + 2 d \hat{\sigma}^2}{n\hat{\sigma}^2}$$
+
 ### BIC : Bayesian information criterion
 
 TO DO
 
+$$ BIC = \frac{RSS + log(n) d \hat{\sigma}^2}{n}$$
+
 ### Adjusted R statistic 
 
 TO DO
+
+$$Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
 
 ## Logistic Regression
 
@@ -324,6 +330,7 @@ We would like to build models that help us to understand which predictors are mo
 data <- data[complete.cases(data), ]
 data <- data[data$totcst > 0, ]
 
+
 # histograms
 par(mfrow = c(3, 3))
 hist(data$age, main = 'age')
@@ -352,8 +359,17 @@ train.ind = sample(1:nrow(data), train.proportion* nrow(data))
 data.train = data[train.ind, ]
 data.test = data[-train.ind, ]
 
+fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), data = data.train)
+summary(fit)
+```
+
+We can that just age and dzgroup seem to have an impact on totcst. 
+
+```{r, eval=TRUE, echo=TRUE}
 fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = data.train)
 summary(fit)
+
+ggplot() + geom_point(aes(age, factor(dzgroup), color = totcst), data = data.train, )
 ```
 
 We can write : 
