@@ -4,8 +4,10 @@ title: "Homework 1"
 author: "BOUYSSOU Gatien , de POURTALES Caroline, LAMBA Ankit"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document:
+  pdf_document: 
     latex_engine: xelatex
+    toc: yes
+    toc_depth: 4
 ---
 ```{r setup, include=FALSE}
 library(knitr)
@@ -34,24 +36,22 @@ library(dplyr)
 
 ## Overall
 
-### Supervised learning
-
 Classification algorithms have categorical responses. In classification we build a function f(X) that takes a vector of input variables X and predicts its class membership, such that Y in C.
 
-### Possibilities of models
+## Possibilities of models
 
 There are classifiers as logistic regression, Decision tree, Perceptron / Neural networks, K-nearest-neighbors, linear and quadratic logistic regression, Bayes  ...
 
-### Some indicators
+## Some indicators
 
-#### Sensitivity and recall
+### Sensitivity and recall
 
 The sensitivity (also named recall) is the percentage of true defaulters that are identified (True positive tests).
 For example, probability of predicting disease given true state is disease.
 
 $$sensitivity = recall = \frac{TruePositiveTests}{PositivePopulation}$$
 
-#### Specificity
+### Specificity
 
 The specificity  is the percentage of non-defaulters that are correctly identified (True negative tests).
 1 - specificity is the Type 1 error, it is the false positive rate.
@@ -59,16 +59,16 @@ For example, probability of predicting non-disease given true state is non- dise
 
 $$specificity = \frac{TrueNegativeTests}{NegativePopulation}$$
 
-#### Precision
+### Precision
 
 The precision is the proportion of true positive tests among the positive tests.
 $$precision = \frac{TruePositiveTests}{PositiveTests}$$
 
-#### F-Mesure
+### F-Mesure
 
 The traditional F measure is calculated as follows: $$F_Measure = \frac{(2 * Precision * Recall)}{ (Precision + Recall)}$$
 
-#### Rand index
+### Rand index
 
 The rand index is a mesure of similarity between two partitions from a single set.
 
@@ -229,26 +229,39 @@ glm.fmesure = (2*glm.precision*glm.sensitivity)/(glm.sensitivity + glm.precision
 glm.fmesure
 ```
 
+### Same example in python with scikit learn 
+
+```{python}
+
+```
 
 ## An other example 
+
+### An example in R
+
+### Same example in python with scikit learn 
+
+```{python}
+
+```
 
 TO DO 
 
 # Regression
 
-## Overall
-
-### Supervised learning
+## Supervised learning
 
 TO DO
 
-### Possibilities of models
+## Possibilities of models
 
 TO DO
 
-### The accuracy of a model 
+## The accuracy of a model 
 
-#### The Mean Squarred error
+TO DO RMSE, MAE, MAPE,R2
+
+### The Mean Squarred error
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
 There are two MSE : the train MSE and the test MSE. \\
@@ -275,7 +288,7 @@ $(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and ref
 
 $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. If the variance is high, there is a large uncertainty associated with the prediction.
 
-#### RSS : residual sum of squares
+### RSS : residual sum of squares
 
 We define the residual sum of squares (RSS) as :
 
@@ -283,13 +296,13 @@ $$RSS = \Sigma (y_i - \hat{y}_i)^2$$
 
 We want to minimize the RSS.
 
-#### RSE : residual standard error
+### RSE : residual standard error
 
 TO DO
 
 $$RSE = \sqrt{\frac{1}{n-2}RSS}$$
 
-#### R statistic
+### R statistic
 
 TO DO 
 
@@ -300,7 +313,7 @@ TSS − RSS measures the amount of variability in the response that is explained
 
 $R^2$ measures the proportion of variability in Y that can be explained using X.
 
-#### F statistic
+### F statistic
 
 TO - DO
 
@@ -390,6 +403,12 @@ mse = mean((y - log(data.test$totcst))^2)
 mse
 ```
 
+### Same example in python with scikit learn 
+
+```{python}
+
+```
+
 ## Multiple linear regression
 
 ### Definition
@@ -422,6 +441,13 @@ mse
 The MSE-test for multiple linear regression is worst than for simple linear regression.
 
 Simple linear regression is the best model so far for this problem.
+
+### Same example in python with scikit learn 
+
+```{python}
+
+```
+
 
 # Comparaison between R and sckit-learn in python
 
@@ -500,4 +526,25 @@ MSE &  &  \\
 \hline
 \end{tabular}
 \end{center}
+
+# Validation techniques 
+
+## Sampling
+
+method of train and test set 
+
+## Cross validation
+
+### Validation set approach 
+
+TO DO
+
+### Leave One out cross-validation
+
+TO DO
+
+### k-Fold Cross-Validation 
+
+TO DO
+
 
