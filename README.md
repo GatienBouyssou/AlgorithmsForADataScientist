@@ -4,7 +4,16 @@
 
 ### Definition
 
-Define error rate, accuracy ... for regression 
+Look at the TO DO 
+
+Caroline : R algorithms for classification and regression : explanations, mesures, plots
+Gatien   : scikit learn on classification (logistic regression + 1 to choose) 
+Ankit    : 
+
+Unassigned tasks : 
+
+- complete Rmarkdown definitions 
+- scikit learn for regression (simple and multiple regression with the dataset down)
 
 ### Datasets 
 
@@ -15,7 +24,8 @@ tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id
 
 #### Dataset for regression 
 
-Arriving soon 
+id <- "1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO" # google file ID
+data <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",  id), header = T)
 
 ### R : 
 
