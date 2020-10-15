@@ -229,10 +229,10 @@ glm.fmesure = (2*glm.precision*glm.sensitivity)/(glm.sensitivity + glm.precision
 glm.fmesure
 ```
 
-Implémenter une ou deux classification(s) de plus entre :
 
 ## An other example 
 
+TO DO 
 
 # Regression
 
@@ -285,9 +285,13 @@ We want to minimize the RSS.
 
 #### RSE : residual standard error
 
+TO DO
+
 $$RSE = \sqrt{\frac{1}{n-2}RSS}$$
 
 #### R statistic
+
+TO DO 
 
 $$R^2 = 1 - \frac{RSS}{TSS}$$
 $$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y.
@@ -427,18 +431,73 @@ Simple linear regression is the best model so far for this problem.
 
 TO DO  : comparaison between R and python
 
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+sensitivity &  &  \\
+\hline
+specificity &  &  \\
+\hline
+precision   &  &  \\
+\hline
+f mesure    &  &  \\
+\hline
+AIC         &  &  \\
+\hline
+\end{tabular}
+\end{center}
+
 ### TO - DO : AN OTHER MODEL FOR THE SAME DATA SET 
 
 TO DO  : comparaison between R and python
 
 either knn, or decsion trees, or linear discriminant analysis or quadratic discriminant analysis
 
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+sensitivity &  &  \\
+\hline
+specificity &  &  \\
+\hline
+precision   &  &  \\
+\hline
+f mesure    &  &  \\
+\hline
+AIC         &  &  \\
+\hline
+\end{tabular}
+\end{center}
+
+
 ## On Regression
 
 ### Simple Linear Regression
 
-TO DO : comparaison between R and python
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+MSE &  &  \\
+\hline
+\end{tabular}
+\end{center}
+
 
 ### Multiple Linear Regression
 
-TO DO : comparaison between R and python
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+MSE &  &  \\
+\hline
+\end{tabular}
+\end{center}
+
