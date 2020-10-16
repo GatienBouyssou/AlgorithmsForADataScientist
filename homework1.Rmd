@@ -36,6 +36,8 @@ library(tidyverse)
 library(caret)
 ```
 
+\clearpage
+
 # Classification
 
 ## Overall
@@ -97,7 +99,7 @@ not in $\pi_1$ & c & d \\
 
 $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 
-## Criterions for best model 
+## Accuracy of a model 
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
@@ -152,7 +154,7 @@ We use Maximum Likehood :
 $$ L(\beta) = \Pi_{i=1}^n{ p_i^{y_i} * (1 - p_i)^{y_i}} $$
 The goal is to maximise it by adjusting $\beta$ vector.
 
-### An example in R
+### Example on the the Wimbledon tennis tournament
 
 We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on the number of aces won by each player and the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics.
 
@@ -167,6 +169,9 @@ n2 = n*(3/4)
 set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
 ```
+
+
+#### On R
 
 ```{r, eval=TRUE, echo=TRUE}
 # reduction to two variables
@@ -236,21 +241,25 @@ glm.fmesure = (2*glm.precision*glm.sensitivity)/(glm.sensitivity + glm.precision
 glm.fmesure
 ```
 
-### Same example in python with scikit learn 
+#### In python with scikit learn 
 
 ```{python}
 
 ```
 
-## Decisions trees 
+## Decision trees and Random Forest
 
-### An example in R : Decision trees and Random Forest
+
+### Example on the the Wimbledon tennis tournament
+
+#### On R
 
 ```{r, eval=TRUE, echo=TRUE}
 MSE <- rep(NA,25)
 deg = 1:25
 for (d in deg) {
-  modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, mtry = 6, ntree = 500, nodesize=d,importance = TRUE)
+  modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, 
+                          mtry = 6, ntree = 500, nodesize=d,importance = TRUE)
   yRandomForest = predict(modelD, newdata = tennisTest)
   MSE[d] = mean((yRandomForest - tennisTest[,3])^2)
 }
@@ -259,12 +268,14 @@ for (d in deg) {
 which.min(MSE)
 
 #The best model is
-modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, mtry = 6, ntree = 500, nodesize=which.min(MSE),importance = TRUE)
+modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, 
+                        mtry = 6, ntree = 500, nodesize=which.min(MSE),importance = TRUE)
 
 #the MSE of random forest
 MSE[which.min(MSE)]
 ```
-### Same example in python with scikit learn 
+
+#### In python with scikit learn 
 
 ```{python}
 
@@ -272,9 +283,11 @@ MSE[which.min(MSE)]
 
 TO DO 
 
+\clearpage
+
 # Regression
 
-## Supervised learning
+## Overall
 
 TO DO
 
@@ -282,7 +295,7 @@ TO DO
 
 TO DO
 
-## The accuracy of a model 
+## Accuracy of a model 
 
 ### MSE : The Mean Squarred error
 
@@ -359,7 +372,7 @@ WHICH INDICATORS CAN WE USE
 Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as
 $$Y ≈ \beta_0 + \beta_1 * X$$
 
-###  An example in R
+### Hospital Costs dataset
 
 The next dataset (source F. E. Harrell, Regression Modeling Strategies) contains the total hospital costs of 9105 patients with certain diseases in American hospitals between 1989 and 1991. The different variables are :
 
@@ -369,7 +382,6 @@ hospitaldata <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=downlo
 head(hospitaldata)
 ```
 
-We would like to build models that help us to understand which predictors are mostly driving the total cost.
 
 ```{r, eval=TRUE, echo=FALSE}
 # We only look at complete cases
@@ -396,6 +408,14 @@ hist(hospitaldata$totcst, main = 'totcst')
 hist(log(hospitaldata$totcst), main = 'log(totcst)')
 ```
 
+```{r, eval=TRUE, echo=FALSE}
+ggplot() + geom_point(aes(age, totcst, color = as.factor(dzgroup) ), data = hospitaldata)
+```
+
+#### On R
+
+We would like to build models that help us to understand which predictors are mostly driving the total cost.
+
 Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. Moreover it seems that only age and disease have an impact.
 
 ```{r, eval=TRUE, echo=TRUE}
@@ -405,7 +425,8 @@ train.ind = sample(1:nrow(hospitaldata), train.proportion* nrow(hospitaldata))
 hospitaldata.train = hospitaldata[train.ind, ]
 hospitaldata.test = hospitaldata[-train.ind, ]
 
-fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), data = hospitaldata.train)
+fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), 
+         data = hospitaldata.train)
 summary(fit)
 ```
 
@@ -414,8 +435,6 @@ We can that just age and dzgroup seem to have an impact on totcst.
 ```{r, eval=TRUE, echo=TRUE}
 fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = hospitaldata.train)
 summary(fit)
-
-ggplot() + geom_point(aes(age, totcst, color = as.factor(dzgroup) ), data = hospitaldata.train)
 ```
 
 We can write : 
@@ -433,7 +452,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
             MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ```
 
-### Same example in python with scikit learn 
+#### In python with scikit learn 
 
 ```{python}
 
@@ -450,7 +469,9 @@ DEFINITION
 
 WHICH INDICATORS ?
 
-###  An example in R
+### Hospital Costs dataset
+
+####  On R
 
 We use the same example than for simple linear regression. 
 
@@ -473,12 +494,13 @@ The MSE-test for multiple linear regression is worst than for simple linear regr
 
 Simple linear regression is the best model so far for this problem.
 
-### Same example in python with scikit learn 
+#### In python with scikit learn 
 
 ```{python}
 
 ```
 
+\clearpage
 
 # Comparaison between R and sckit-learn in python
 
@@ -558,6 +580,8 @@ MSE &  &  \\
 \end{tabular}
 \end{center}
 
+\clearpage
+
 # Validation techniques 
 
 ## Sampling
@@ -572,6 +596,8 @@ R2, RMSE and MAE are used to measure the regression model performance during cro
 
 TO DO 
 
+#### Example on R 
+
 ```{r, eval=TRUE, echo=TRUE}
 # Split the data into training and test set
 set.seed(123)
@@ -583,10 +609,10 @@ model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
 print(model)
 # Make predictions and compute the R2, RMSE and MAE
 predictions <- model %>% predict(hospitaldata.test2)
-data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
-            R2 = R2(predictions, log(hospitaldata.test$totcst)),
-            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
-            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
+data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
+            R2 = R2(predictions, log(hospitaldata.test2$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test2$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
 ``` 
 
 ### Leave One out cross-validation
@@ -600,11 +626,14 @@ Test the model against the data point that is left out at step 1 and record the 
 Repeat the process for all data points
 Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
 
+#### Example on R 
+
 ```{r, eval=TRUE, echo=TRUE}
 # Define training control
 train.control <- trainControl(method = "LOOCV")
 # Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  trControl = train.control)
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  
+               trControl = train.control)
 # Summarize the results
 print(model)
 ``` 
@@ -637,11 +666,14 @@ We would use the cross-validation error :
 $$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
 with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
 
+#### Example on R  
+
 ```{r, eval=TRUE, echo=TRUE}
 # Define training control
 train.control <- trainControl(method = "cv", number = 10)
 # Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  trControl = train.control)
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  
+               trControl = train.control)
 # Summarize the results
 print(model)
 ``` 
