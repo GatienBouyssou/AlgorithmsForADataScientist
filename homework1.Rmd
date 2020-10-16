@@ -284,13 +284,7 @@ TO DO
 
 ## The accuracy of a model 
 
-TO DO RMSE, MAE, MAPE,R2
-
-Root Mean Squared Error (RMSE), which measures the average prediction error made by the model in predicting the outcome for an observation. That is, the average difference between the observed known outcome values and the values predicted by the model. The lower the RMSE, the better the model.
-
-Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model
-
-### The Mean Squarred error
+### MSE : The Mean Squarred error
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
 There are two MSE : the train MSE and the test MSE. \\
@@ -317,6 +311,11 @@ $(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and ref
 
 $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. If the variance is high, there is a large uncertainty associated with the prediction.
 
+
+### RMSE
+
+Root Mean Squared Error (RMSE), which measures the average prediction error made by the model in predicting the outcome for an observation. That is, the average difference between the observed known outcome values and the values predicted by the model. The lower the RMSE, the better the model.
+
 ### RSS : residual sum of squares
 
 We define the residual sum of squares (RSS) as :
@@ -342,9 +341,10 @@ TSS − RSS measures the amount of variability in the response that is explained
 
 $R^2$ measures the proportion of variability in Y that can be explained using X.
 
-### F statistic
+### MAE
 
-TO - DO
+Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model
+
 
 ## Simple Linear Regression
 
@@ -425,10 +425,12 @@ where $x_{ij}$ is 1 if patient i has disease j and $\beta_j$ is the coefficient 
 
 
 We can calculate the MSE on the test set to evaluate the simple linear regression model. 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 predictions <- fit %>% predict(hospitaldata.test)
-mse = mean((predictions - log(hospitaldata.test$totcst))^2)
-mse
+data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
+            R2 = R2(predictions, log(hospitaldata.test$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ```
 
 ### Same example in python with scikit learn 
@@ -459,10 +461,12 @@ summary(fit_multiple)
 
 We can calculate the MSE on the test set to evaluate the multiple linear regression model. 
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 predictions <- fit_multiple %>% predict(hospitaldata.test)
-mse = mean((predictions - log(hospitaldata.test$totcst))^2)
-mse
+data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
+            R2 = R2(predictions, log(hospitaldata.test$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ```
 
 The MSE-test for multiple linear regression is worst than for simple linear regression.
@@ -579,9 +583,10 @@ model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
 print(model)
 # Make predictions and compute the R2, RMSE and MAE
 predictions <- model %>% predict(hospitaldata.test2)
-data.frame( R2 = R2(predictions, log(hospitaldata.test2$totcst)),
-            RMSE = RMSE(predictions, log(hospitaldata.test2$totcst)),
-            MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
+data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
+            R2 = R2(predictions, log(hospitaldata.test$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ``` 
 
 ### Leave One out cross-validation
@@ -599,14 +604,9 @@ Compute the overall prediction error by taking the average of all these test err
 # Define training control
 train.control <- trainControl(method = "LOOCV")
 # Train the model
-model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train,  trControl = train.control)
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  trControl = train.control)
 # Summarize the results
 print(model)
-# Make predictions and compute the R2, RMSE and MAE
-predictions <- model %>% predict(hospitaldata.test)
-data.frame( R2 = R2(predictions, log(hospitaldata.test$totcst)),
-            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
-            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ``` 
 
 ### k-Fold Cross-Validation 
@@ -641,14 +641,9 @@ with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate
 # Define training control
 train.control <- trainControl(method = "cv", number = 10)
 # Train the model
-model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train,  trControl = train.control)
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  trControl = train.control)
 # Summarize the results
 print(model)
-# Make predictions and compute the R2, RMSE and MAE
-predictions <- model %>% predict(hospitaldata.test)
-data.frame( R2 = R2(predictions, log(hospitaldata.test$totcst)),
-            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
-            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ``` 
 
 
