@@ -22,7 +22,8 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.wh
 #install.packages("MASS")
 #install.packages("dplyr")
 #install.packages("magrittr")
-#install.packages("dplyr")
+#install.packages("tidyverse")
+#install.packages("caret")
 library(magrittr)
 library(knitr)
 library(rmarkdown)
@@ -30,6 +31,9 @@ library(ggplot2)
 library(ggfortify)
 library(MASS)
 library(dplyr)
+library(randomForest)
+library(tidyverse)
+library(caret)
 ```
 
 # Classification
@@ -152,16 +156,19 @@ The goal is to maximise it by adjusting $\beta$ vector.
 
 We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on the number of aces won by each player and the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
+head(tennis)
 
 # test and train set
 n = dim(tennis)[1]
 n2 = n*(3/4)
 set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
+```
 
+```{r, eval=TRUE, echo=TRUE}
 # reduction to two variables
 tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
@@ -196,7 +203,7 @@ We can observe AIC =  105.1
 
 The confusion matrix is :
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 glm.Result_probs = predict(r.tennis2, newdata = tennisTest)
 glm.Result_pred = ifelse(glm.Result_probs > 0.5, 1, 0)
 glm.confusion_matrix = table(glm.Result_pred, tennisTest$Result)
@@ -206,25 +213,25 @@ glm.confusion_matrix
 The accuracy rate is $\frac{17+25}{13+25+4+17} = 0.71$.
 
 The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 glm.sensitivity = glm.confusion_matrix[2,2]/(glm.confusion_matrix[1,2] + glm.confusion_matrix[2,2])
 glm.sensitivity
 ```
 
 The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 glm.specificity = glm.confusion_matrix[1,1]/(glm.confusion_matrix[1,1] + glm.confusion_matrix[2,1])
 glm.specificity
 ```
 
 The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 glm.precision = glm.confusion_matrix[2,2]/(glm.confusion_matrix[2,1] + glm.confusion_matrix[2,2])
 glm.precision
 ```
 
 So the F_Mesure is :
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 glm.fmesure = (2*glm.precision*glm.sensitivity)/(glm.sensitivity + glm.precision)
 glm.fmesure
 ```
@@ -235,10 +242,28 @@ glm.fmesure
 
 ```
 
-## An other example 
+## Decisions trees 
 
-### An example in R
+### An example in R : Decision trees and Random Forest
 
+```{r, eval=TRUE, echo=TRUE}
+MSE <- rep(NA,25)
+deg = 1:25
+for (d in deg) {
+  modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, mtry = 6, ntree = 500, nodesize=d,importance = TRUE)
+  yRandomForest = predict(modelD, newdata = tennisTest)
+  MSE[d] = mean((yRandomForest - tennisTest[,3])^2)
+}
+
+#The model with the smallest MSE has 14 nodesizes
+which.min(MSE)
+
+#The best model is
+modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, mtry = 6, ntree = 500, nodesize=which.min(MSE),importance = TRUE)
+
+#the MSE of random forest
+MSE[which.min(MSE)]
+```
 ### Same example in python with scikit learn 
 
 ```{python}
@@ -260,6 +285,10 @@ TO DO
 ## The accuracy of a model 
 
 TO DO RMSE, MAE, MAPE,R2
+
+Root Mean Squared Error (RMSE), which measures the average prediction error made by the model in predicting the outcome for an observation. That is, the average difference between the observed known outcome values and the values predicted by the model. The lower the RMSE, the better the model.
+
+Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model
 
 ### The Mean Squarred error
 
@@ -334,59 +363,59 @@ $$Y ≈ \beta_0 + \beta_1 * X$$
 
 The next dataset (source F. E. Harrell, Regression Modeling Strategies) contains the total hospital costs of 9105 patients with certain diseases in American hospitals between 1989 and 1991. The different variables are :
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 id <- "1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO" # google file ID
-data <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",  id), header = T)
-head(data)
+hospitaldata <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",  id), header = T)
+head(hospitaldata)
 ```
 
 We would like to build models that help us to understand which predictors are mostly driving the total cost.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 # We only look at complete cases
-data <- data[complete.cases(data), ]
-data <- data[data$totcst > 0, ]
+hospitaldata <- hospitaldata[complete.cases(hospitaldata), ]
+hospitaldata <- hospitaldata[hospitaldata$totcst > 0, ]
 
 
 # histograms
 par(mfrow = c(3, 3))
-hist(data$age, main = 'age')
-hist(data$num.co, main = 'num.co')
-hist(data$edu, main = 'edu')
-hist(data$scoma, main = 'scoma')
-hist(data$totcst, main = 'totcst')
-hist(data$meanbp, main = 'meanbp')
-hist(data$hrt, main = 'hrt')
-hist(data$resp, main = 'resp')
-hist(data$temp, main = 'temp')
-hist(data$pafi, main = 'pafi')
+hist(hospitaldata$age, main = 'age')
+hist(hospitaldata$num.co, main = 'num.co')
+hist(hospitaldata$edu, main = 'edu')
+hist(hospitaldata$scoma, main = 'scoma')
+hist(hospitaldata$totcst, main = 'totcst')
+hist(hospitaldata$meanbp, main = 'meanbp')
+hist(hospitaldata$hrt, main = 'hrt')
+hist(hospitaldata$resp, main = 'resp')
+hist(hospitaldata$temp, main = 'temp')
+hist(hospitaldata$pafi, main = 'pafi')
 
 #transformation
 par(mfrow = c(1, 2))
-hist(data$totcst, main = 'totcst')
-hist(log(data$totcst), main = 'log(totcst)')
+hist(hospitaldata$totcst, main = 'totcst')
+hist(log(hospitaldata$totcst), main = 'log(totcst)')
 ```
 
 Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. Moreover it seems that only age and disease have an impact.
 
 ```{r, eval=TRUE, echo=TRUE}
 set.seed(12345)
-train.proportion = 0.8
-train.ind = sample(1:nrow(data), train.proportion* nrow(data))
-data.train = data[train.ind, ]
-data.test = data[-train.ind, ]
+train.proportion = 0.7
+train.ind = sample(1:nrow(hospitaldata), train.proportion* nrow(hospitaldata))
+hospitaldata.train = hospitaldata[train.ind, ]
+hospitaldata.test = hospitaldata[-train.ind, ]
 
-fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), data = data.train)
+fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), data = hospitaldata.train)
 summary(fit)
 ```
 
 We can that just age and dzgroup seem to have an impact on totcst. 
 
 ```{r, eval=TRUE, echo=TRUE}
-fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = data.train)
+fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = hospitaldata.train)
 summary(fit)
 
-ggplot() + geom_point(aes(age, factor(dzgroup), color = totcst), data = data.train, )
+ggplot() + geom_point(aes(age, totcst, color = as.factor(dzgroup) ), data = hospitaldata.train)
 ```
 
 We can write : 
@@ -397,9 +426,8 @@ where $x_{ij}$ is 1 if patient i has disease j and $\beta_j$ is the coefficient 
 
 We can calculate the MSE on the test set to evaluate the simple linear regression model. 
 ```{r, eval=TRUE, echo=TRUE}
-y = predict(fit, newdata = data.test,
-            newx=model.matrix(log(totcst)~. , data.test)[,-1]) 
-mse = mean((y - log(data.test$totcst))^2)
+predictions <- fit %>% predict(hospitaldata.test)
+mse = mean((predictions - log(hospitaldata.test$totcst))^2)
 mse
 ```
 
@@ -425,16 +453,15 @@ WHICH INDICATORS ?
 We use the same example than for simple linear regression. 
 
 ```{r, eval=TRUE, echo=TRUE}
-fit_multiple = lm(log(totcst)~age*as.factor(dzgroup), data = data.train)
+fit_multiple = lm(log(totcst)~age*as.factor(dzgroup), data = hospitaldata.train)
 summary(fit_multiple)
 ```
 
 We can calculate the MSE on the test set to evaluate the multiple linear regression model. 
 
 ```{r, eval=TRUE, echo=TRUE}
-y = predict(fit_multiple, newdata = data.test,
-            newx=model.matrix(log(totcst)~age*as.factor(dzgroup) , data.test)[,-1]) 
-mse = mean((y - log(data.test$totcst))^2)
+predictions <- fit_multiple %>% predict(hospitaldata.test)
+mse = mean((predictions - log(hospitaldata.test$totcst))^2)
 mse
 ```
 
@@ -475,7 +502,7 @@ AIC         &  &  \\
 \end{tabular}
 \end{center}
 
-### TO - DO : AN OTHER MODEL FOR THE SAME DATA SET 
+### Decision trees
 
 TO DO  : comparaison between R and python
 
@@ -531,20 +558,98 @@ MSE &  &  \\
 
 ## Sampling
 
-method of train and test set 
+This consists in dividing the dataset into a training set and a test set.
 
 ## Cross validation
 
+R2, RMSE and MAE are used to measure the regression model performance during cross-validation.
+
 ### Validation set approach 
 
-TO DO
+TO DO 
+
+```{r, eval=TRUE, echo=TRUE}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- log(hospitaldata$totcst) %>% createDataPartition(p = 0.8, list = FALSE)
+hospitaldata.train2  <- hospitaldata[training.samples, ]
+hospitaldata.test2 <- hospitaldata[-training.samples, ]
+# Build the model
+model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
+print(model)
+# Make predictions and compute the R2, RMSE and MAE
+predictions <- model %>% predict(hospitaldata.test2)
+data.frame( R2 = R2(predictions, log(hospitaldata.test2$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test2$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
+``` 
 
 ### Leave One out cross-validation
 
 TO DO
 
+This method works as follow:
+
+Leave out one data point and build the model on the rest of the data set
+Test the model against the data point that is left out at step 1 and record the test error associated with the prediction
+Repeat the process for all data points
+Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
+
+```{r, eval=TRUE, echo=TRUE}
+# Define training control
+train.control <- trainControl(method = "LOOCV")
+# Train the model
+model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train,  trControl = train.control)
+# Summarize the results
+print(model)
+# Make predictions and compute the R2, RMSE and MAE
+predictions <- model %>% predict(hospitaldata.test)
+data.frame( R2 = R2(predictions, log(hospitaldata.test$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
+``` 
+
 ### k-Fold Cross-Validation 
 
 TO DO
+
+We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part.
+
+Here are the steps : 
+
+1.Split the dataset into k equal partitions (or "folds")
+
+
+2.For each fold
+
+
+  One fold is used as the testing set and the union of the other folds as the training set
+  
+  
+  Calculate testing accuracy for this fold : 
+  
+  $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
+  $$MSE = \frac{k}{n}\sum_i{I(y_i≠\hat{y_i})}$$
+
+3.Use the average testing accuracy as the estimate of out-of-sample accuracy :
+
+We would use the cross-validation error : 
+$$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
+with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
+
+```{r, eval=TRUE, echo=TRUE}
+# Define training control
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train,  trControl = train.control)
+# Summarize the results
+print(model)
+# Make predictions and compute the R2, RMSE and MAE
+predictions <- model %>% predict(hospitaldata.test)
+data.frame( R2 = R2(predictions, log(hospitaldata.test$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test$totcst)))
+``` 
+
 
 
