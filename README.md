@@ -12,8 +12,10 @@ Ankit    :
 
 Unassigned tasks : 
 
-- complete Rmarkdown definitions 
+- complete Rmarkdown definitions, formulas 
 - scikit learn for regression (simple and multiple regression with the dataset down)
+- write the comparaison part when we have the results
+- write the Validation part (part 4)
 
 ### Datasets 
 
