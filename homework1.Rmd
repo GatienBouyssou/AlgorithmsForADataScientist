@@ -4,7 +4,7 @@ title: "Homework 1"
 author: "BOUYSSOU Gatien , de POURTALES Caroline, LAMBA Ankit"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: 
+  pdf_document:
     latex_engine: xelatex
     toc: yes
     toc_depth: 4
@@ -99,16 +99,16 @@ not in $\pi_1$ & c & d \\
 
 $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 
-## Accuracy of a model 
+## Accuracy of a model
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
 
-### Mallow’s Cp 
+### Mallow’s Cp
 
 TO DO
 
-If there are d predictors : 
+If there are d predictors :
 
 $$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
 
@@ -124,7 +124,7 @@ TO DO
 
 $$ BIC = \frac{RSS + log(n) d \hat{\sigma}^2}{n}$$
 
-### Adjusted R statistic 
+### Adjusted R statistic
 
 TO DO
 
@@ -173,7 +173,7 @@ train = sample(c(1:n), replace = F)[1:n2]
 
 #### On R
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 # reduction to two variables
 tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
@@ -196,7 +196,7 @@ ggplot() + geom_point(aes(ACEdiff, UFEdiff, color = factor(Result)), data = tenn
   theme_minimal()
 ```
 
-We can write : 
+We can write :
 
 $$ \begin{aligned}
 logit(p_i) = log(\frac{p_i}{1-p_i}) &= 0,31318 + 0,20856 * ACEDiff - 0,08272 * UFEDiff
@@ -215,7 +215,7 @@ glm.confusion_matrix = table(glm.Result_pred, tennisTest$Result)
 glm.confusion_matrix
 ```
 
-The accuracy rate is $\frac{17+25}{13+25+4+17} = 0.71$.
+The accuracy rate is $\frac{15 + 8}{30} = 0.7667$.
 
 The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
 ```{r, eval=TRUE, echo=FALSE}
@@ -241,7 +241,7 @@ glm.fmesure = (2*glm.precision*glm.sensitivity)/(glm.sensitivity + glm.precision
 glm.fmesure
 ```
 
-#### In python with scikit learn 
+#### In python with scikit learn
 
 ```{python}
 
@@ -254,34 +254,80 @@ glm.fmesure
 
 #### On R
 
-```{r, eval=TRUE, echo=TRUE}
-MSE <- rep(NA,25)
-deg = 1:25
+```{r, eval=TRUE, echo=FALSE}
+accuracyrate <- rep(NA,40)
+deg = 1:40
 for (d in deg) {
-  modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, 
-                          mtry = 6, ntree = 500, nodesize=d,importance = TRUE)
-  yRandomForest = predict(modelD, newdata = tennisTest)
-  MSE[d] = mean((yRandomForest - tennisTest[,3])^2)
+  model <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain,
+                          mtry = 2, ntree = 500, nodesize=d,importance = TRUE)
+  yRandomForest = predict(model, newdata = tennisTest)
+  model.Result_probs = predict(model, newdata = tennisTest)
+  model.Result_pred = ifelse(model.Result_probs > 0.5, 1, 0)
+  model.confusion_matrix = table(model.Result_pred, tennisTest$Result)
+  model.accuracyrate = (model.confusion_matrix[2,2] + model.confusion_matrix[1,1]) /30
+  accuracyrate[d] = model.accuracyrate
 }
 
 #The model with the smallest MSE has 14 nodesizes
-which.min(MSE)
+which.min(accuracyrate)
 
 #The best model is
-modelD <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain, 
-                        mtry = 6, ntree = 500, nodesize=which.min(MSE),importance = TRUE)
+model <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain,
+                        mtry = 2, ntree = 500, nodesize=which.min(accuracyrate),importance = TRUE)
 
-#the MSE of random forest
-MSE[which.min(MSE)]
+predictions <- model %>% predict(tennisTest)
+data.frame( MSE = mean((predictions - tennisTest$Result)^2),
+            R2 = R2(predictions, tennisTest$Result),
+            RMSE = RMSE(predictions, tennisTest$Result),
+            MAE = MAE(predictions, tennisTest$Result))
 ```
 
-#### In python with scikit learn 
+The confusion matrix is :
+
+```{r, eval=TRUE, echo=FALSE}
+model.Result_probs = predict(model, newdata = tennisTest)
+model.Result_pred = ifelse(model.Result_probs > 0.5, 1, 0)
+model.confusion_matrix = table(model.Result_pred, tennisTest$Result)
+model.confusion_matrix
+```
+
+The accuracy rate is :
+```{r, eval=TRUE, echo=FALSE}
+model.accuracyrate = (model.confusion_matrix[2,2] + model.confusion_matrix[1,1]) /30
+model.accuracyrate
+```
+
+The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
+```{r, eval=TRUE, echo=FALSE}
+model.sensitivity = model.confusion_matrix[2,2]/(model.confusion_matrix[1,2] + model.confusion_matrix[2,2])
+model.sensitivity
+```
+
+The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
+```{r, eval=TRUE, echo=FALSE}
+model.specificity = model.confusion_matrix[1,1]/(model.confusion_matrix[1,1] + model.confusion_matrix[2,1])
+model.specificity
+```
+
+The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
+```{r, eval=TRUE, echo=FALSE}
+model.precision = model.confusion_matrix[2,2]/(model.confusion_matrix[2,1] + model.confusion_matrix[2,2])
+model.precision
+```
+
+So the F_Mesure is :
+```{r, eval=TRUE, echo=FALSE}
+model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model.precision)
+model.fmesure
+```
+
+#### In python with scikit learn
 
 ```{python}
 
 ```
 
-TO DO 
+TO DO
 
 \clearpage
 
@@ -295,7 +341,7 @@ TO DO
 
 TO DO
 
-## Accuracy of a model 
+## Accuracy of a model
 
 ### MSE : The Mean Squarred error
 
@@ -333,7 +379,7 @@ Root Mean Squared Error (RMSE), which measures the average prediction error made
 
 We define the residual sum of squares (RSS) as :
 
-$$RSS = \Sigma (y_i - \hat{y}_i)^2$$ 
+$$RSS = \Sigma (y_i - \hat{y}_i)^2$$
 
 We want to minimize the RSS.
 
@@ -345,7 +391,7 @@ $$RSE = \sqrt{\frac{1}{n-2}RSS}$$
 
 ### R statistic
 
-TO DO 
+TO DO
 
 $$R^2 = 1 - \frac{RSS}{TSS}$$
 $$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y.
@@ -365,9 +411,9 @@ Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to 
 
 TO DO
 
-DEFINITION 
+DEFINITION
 
-WHICH INDICATORS CAN WE USE 
+WHICH INDICATORS CAN WE USE
 
 Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as
 $$Y ≈ \beta_0 + \beta_1 * X$$
@@ -418,32 +464,32 @@ We would like to build models that help us to understand which predictors are mo
 
 Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. Moreover it seems that only age and disease have an impact.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 set.seed(12345)
 train.proportion = 0.7
 train.ind = sample(1:nrow(hospitaldata), train.proportion* nrow(hospitaldata))
 hospitaldata.train = hospitaldata[train.ind, ]
 hospitaldata.test = hospitaldata[-train.ind, ]
 
-fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup), 
+fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup),
          data = hospitaldata.train)
 summary(fit)
 ```
 
-We can that just age and dzgroup seem to have an impact on totcst. 
+We can that just age and dzgroup seem to have an impact on totcst.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = hospitaldata.train)
 summary(fit)
 ```
 
-We can write : 
+We can write :
 
 $$log(totcost) = 8.0823597 -0.0069950 * age + x_{ij} * \beta_j$$
 where $x_{ij}$ is 1 if patient i has disease j and $\beta_j$ is the coefficient matchinf the disease in the previous tab.
 
 
-We can calculate the MSE on the test set to evaluate the simple linear regression model. 
+We can calculate the MSE on the test set to evaluate the simple linear regression model.
 ```{r, eval=TRUE, echo=FALSE}
 predictions <- fit %>% predict(hospitaldata.test)
 data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
@@ -452,7 +498,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
             MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ```
 
-#### In python with scikit learn 
+#### In python with scikit learn
 
 ```{python}
 
@@ -462,10 +508,10 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
 
 ### Definition
 
-TO DO 
+TO DO
 
 
-DEFINITION 
+DEFINITION
 
 WHICH INDICATORS ?
 
@@ -473,14 +519,14 @@ WHICH INDICATORS ?
 
 ####  On R
 
-We use the same example than for simple linear regression. 
+We use the same example than for simple linear regression.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 fit_multiple = lm(log(totcst)~age*as.factor(dzgroup), data = hospitaldata.train)
 summary(fit_multiple)
 ```
 
-We can calculate the MSE on the test set to evaluate the multiple linear regression model. 
+We can calculate the MSE on the test set to evaluate the multiple linear regression model.
 
 ```{r, eval=TRUE, echo=FALSE}
 predictions <- fit_multiple %>% predict(hospitaldata.test)
@@ -494,11 +540,111 @@ The MSE-test for multiple linear regression is worst than for simple linear regr
 
 Simple linear regression is the best model so far for this problem.
 
-#### In python with scikit learn 
+#### In python with scikit learn
 
 ```{python}
 
 ```
+
+\clearpage
+
+# Validation techniques
+
+## Sampling
+
+This consists in dividing the dataset into a training set and a test set.
+
+## Cross validation
+
+R2, RMSE and MAE are used to measure the regression model performance during cross-validation.
+
+### Validation set approach
+
+TO DO
+
+#### Example on R
+
+```{r, eval=TRUE, echo=FALSE}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- log(hospitaldata$totcst) %>% createDataPartition(p = 0.8, list = FALSE)
+hospitaldata.train2  <- hospitaldata[training.samples, ]
+hospitaldata.test2 <- hospitaldata[-training.samples, ]
+# Build the model
+model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
+print(model)
+# Make predictions and compute the R2, RMSE and MAE
+predictions <- model %>% predict(hospitaldata.test2)
+data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
+            R2 = R2(predictions, log(hospitaldata.test2$totcst)),
+            RMSE = RMSE(predictions, log(hospitaldata.test2$totcst)),
+            MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
+```
+
+### Leave One out cross-validation
+
+TO DO
+
+This method works as follow:
+
+Leave out one data point and build the model on the rest of the data set
+Test the model against the data point that is left out at step 1 and record the test error associated with the prediction
+Repeat the process for all data points
+Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
+
+#### Example on R
+
+```{r, eval=TRUE, echo=FALSE}
+# Define training control
+train.control <- trainControl(method = "LOOCV")
+# Train the model
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+### k-Fold Cross-Validation
+
+TO DO
+
+We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part.
+
+Here are the steps :
+
+1.Split the dataset into k equal partitions (or "folds")
+
+
+2.For each fold
+
+
+  One fold is used as the testing set and the union of the other folds as the training set
+
+
+  Calculate testing accuracy for this fold :
+
+  $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
+  $$MSE = \frac{k}{n}\sum_i{I(y_i≠\hat{y_i})}$$
+
+3.Use the average testing accuracy as the estimate of out-of-sample accuracy :
+
+We would use the cross-validation error :
+$$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
+with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
+
+#### Example on R
+
+```{r, eval=TRUE, echo=FALSE}
+# Define training control
+train.control <- trainControl(method = "cv", number = 10)
+# Train the model
+model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+
 
 \clearpage
 
@@ -515,15 +661,15 @@ TO DO  : comparaison between R and python
 \hline
   & R & Scikit-learn \\
 \hline
-sensitivity &  &  \\
+sensitivity &  0.6153846 &  \\
 \hline
-specificity &  &  \\
+specificity & 0.8823529 &  \\
 \hline
-precision   &  &  \\
+precision   & 0.8 &  \\
 \hline
-f mesure    &  &  \\
+f mesure    & 0.6956522 &  \\
 \hline
-AIC         &  &  \\
+AIC         & 105.1 &  \\
 \hline
 \end{tabular}
 \end{center}
@@ -539,13 +685,13 @@ either knn, or decsion trees, or linear discriminant analysis or quadratic discr
 \hline
   & R & Scikit-learn \\
 \hline
-sensitivity &  &  \\
+sensitivity & 0.6923077 &  \\
 \hline
-specificity &  &  \\
+specificity & 0.5882353 &  \\
 \hline
-precision   &  &  \\
+precision   & 0.5625 &  \\
 \hline
-f mesure    &  &  \\
+f mesure    & 0.6206897 &  \\
 \hline
 AIC         &  &  \\
 \hline
@@ -562,7 +708,11 @@ AIC         &  &  \\
 \hline
   & R & Scikit-learn \\
 \hline
-MSE &  &  \\
+RMSE & 0.9496248 &  \\
+\hline
+Rsquared & 0.3660489 & \\
+\hline
+MAE & 0.751934 & \\
 \hline
 \end{tabular}
 \end{center}
@@ -575,108 +725,62 @@ MSE &  &  \\
 \hline
   & R & Scikit-learn \\
 \hline
-MSE &  &  \\
+RMSE & 0.9475793 &  \\
+\hline
+Rsquared & 0.3687867 & \\
+\hline
+MAE & 0.7486429 & \\
 \hline
 \end{tabular}
 \end{center}
 
-\clearpage
+## On Cross Validation
 
-# Validation techniques 
+### Validation set approach
 
-## Sampling
-
-This consists in dividing the dataset into a training set and a test set.
-
-## Cross validation
-
-R2, RMSE and MAE are used to measure the regression model performance during cross-validation.
-
-### Validation set approach 
-
-TO DO 
-
-#### Example on R 
-
-```{r, eval=TRUE, echo=TRUE}
-# Split the data into training and test set
-set.seed(123)
-training.samples <- log(hospitaldata$totcst) %>% createDataPartition(p = 0.8, list = FALSE)
-hospitaldata.train2  <- hospitaldata[training.samples, ]
-hospitaldata.test2 <- hospitaldata[-training.samples, ]
-# Build the model
-model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
-print(model)
-# Make predictions and compute the R2, RMSE and MAE
-predictions <- model %>% predict(hospitaldata.test2)
-data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
-            R2 = R2(predictions, log(hospitaldata.test2$totcst)),
-            RMSE = RMSE(predictions, log(hospitaldata.test2$totcst)),
-            MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
-``` 
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+RMSE & 0.956954 &  \\
+\hline
+Rsquared & 0.3497368 & \\
+\hline
+MAE & 0.7521536 & \\
+\hline
+\end{tabular}
+\end{center}
 
 ### Leave One out cross-validation
 
-TO DO
-
-This method works as follow:
-
-Leave out one data point and build the model on the rest of the data set
-Test the model against the data point that is left out at step 1 and record the test error associated with the prediction
-Repeat the process for all data points
-Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
-
-#### Example on R 
-
-```{r, eval=TRUE, echo=TRUE}
-# Define training control
-train.control <- trainControl(method = "LOOCV")
-# Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  
-               trControl = train.control)
-# Summarize the results
-print(model)
-``` 
-
-### k-Fold Cross-Validation 
-
-TO DO
-
-We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part.
-
-Here are the steps : 
-
-1.Split the dataset into k equal partitions (or "folds")
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+RMSE & 0.944522 &  \\
+\hline
+Rsquared & 0.3656192 & \\
+\hline
+MAE & 0.7552076 & \\
+\hline
+\end{tabular}
+\end{center}
 
 
-2.For each fold
+### k-fold Cross Validation
 
-
-  One fold is used as the testing set and the union of the other folds as the training set
-  
-  
-  Calculate testing accuracy for this fold : 
-  
-  $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
-  $$MSE = \frac{k}{n}\sum_i{I(y_i≠\hat{y_i})}$$
-
-3.Use the average testing accuracy as the estimate of out-of-sample accuracy :
-
-We would use the cross-validation error : 
-$$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
-with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
-
-#### Example on R  
-
-```{r, eval=TRUE, echo=TRUE}
-# Define training control
-train.control <- trainControl(method = "cv", number = 10)
-# Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",  
-               trControl = train.control)
-# Summarize the results
-print(model)
-``` 
-
-
-
+\begin{center}
+\begin{tabular} { | c | c | c |}
+\hline
+  & R & Scikit-learn \\
+\hline
+RMSE & 0.9442358 &  \\
+\hline
+Rsquared & 0.3678628 & \\
+\hline
+MAE & 0.7551859 & \\
+\hline
+\end{tabular}
+\end{center}
