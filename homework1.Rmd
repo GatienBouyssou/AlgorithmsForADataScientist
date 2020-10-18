@@ -72,7 +72,9 @@ $$precision = \frac{TruePositiveTests}{PositiveTests}$$
 
 ### F-Mesure
 
-The traditional F measure is calculated as follows: $$F_Measure = \frac{(2 * Precision * Recall)}{ (Precision + Recall)}$$
+The traditional F measure is calculated as follows: 
+
+$$F_Measure = \frac{(2 * Precision * Recall)}{ (Precision + Recall)}$$
 
 ### Rand index
 
@@ -104,6 +106,20 @@ $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
 
+Let's define the mean squared error or MSE.
+$$MSE = \frac{1}{n} \sum_i 1_{y_i-\hat{f}(x_i)}$$ where : 
+
+$$1_{y_i-\hat{f}(x_i)} = \left\{
+    \begin{array}{ll}
+        1 & \mbox{if } y_i != \hat{f}(x_i) \\
+        0 & \mbox{otherwise}
+    \end{array}
+\right. $$
+
+Recall : $$RSS = MSE * n$$
+
+RSS and $R^2$ are not suitable for selecting the best model among a collection of models with different numbers of predictors.
+
 ### Mallow’s Cp
 
 TO DO
@@ -116,11 +132,17 @@ $$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
 
 TO DO
 
+The AIC criterion is defined for a large class of models fit by maximum likelihood.
+
 $$ AIC = \frac{RSS + 2 d \hat{\sigma}^2}{n\hat{\sigma}^2}$$
+
+To use AIC for model selection, we simply choose the model giving small- est AIC over the set of models considered.
 
 ### BIC : Bayesian information criterion
 
 TO DO
+
+BIC is derived from a Bayesian point of view, but ends up looking similar to Cp (and AIC) as well. For the least squares model with d predictors, the BIC is, up to irrelevant constants, given by
 
 $$ BIC = \frac{RSS + log(n) d \hat{\sigma}^2}{n}$$
 
@@ -147,7 +169,7 @@ We can define the odds :
 
 $$\frac{odds(Y_i=1 | X1 = x_{i1}+1)}{odds(Y_i=1 | X1 = x_{i1})} = e^{\beta_1}$$
 
-### Which indicator for validity  ?
+### Which indicator to construct the model ? 
 
 We use Maximum Likehood :
 
@@ -249,6 +271,19 @@ glm.fmesure
 
 ## Decision trees and Random Forest
 
+### How it works
+
+TO DO 
+
+### Which indicator to construct the model ? 
+
+#### Entropy
+
+TO DO 
+
+#### Gine
+
+TO DO 
 
 ### Example on the the Wimbledon tennis tournament
 
