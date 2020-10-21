@@ -1,0 +1,249 @@
+---
+subtitle: "Pattern Mining and Social Network Analysis"
+title: "Homework 2"
+author: "BOUYSSOU Gatien , de POURTALES Caroline, LAMBA Ankit"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    toc_depth: 4
+---
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=6, fig.height=5)
+```
+
+```{r rpackages,eval=TRUE,echo=FALSE}
+#install.packages("rmarkdown") #probably already installed
+#install.packages("ggplot2") #plotting with ggplot
+#install.packages("ggfortify")
+#install.packages("MASS")
+#install.packages("dplyr")
+#install.packages("magrittr")
+#install.packages("tidyverse")
+#install.packages("caret")
+library(magrittr)
+library(knitr)
+library(rmarkdown)
+library(ggplot2)
+library(ggfortify)
+library(MASS)
+library(dplyr)
+library(randomForest)
+library(tidyverse)
+library(caret)
+```
+
+\clearpage
+
+# Supervised VS Unsupervised 
+
+\clearpage
+
+# Principal Components Analysis 
+
+## Proportion of variance explained (PVE)
+
+## Deciding how many PCs to use
+
+## Example 
+
+The following dataset consists of 40 tissue samples with measurements of 1,000 genes. The first 20 tissues
+come from healthy patients (H) and the remaining 20 come from a diseased patient group (D). 
+
+### On R 
+
+```{r, eval=TRUE, echo=FALSE}
+id <- "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
+GeneData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
+colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "") 
+colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "") 
+row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
+head(GeneData)
+```
+
+This matrix describes the "link" between each tissue sample and gene.
+```{r, eval=TRUE, echo=FALSE}
+genematrix <- t(GeneData)
+```
+
+```{r, eval=TRUE, echo=FALSE}
+pca <- prcomp(genematrix, scale=TRUE) 
+summary(pca)
+biplot(pca, scale=0)
+
+pr.var=pca$sdev^2
+pve=pr.var/sum(pr.var)
+plot(cumsum(pve),
+     xlab="Principal Component",
+     ylab="Cumulative Proportion of Variance Explained",
+     ylim=c(0,1),
+     type='b')
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+p=plot(pca_plot$x[,1:2], type = "n")
+p=p+points(pca_plot$x[0:20,1:2], pch = "H", col='green')
+p=p+points(pca_plot$x[21:40,1:2], pch = "D",col='red')
+```
+
+
+### On python with scikit-learn 
+
+```{python}
+
+```
+
+
+\clearpage
+
+# Clustering 
+
+## K-means
+
+### Within-cluster variation (squared Euclidean distance)
+
+### K-means algorithm
+
+### Choice of k 
+
+### Example 
+
+#### On R
+
+```{r, eval=TRUE, echo=FALSE}
+k2 <- kmeans(genematrix, centers = 2, nstart = 15)
+k2$cluster
+k2$tot.withinss
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+p2= plot(genematrix,
+     col=(k2$cluster),
+     main="K-Means Clustering Results with K=2",
+     xlab="", ylab="", pch=15, cex=2)
+```
+
+
+#### On python with scikit-learn 
+
+```{python}
+
+```
+
+
+## Hierarchical clustering
+
+### Interpreting a dendogram
+
+### Correlation-based distance 
+
+#### Euclidean distance 
+
+#### Correlation-based distance
+
+### Hierarchical clustering algorithm 
+
+### Linkage
+
+\clearpage
+
+### Example 
+
+#### On R 
+
+```{r, eval=TRUE, echo=FALSE}
+c_euclidean<-dist(genematrix, method = 'euclidean')
+c_pearson <- cor(t(genematrix), method="pearson") 
+c_pearson <- as.dist(1-c_pearson)
+
+#complete
+clusters_complete_euclidean <- hclust(c_euclidean, method = "complete")
+clusterCut <- cutree(clusters_complete_euclidean, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+clusters_complete_correlation <- hclust(c_pearson, method = "complete")
+clusterCut <- cutree(clusters_complete_correlation, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+#single
+clusters_single_euclidean <- hclust(c_euclidean, method = "single")
+clusterCut <- cutree(clusters_single_euclidean, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+clusters_single_correlation <- hclust(c_pearson, method = "single")
+clusterCut <- cutree(clusters_single_correlation, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+#average
+clusters_average_euclidean <- hclust(c_euclidean, method = "average")
+clusterCut <- cutree(clusters_average_euclidean, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+clusters_average_correlation <- hclust(c_pearson, method = "average")
+clusterCut <- cutree(clusters_average_correlation, 2)
+clusterCut
+```
+
+```{r, eval=TRUE, echo=FALSE}
+par(mfrow = c(2, 3))
+plot(clusters_complete_euclidean)
+plot(clusters_complete_correlation)
+plot(clusters_single_euclidean)
+plot(clusters_single_correlation)
+plot(clusters_average_euclidean)
+plot(clusters_average_correlation)
+```
+
+We can see that the use of euclidean distance in the three methods (complete, single, average) gives good results (no missclassification) but the use of correlation-distance gives very bad results. 
+
+
+Furthermore all methods, except Average with correlation-distance, divide the graph in two groups (healthy and non-healthy) which is very good.
+
+
+#### On python with scikit-learn 
+
+```{python}
+
+```
+
+
+# Validation techniques
+
+## Bootstrapping
+
+## Example 
+
+### On R 
+
+```{r}
+
+```
+
+
+### On python with scikit-learn 
+
+```{python}
+
+```
+
+
+
+
+
+
+

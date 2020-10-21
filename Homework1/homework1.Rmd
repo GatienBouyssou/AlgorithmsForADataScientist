@@ -378,7 +378,7 @@ TO DO
 
 ## Accuracy of a model
 
-### MSE : The Mean Squarred error
+### MSE : Mean Squarred Error
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
 There are two MSE : the train MSE and the test MSE. \\
@@ -406,11 +406,11 @@ $(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and ref
 $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. If the variance is high, there is a large uncertainty associated with the prediction.
 
 
-### RMSE
+### RMSE : Root Mean Squared Error
 
 Root Mean Squared Error (RMSE), which measures the average prediction error made by the model in predicting the outcome for an observation. That is, the average difference between the observed known outcome values and the values predicted by the model. The lower the RMSE, the better the model.
 
-### RSS : residual sum of squares
+### RSS : Residual Sum of Squares
 
 We define the residual sum of squares (RSS) as :
 
@@ -418,7 +418,7 @@ $$RSS = \Sigma (y_i - \hat{y}_i)^2$$
 
 We want to minimize the RSS.
 
-### RSE : residual standard error
+### RSE : Residual Standard Error
 
 TO DO
 
