@@ -13,17 +13,15 @@ output:
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
                       cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+library(reticulate)
+use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
+knitr::knit_engines$set(python.reticulate =  FALSE)
+matplotlib <- import("matplotlib")
+matplotlib$use("Agg", force = TRUE)
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
-#install.packages("rmarkdown") #probably already installed
-#install.packages("ggplot2") #plotting with ggplot
-#install.packages("ggfortify")
-#install.packages("MASS")
-#install.packages("dplyr")
-#install.packages("magrittr")
-#install.packages("tidyverse")
-#install.packages("caret")
+#install.packages("cluster")
 library(magrittr)
 library(knitr)
 library(rmarkdown)
@@ -34,6 +32,8 @@ library(dplyr)
 library(randomForest)
 library(tidyverse)
 library(caret)
+library(cluster)
+library(factoextra)
 ```
 
 \clearpage
@@ -65,51 +65,49 @@ The dunn index is the min distance between two clusters (separation) over the ma
 
 $$Dunn\:index = \frac{min.separation}{max.diameter}$$
 
+\clearpage
+
 # Discrete
 
 with discrete (binary, graph based) : modularity, C measure, ...
 
-# Validation Techniques
-and validation techniques (sampling and répetitions) : bootstrapping, ..
-
-
-
 \clearpage
 
-# Principal Components Analysis
+# Principal Components Analysis 
+
+The goal of PCA is to identify which features in the dataset explain the most variability.
+
+## Different kinds of PCA 
+
+### Standard PCA
+
+### Incremental PCA
+
+### Sparse PCA
+
+### Kernel PCA
 
 ## Proportion of variance explained (PVE)
 
 ## Deciding how many PCs to use
 
-## Example
+## Example 
 
 The following dataset consists of 40 tissue samples with measurements of 1,000 genes. The first 20 tissues
-come from healthy patients (H) and the remaining 20 come from a diseased patient group (D).
-
-### On R
+come from healthy patients (H) and the remaining 20 come from a diseased patient group (D). 
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
 GeneData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
-colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "")
-colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "")
+colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "") 
+colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "") 
 row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
-head(GeneData)
-```
-
-This matrix describes the "link" between each tissue sample and gene.
-```{r, eval=TRUE, echo=FALSE}
 genematrix <- t(GeneData)
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-pca <- prcomp(genematrix, scale=TRUE)
-summary(pca)
-biplot(pca, scale=0)
-```
+pca <- prcomp(genematrix, scale=TRUE) 
 
-```{r, eval=TRUE, echo=FALSE}
 pr.var=pca$sdev^2
 pve=pr.var/sum(pr.var)
 plot(cumsum(pve),
@@ -120,122 +118,182 @@ plot(cumsum(pve),
 ```
 
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 p=plot(pca$x[,1:2], type = "n")
 p=p+points(pca$x[0:20,1:2], pch = "H", col='green')
 p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 ```
 
-
-### On python with scikit-learn
-
-```{python}
-
-```
-
-
 \clearpage
 
-# Clustering
+# Clustering 
 
 ## K-means
 
+The objective of clustering is to distinct groups from the datatest. With k-means we want to distinct k groups. The algorithm will assign each observation to exactly one of the cluster. It optimizes the groups by minimizing the within-cluster variation such that the sum of the with-cluster variations across all the clusters is the smallest possible.
+
 ### Within-cluster variation (squared Euclidean distance)
+
+If $\mu_k$ is the center of the cluster k.
+The total with-cluster variation is TW :
+$$ TW = \Sigma_{j=1}^k W_j= \Sigma_{j=1}^k \Sigma_{x_i \in C_j} (x_i - \mu_k)^2$$
 
 ### K-means algorithm
 
-### Choice of k
+The first step when using k-means clustering is to indicate the number of clusters (k) that will be generated in the final solution.
+The algorithm starts by randomly selecting k objects from the data set to serve as the initial centers for the clusters. The selected objects are also known as cluster means or centroids.
 
-### Example
+### Choice of k 
+
+We compute k-means clustering using different k, then we choose the number of cluster according to the location of a bend on the graph representing the Within-cluster variation according to k.
+
+### Example 
 
 #### On R
 
+According to this graph, we should choose k=2 (it makes sense since we have Healthy and non healthy patients).
+
 ```{r, eval=TRUE, echo=FALSE}
-k2 <- kmeans(genematrix, centers = 2, nstart = 15)
+fviz_nbclust(genematrix, kmeans, method = "wss") + geom_vline(xintercept = 2, linetype = 2)
+```
+
+Then applying kmeans with 2 clusters we observe that the 20 first individuals (healthy) are not in the same cluster than the 20 others (non healthy).
+```{r, eval=TRUE, echo=FALSE}
+k2 <- kmeans(genematrix, centers = 2, nstart = 10)
 k2$cluster
-k2$tot.withinss
 ```
 
+Since we have a multi-dimensional dataset, we apply dimensionality reduction with the use of PCA to plot the clusters.
+On the x axis, it is the first PCA, on the y axis, it is the second PCA.
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
+fviz_cluster(k2, data = genematrix,
+palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, ggtheme = theme_minimal())
+```
+
+
+#### On python with scikit-learn 
+
+By applying Kmeans (with 2 clusters) from scikit-learn on the gene dataset, we have the following assgnation to clusters.
+The 20 first individuals (Healthy) are well separated from the 20 last individuals since there are not in the same cluster.
+
+```{python echo=FALSE}
+from sklearn.cluster import KMeans
+
+X = r.genematrix
+clf = KMeans(n_clusters=2, random_state=100)
+clf.fit_predict(X)
+```
+
+## k-medoids algorithm
+
+### Principle 
+
+The k-medoids algorithm is a clustering approach related to k-means clustering. In k-medoids clustering, each cluster is represented by one of the data point in the cluster.
+
+The most common k-medoids clustering methods is the PAM.
+
+### PAM algorithm (Partitioning Around Medoids)
 
 ```{r, eval=TRUE, echo=FALSE}
-p2= plot(genematrix,
-     col=(k2$cluster),
-     main="K-Means Clustering Results with K=2",
-     xlab="", ylab="", pch=15, cex=2)
+pam.res <-pam(genematrix, 2, metric = "euclidean")
+pam.res$clustering
 ```
 
-
-#### On python with scikit-learn
-
-```{python}
-
+```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
+fviz_cluster(pam.res, data = genematrix,
+palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, ggtheme = theme_minimal())
 ```
-
-
-## Hierarchical clustering
-
-### Interpreting a dendogram
-
-### Correlation-based distance
-
-#### Euclidean distance
-
-#### Correlation-based distance
-
-### Hierarchical clustering algorithm
-
-### Linkage
 
 \clearpage
 
-### Example
+## Hierarchical clustering
 
-#### On R
+### Dissimilarity function
+
+#### Euclidean distance 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
+c_euclidean<-dist(genematrix, method = 'euclidean')
+round(as.matrix(c_euclidean)[1:10, 1:10], 1)
+```
+
+#### Correlation-based distance
+
+Correlation-based distance considers two observations to be similar if their features are highly correlated, even though the observed values may be far apart in terms of Euclidean distance.
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
+c_pearson <- cor(t(genematrix), method="pearson") 
+c_pearson <- as.dist(1-c_pearson)
+round(as.matrix(c_pearson)[1:10, 1:10], 1)
+```
+
+### Linkage
+
+The linkage function takes the distances and groups pairs of objects into clusters based on their similarity. These clusters are then linked to each other to create bigger clusters and the linkage continues until all the data are linked together in a hierarchical tree.
+
+#### Maximum or complete linkage
+
+The distance between two clusters is defined as the maximum value of all pairwise distances between the elements in cluster 1 and the elements in cluster 2. It tends to produce more compact clusters.
+
+#### Minimum or single linkage
+
+The distance between two clusters is defined as the minimum value of all pairwise distances between the elements in cluster 1 and the elements in cluster 2. It tends to produce long, "loose" clusters.
+
+#### Mean or average linkage
+
+The distance between two clusters is defined as the average distance between the elements in cluster 1 and the elements in cluster 2.
+
+#### Centroid linkage
+
+The distance between two clusters is defined as the distance between the centroid for cluster 1 (a mean vector of length p variables) and the centroid for cluster 2.
+
+#### Ward’s minimum variance method
+
+It minimizes the total within-cluster vari- ance. At each step the pair of clusters with minimum between-cluster distance are merged.
+
+### Example 
+
+#### On R 
 
 ```{r, eval=TRUE, echo=FALSE}
 c_euclidean<-dist(genematrix, method = 'euclidean')
-c_pearson <- cor(t(genematrix), method="pearson")
+c_pearson <- cor(t(genematrix), method="pearson") 
 c_pearson <- as.dist(1-c_pearson)
 
 #complete
 clusters_complete_euclidean <- hclust(c_euclidean, method = "complete")
 clusterCut <- cutree(clusters_complete_euclidean, 2)
-clusterCut
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 clusters_complete_correlation <- hclust(c_pearson, method = "complete")
 clusterCut <- cutree(clusters_complete_correlation, 2)
-clusterCut
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 #single
 clusters_single_euclidean <- hclust(c_euclidean, method = "single")
 clusterCut <- cutree(clusters_single_euclidean, 2)
-clusterCut
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 clusters_single_correlation <- hclust(c_pearson, method = "single")
 clusterCut <- cutree(clusters_single_correlation, 2)
-clusterCut
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 #average
 clusters_average_euclidean <- hclust(c_euclidean, method = "average")
 clusterCut <- cutree(clusters_average_euclidean, 2)
-clusterCut
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 clusters_average_correlation <- hclust(c_pearson, method = "average")
 clusterCut <- cutree(clusters_average_correlation, 2)
-clusterCut
 ```
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 par(mfrow = c(2, 3))
 plot(clusters_complete_euclidean)
 plot(clusters_complete_correlation)
@@ -245,16 +303,24 @@ plot(clusters_average_euclidean)
 plot(clusters_average_correlation)
 ```
 
-We can see that the use of euclidean distance in the three methods (complete, single, average) gives good results (no missclassification) but the use of correlation-distance gives very bad results.
-
+We can see that the use of euclidean distance in the three methods (complete, single, average) gives good results (no missclassification) but the use of correlation-distance gives very bad results. 
 
 Furthermore all methods, except Average with correlation-distance, divide the graph in two groups (healthy and non-healthy) which is very good.
 
 
-#### On python with scikit-learn
+#### On python with scikit-learn 
+
+Doing hiearchical clustering with python gives the following dendogramm which shows that individual between 0 and 19 and individuals between 20 and 39 are well separated.
 
 ```{python}
+from scipy.cluster.hierarchy import dendrogram, linkage
+from matplotlib import pyplot as plt
 
+linked = linkage(r.genematrix, 'single')
+
+plt.figure(figsize=(5, 2))
+dendrogram(linked)
+plt.show()
 ```
 
 
@@ -262,17 +328,18 @@ Furthermore all methods, except Average with correlation-distance, divide the gr
 
 ## Bootstrapping
 
-## Example
+## Example 
 
-### On R
+### On R 
 
 ```{r}
 
 ```
 
 
-### On python with scikit-learn
+### On python with scikit-learn 
 
 ```{python}
 
 ```
+
