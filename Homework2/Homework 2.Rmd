@@ -38,28 +38,62 @@ library(caret)
 
 \clearpage
 
-# Supervised VS Unsupervised 
+# Continuous
+Continuous data is data that can take any value while discrete data can take only certain values.
+with continuous (distance/similarity based) : Silhouette, Dunn, ...
+
+## Silhouette coefficient
+
+The Silhouette coefficient evaluates the performance of your clustering model on a dataset. This coefficient can take 3 value :
+
+* 1 it means that the cluster is far away from its neighbours
+* 0 indicates that it is close from one or multiple clusters
+* -1 or negative values in general means that the cluster is allocated to the wrong values
+
+It is possible to compute this coefficient thanks to the following formula :
+
+$$Silhouette\:Score = (b-a)/max(a,b) $$
+
+Where :
+
+* a is the distance between each point within a cluster
+* b is the distance between all the clusters
+
+## Dunn index
+
+The dunn index is the min distance between two clusters (separation) over the max distance btw the objects of one clusters ( diameter ).
+
+$$Dunn\:index = \frac{min.separation}{max.diameter}$$
+
+# Discrete
+
+with discrete (binary, graph based) : modularity, C measure, ...
+
+# Validation Techniques
+and validation techniques (sampling and répetitions) : bootstrapping, ..
+
+
 
 \clearpage
 
-# Principal Components Analysis 
+# Principal Components Analysis
 
 ## Proportion of variance explained (PVE)
 
 ## Deciding how many PCs to use
 
-## Example 
+## Example
 
 The following dataset consists of 40 tissue samples with measurements of 1,000 genes. The first 20 tissues
-come from healthy patients (H) and the remaining 20 come from a diseased patient group (D). 
+come from healthy patients (H) and the remaining 20 come from a diseased patient group (D).
 
-### On R 
+### On R
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
 GeneData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
-colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "") 
-colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "") 
+colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "")
+colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "")
 row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
 head(GeneData)
 ```
@@ -70,7 +104,7 @@ genematrix <- t(GeneData)
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-pca <- prcomp(genematrix, scale=TRUE) 
+pca <- prcomp(genematrix, scale=TRUE)
 summary(pca)
 biplot(pca, scale=0)
 ```
@@ -93,7 +127,7 @@ p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 ```
 
 
-### On python with scikit-learn 
+### On python with scikit-learn
 
 ```{python}
 
@@ -102,7 +136,7 @@ p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 
 \clearpage
 
-# Clustering 
+# Clustering
 
 ## K-means
 
@@ -110,9 +144,9 @@ p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 
 ### K-means algorithm
 
-### Choice of k 
+### Choice of k
 
-### Example 
+### Example
 
 #### On R
 
@@ -131,7 +165,7 @@ p2= plot(genematrix,
 ```
 
 
-#### On python with scikit-learn 
+#### On python with scikit-learn
 
 ```{python}
 
@@ -142,25 +176,25 @@ p2= plot(genematrix,
 
 ### Interpreting a dendogram
 
-### Correlation-based distance 
+### Correlation-based distance
 
-#### Euclidean distance 
+#### Euclidean distance
 
 #### Correlation-based distance
 
-### Hierarchical clustering algorithm 
+### Hierarchical clustering algorithm
 
 ### Linkage
 
 \clearpage
 
-### Example 
+### Example
 
-#### On R 
+#### On R
 
 ```{r, eval=TRUE, echo=FALSE}
 c_euclidean<-dist(genematrix, method = 'euclidean')
-c_pearson <- cor(t(genematrix), method="pearson") 
+c_pearson <- cor(t(genematrix), method="pearson")
 c_pearson <- as.dist(1-c_pearson)
 
 #complete
@@ -211,13 +245,13 @@ plot(clusters_average_euclidean)
 plot(clusters_average_correlation)
 ```
 
-We can see that the use of euclidean distance in the three methods (complete, single, average) gives good results (no missclassification) but the use of correlation-distance gives very bad results. 
+We can see that the use of euclidean distance in the three methods (complete, single, average) gives good results (no missclassification) but the use of correlation-distance gives very bad results.
 
 
 Furthermore all methods, except Average with correlation-distance, divide the graph in two groups (healthy and non-healthy) which is very good.
 
 
-#### On python with scikit-learn 
+#### On python with scikit-learn
 
 ```{python}
 
@@ -228,20 +262,17 @@ Furthermore all methods, except Average with correlation-distance, divide the gr
 
 ## Bootstrapping
 
-## Example 
+## Example
 
-### On R 
+### On R
 
 ```{r}
 
 ```
 
 
-### On python with scikit-learn 
+### On python with scikit-learn
 
 ```{python}
 
 ```
-
-
-
