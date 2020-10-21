@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=6, fig.height=5)
+                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -73,7 +73,9 @@ genematrix <- t(GeneData)
 pca <- prcomp(genematrix, scale=TRUE) 
 summary(pca)
 biplot(pca, scale=0)
+```
 
+```{r, eval=TRUE, echo=FALSE}
 pr.var=pca$sdev^2
 pve=pr.var/sum(pr.var)
 plot(cumsum(pve),
@@ -85,9 +87,9 @@ plot(cumsum(pve),
 
 
 ```{r, eval=TRUE, echo=FALSE}
-p=plot(pca_plot$x[,1:2], type = "n")
-p=p+points(pca_plot$x[0:20,1:2], pch = "H", col='green')
-p=p+points(pca_plot$x[21:40,1:2], pch = "D",col='red')
+p=plot(pca$x[,1:2], type = "n")
+p=p+points(pca$x[0:20,1:2], pch = "H", col='green')
+p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 ```
 
 
@@ -240,10 +242,6 @@ Furthermore all methods, except Average with correlation-distance, divide the gr
 ```{python}
 
 ```
-
-
-
-
 
 
 
