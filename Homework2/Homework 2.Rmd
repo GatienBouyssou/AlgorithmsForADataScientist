@@ -43,6 +43,7 @@ library(factoextra)
 \clearpage
 
 # Continuous
+
 Continuous data is data that can take any value while discrete data can take only certain values.
 with continuous (distance/similarity based) : Silhouette, Dunn, ...
 
@@ -75,25 +76,41 @@ $$Dunn\:index = \frac{min.separation}{max.diameter}$$
 
 with discrete (binary, graph based) : modularity, C measure, ...
 
+TO-DO 
+
 \clearpage
 
 # Principal Components Analysis 
 
 The goal of PCA is to identify which features in the dataset explain the most variability.
 
+TO-DO 
+
 ## Different kinds of PCA 
 
 ### Standard PCA
 
+TO-DO 
+
 ### Incremental PCA
+
+TO-DO 
 
 ### Sparse PCA
 
+TO-DO 
+
 ### Kernel PCA
+
+TO-DO 
 
 ## Proportion of variance explained (PVE)
 
+TO-DO 
+
 ## Deciding how many PCs to use
+
+TO-DO 
 
 ## Example 
 
@@ -189,7 +206,7 @@ clf = KMeans(n_clusters=2, random_state=100)
 clf.fit_predict(X)
 ```
 
-## k-medoids algorithm
+## K-medoids algorithm
 
 ### Principle 
 
@@ -208,6 +225,12 @@ pam.res$clustering
 fviz_cluster(pam.res, data = genematrix,
 palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, ggtheme = theme_minimal())
 ```
+
+### CLARA - Clustering Large Applications 
+
+#### Overall 
+
+#### Examples 
 
 \clearpage
 
@@ -256,9 +279,14 @@ The distance between two clusters is defined as the distance between the centroi
 
 It minimizes the total within-cluster vari- ance. At each step the pair of clusters with minimum between-cluster distance are merged.
 
-### Example on mushrooms dataset
 
-#### On R 
+### P-value 
+
+### Examples
+
+#### Mushrooms dataset
+
+##### On R 
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 6, fig.align = "center"}
 
@@ -288,9 +316,9 @@ clusterCut
 plot(clusters)
 ``` 
 
-### Example on healthy and non-healthy tissues samples
+#### Healthy and non-healthy tissues samples
 
-#### On R 
+##### On R 
 
 ```{r, eval=TRUE, echo=FALSE}
 c_euclidean<-dist(genematrix, method = 'euclidean')
@@ -344,7 +372,7 @@ We can see that the use of euclidean distance in the three methods (complete, si
 Furthermore all methods, except Average with correlation-distance, divide the graph in two groups (healthy and non-healthy) which is very good.
 
 
-#### On python with scikit-learn 
+##### On python with scikit-learn 
 
 Doing hiearchical clustering with python gives the following dendogramm which shows that individual between 0 and 19 and individuals between 20 and 39 are well separated.
 
@@ -360,7 +388,7 @@ plt.show()
 ```
 
 
-### Example on corona dataset 
+#### Corona dataset 
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
 id <- "1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw" # google file ID
@@ -387,22 +415,61 @@ clusterCut
 
 ```
 
-# Validation techniques
+## Fuzzy Clustering 
 
-## Bootstrapping
+### Overall
 
-## Example 
- 
-### On R 
+TO-DO 
 
-```{r}
+### Examples 
 
-```
+TO-DO 
+
+# Choosing the best algorithm ? 
+
+TO-DO 
+
+# Cluster validation techniques
+
+## Clustering Tendency 
+
+### Why assessing clustering tendency ?
+
+TO-DO 
+
+### Methods
+
+TO-DO 
+
+## Determining the Optimal number of Clusters
+
+### Elbow method
+
+TO-DO 
+
+### Average silhouette method
+
+TO-DO 
+
+### Gap statistic method
+
+TO-DO 
+
+## Statistics
+
+### Internal measures
+
+TO-DO 
+
+###  External mesures 
+
+TO-DO 
 
 
-### On python with scikit-learn 
 
-```{python}
 
-```
+
+
+
+
 
