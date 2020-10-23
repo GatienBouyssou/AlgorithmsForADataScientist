@@ -22,13 +22,17 @@ matplotlib$use("Agg", force = TRUE)
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
 #install.packages("cluster")
+#install.packages("xlsx")
 library(magrittr)
 library(knitr)
 library(rmarkdown)
+library(xlsx)
 library(ggplot2)
 library(ggfortify)
 library(MASS)
 library(dplyr)
+library(ISLR)
+library(readr)
 library(randomForest)
 library(tidyverse)
 library(caret)
@@ -180,7 +184,7 @@ The 20 first individuals (Healthy) are well separated from the 20 last individua
 ```{python echo=FALSE}
 from sklearn.cluster import KMeans
 
-X = r.genematrix
+X = r.genematrix 
 clf = KMeans(n_clusters=2, random_state=100)
 clf.fit_predict(X)
 ```
@@ -252,7 +256,39 @@ The distance between two clusters is defined as the distance between the centroi
 
 It minimizes the total within-cluster vari- ance. At each step the pair of clusters with minimum between-cluster distance are merged.
 
-### Example 
+### Example on mushrooms dataset
+
+#### On R 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 6, fig.align = "center"}
+
+mushrooms =  xlsx::read.xlsx("/Users/caro/Desktop/Master\ DNM/Pattern\ mining/Pattern\ Mining/Homework/Homework2/mushrooms.XLS", sheetIndex=1)
+
+mushrooms_com = mushrooms[mushrooms[,7]==1,]
+row.names(mushrooms_com) = paste(rep("c", 18), c(1:18), sep = "")
+mushrooms_nocom = mushrooms[mushrooms[,7]==0,]
+row.names(mushrooms_nocom) = paste(rep("nc", 6), c(1:6), sep = "")
+
+mushrooms = rbind(mushrooms_com, mushrooms_nocom)
+mushrooms = mushrooms[,2:6]
+mushrooms
+
+rows <- sample(nrow(mushrooms))
+mushrooms <- mushrooms[rows, ]
+
+k2 <- kmeans(mushrooms, centers = 2, nstart = 10)
+k2$cluster
+
+c_euclidean<-dist(mushrooms, method = 'euclidean')
+c_daisy <- daisy(mushrooms)
+
+clusters <- hclust(c_euclidean, method = "complete")
+clusterCut <- cutree(clusters, 2)
+clusterCut
+plot(clusters)
+``` 
+
+### Example on healthy and non-healthy tissues samples
 
 #### On R 
 
@@ -324,12 +360,39 @@ plt.show()
 ```
 
 
+### Example on corona dataset 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
+id <- "1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw" # google file ID
+d.corona <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
+                             id), header = F)
+
+deceased = d.corona[d.corona[,1] == 1,]
+row.names(deceased)[1:45] = paste(rep("D", 45), c(1:45), sep = "")
+colnames(deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "") 
+
+non_deceased = d.corona[d.corona[,1] == 0,]
+row.names(non_deceased)[1:1965] = paste(rep("H", 1965), c(1:1965), sep = "")
+colnames(non_deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "") 
+non_deceased = non_deceased[1:450,]
+
+d.corona=rbind(non_deceased,deceased)
+d.corona= d.corona[,2:4]
+
+c_daisy <- daisy(d.corona)
+
+clusters <- hclust(c_daisy, method = "complete")
+clusterCut <- cutree(clusters, 2)
+clusterCut
+
+```
+
 # Validation techniques
 
 ## Bootstrapping
 
 ## Example 
-
+ 
 ### On R 
 
 ```{r}
