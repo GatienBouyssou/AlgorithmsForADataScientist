@@ -352,11 +352,7 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 
 #### CLARA - Clustering Large Applications 
 
-##### Overall 
-
-TO DO
-
-##### Examples 
+DEFINITION 
 
 TO DO
 
@@ -426,6 +422,13 @@ It minimizes the total within-cluster vari- ance. At each step the pair of clust
 
 #### Mushrooms dataset
 
+The mushrooms data set contains information about 24 mushrooms. It indicates the smell, form and color but also whether it is possible to eat or not. \newline
+
+The purpous is to see if smell, form and color are enough to cluster the mushrooms into comestible and non-comestible.  \newline
+
+n stands for non comestible  \newline
+c stands for comestible  \newline
+
 ##### On R 
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 6, fig.align = "center"}
@@ -444,22 +447,27 @@ rows <- sample(nrow(mushrooms))
 mushrooms <- mushrooms[rows, ]
 
 k2 <- kmeans(mushrooms, centers = 2, nstart = 10)
-k2$cluster
+
 
 c_euclidean<-dist(mushrooms, method = 'euclidean')
 c_daisy <- daisy(mushrooms)
+c_pearson <- cor(t(mushrooms), method="pearson") 
+c_pearson <- as.dist(1-c_pearson)
 
-clusters <- hclust(c_euclidean, method = "complete")
+clusters <- hclust(c_pearson, method = "complete")
 clusterCut <- cutree(clusters, 2)
+clusterCut
 ``` 
 
-```{r, eval=TRUE, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 plot(clusters)
 ``` 
 
 \clearpage
  
 #### Healthy and non-healthy tissues samples
+
+Using the tissue and genes data set, we apply hierarchical clustering.
 
 ##### On R 
 
@@ -517,23 +525,19 @@ Furthermore all methods, except Average with correlation-distance, divide the gr
 
 ##### On python with scikit-learn 
 
-Doing hiearchical clustering with python gives the following dendogramm which shows that individual between 0 and 19 and individuals between 20 and 39 are well separated.
 
 ```{python, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
-from scipy.cluster.hierarchy import dendrogram, linkage
-from matplotlib import pyplot as plt
 
-linked = linkage(r.genematrix, 'single')
-
-plt.figure(figsize=(5, 2))
-dendrogram(linked)
-plt.show()
 ```
 
 
-#### Corona dataset 
+#### Corona dataset : the problem of over-represented category 
 
-```{r, eval=TRUE, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
+The corona dataset contains information of patients who have caught Corona. It stores their age, sex and nationality but also if there are dead or not. \newline 
+
+The purpous is to use hiearchical clustering to see if the age, sex and nationality is enough to separate the dead from the living patients. H stands for Healthy now and D stands for Deceased.
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 id <- "1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw" # google file ID
 d.corona <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
                              id), header = F)
@@ -554,8 +558,10 @@ c_daisy <- daisy(d.corona)
 
 clusters <- hclust(c_daisy, method = "complete")
 clusterCut <- cutree(clusters, 2)
-
+tail(clusterCut, n=50)
 ```
+Looking at the clustering, 1 is the cluster of healthy patients, 2 is the cluster of dead patients. \newline
+We can see that it is difficult to cluster the dead patients together because there are only 45 deceased cases against 450 healthy patients. This is a problem of over-represented category.
 
 ## Fuzzy Clustering 
 
