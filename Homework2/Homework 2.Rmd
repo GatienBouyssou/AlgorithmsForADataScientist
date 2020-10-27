@@ -189,10 +189,10 @@ A negative $S_i$ means the observation is probably placed in the wrong cluster.
 #### Dunn index
 
 The Dunn index is another internal clustering validation measure. \newline
-It is the min distance between two clusters (separation) over the max distance btw the objects of one clusters ( diameter ).
+It is the minimal distance between two clusters (the smallest separation) over the maximal distance between the objects of one clusters (the biggest diameter of a cluster).
 
 $$Dunn\:index = \frac{min.separation}{max.diameter}$$
-
+Compact and well-separated clusters in a data set means a small diameter of the clusters and a large distance between the clusters. Thus, Dunn index should be maximized.
 
 ###  External mesures 
 
@@ -565,7 +565,31 @@ TO-DO
 
 ### Examples 
 
-TO-DO 
+The function fanny() computes fuzzy clustering. \newline
+ 
+We use the tissue dataset. \newline
+For the dissimilarity function, the choice was euclidean distance. \newline
+2 is for the number of clusters expected. \newline
+stand indicates whether variables are standardized before calculating the dissimilarities.
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
+fuzzyclust <- fanny(genematrix, 2, metric = "euclidean", stand = TRUE)
+fuzzyclust$clustering
+```
+
+We can see that every tissue sample was well clustered. 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
+fuzzyclust$coeff
+```
+
+Looking at the Dunn coefficient, it is about 0.5 meaning that the diameter of one of the cluster is 2 times larger than the minimal separation of two cluster. \newline
+
+This makes sense looking at the following plot. 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
+fviz_cluster(fuzzyclust, ellipse.type = "norm", repel = TRUE, palette = "jco", ggtheme = theme_minimal(), legend = "right")
+```
 
 \clearpage
 
