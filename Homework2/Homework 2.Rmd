@@ -140,7 +140,7 @@ A negative $S_i$ means the observation is probably placed in the wrong cluster.
 
 ##### Average silhouette
 
-The average silhouette is the mean of all silhouette coefficients. It is used to evaluate a clustering
+The average silhouette is the mean of all silhouette coefficients. It is used to evaluate a clustering. 
 
 #### Dunn index 
 
