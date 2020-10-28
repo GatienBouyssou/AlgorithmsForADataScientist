@@ -101,6 +101,25 @@ not in $\pi_1$ & c & d \\
 
 $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 
+### Mutual information
+
+Mutual information is calculated between two variables and measures the reduction in uncertainty for one variable given a known value of the other variable.
+The mutual information between two random variables X and Y can be stated formally as follows:
+
+$$ MI= I(X ; Y) = H(X) – H(X | Y)$$
+
+### Cross Entropy(log loss)
+
+Cross-entropy loss, or log loss, measures the performance of a classification model whose output is a probability value between 0 and 1. Cross-entropy loss increases as the predicted probability diverges from the actual label. So predicting a probability of .012 when the actual observation label is 1 would be bad and result in a high loss value. A perfect model would have a log loss of 0.
+
+In binary classification, where the number of classes M equals 2, cross-entropy can be calculated as:
+
+$$ CE = − (y\log(p)+(1 − y)\log(1 − p))$$
+
+If M>2 (i.e. multiclass classification), we calculate a separate loss for each class label per observation and sum the result.
+
+$$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
+
 ## Accuracy of a model
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
@@ -122,7 +141,7 @@ RSS and $R^2$ are not suitable for selecting the best model among a collection o
 
 ### Mallow’s Cp
 
-TO DO
+Mallows’s Cp addresses the issue of overfitting, in which model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model
 
 If there are d predictors :
 
@@ -130,7 +149,7 @@ $$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
 
 ### AIC : Akaike information criterion
 
-TO DO
+The Akaike information criterion (AIC) is an estimator of in-sample prediction error and thereby relative quality of statistical models for a given set of data.[1] In-sample prediction error is the expected error in predicting the resampled response to a training sample
 
 The AIC criterion is defined for a large class of models fit by maximum likelihood.
 
@@ -140,7 +159,7 @@ To use AIC for model selection, we simply choose the model giving small- est AIC
 
 ### BIC : Bayesian information criterion
 
-TO DO
+In statistics, the Bayesian information criterion or Schwarz information criterion is a criterion for model selection among a finite set of models; the model with the lowest BIC is preferred. It is based, in part, on the likelihood function and it is closely related to the Akaike information criterion
 
 BIC is derived from a Bayesian point of view, but ends up looking similar to Cp (and AIC) as well. For the least squares model with d predictors, the BIC is, up to irrelevant constants, given by
 
@@ -148,9 +167,9 @@ $$ BIC = \frac{RSS + log(n) d \hat{\sigma}^2}{n}$$
 
 ### Adjusted R statistic
 
-TO DO
+The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model. The adjusted R-squared increases only if the new term improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance
 
-$$Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
+$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
 
 ## Logistic Regression
 
@@ -271,19 +290,42 @@ glm.fmesure
 
 ## Decision trees and Random Forest
 
+
+### Decision Tree
+Decision Tree algorithm belongs to the family of supervised learning algorithms. Unlike other supervised learning algorithms, the decision tree algorithm can be used for solving regression and classification problems too.
+
+The goal of using a Decision Tree is to create a training model that can use to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data).
+
 ### How it works
 
-TO DO
+Decision trees use multiple algorithms to decide to split a node into two or more sub-nodes. The creation of sub-nodes increases the homogeneity of resultant sub-nodes. In other words, we can say that the purity of the node increases with respect to the target variable. The decision tree splits the nodes on all available variables and then selects the split which results in most homogeneous sub-nodes.
+
+### Random Forest
+
+Random forests or random decision forests are an ensemble learning method for classification, regression and other tasks that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes or mean/average prediction of the individual trees.
+
 
 ### Which indicator to construct the model ?
 
-#### Entropy
+### Entropy
 
-TO DO
+Entropy is a measure of the randomness in the information being processed. The higher the entropy, the harder it is to draw any conclusions from that information. Flipping a coin is an example of an action that provides information that is random.
 
-#### Gine
+Mathematically Entropy for 1 attribute is represented as:
 
-TO DO
+$$ E(s) = \sum_{i = 1}^{c} -p_{i}\log_{2}(p_{i})$$
+
+Mathematically Entropy for multiple attributes is represented as:
+
+$$ E(T,X) = \sum_{c \in X}P(c)E(c)$$
+
+
+### Gini
+
+You can understand the Gini index as a cost function used to evaluate splits in the dataset. It is calculated by subtracting the sum of the squared probabilities of each class from one. It favors larger partitions and easy to implement whereas information gain favors smaller partitions with distinct values.
+
+$$ Gini = 1 - \sum_{i =1}^c(p_{i})^2$$
+
 
 ### Example on the the Wimbledon tennis tournament
 
@@ -973,11 +1015,11 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 
 ## Overall
 
-TO DO
+Regression is a statistical method used in finance, investing, and other disciplines that attempts to determine the strength and character of the relationship between one dependent variable (usually denoted by Y) and a series of other variables (known as independent variables).
 
 ## Possibilities of models
 
-TO DO
+Linear Regression, Multiple linear Regression, Logistic Regression, etc. 
 
 ## Accuracy of a model
 
@@ -1023,13 +1065,13 @@ We want to minimize the RSS.
 
 ### RSE : Residual Standard Error
 
-TO DO
+The residual standard error is the square root of the residual sum of squares divided by the residual degrees of freedom. Mean Square Error. The mean square error is the mean of the sum of squared residuals, i.e. it measures the average of the squares of the errors. Lower values (closer to zero) indicate better fit.
 
 $$RSE = \sqrt{\frac{1}{n-2}RSS}$$
 
-### R statistic
+### R squared statistic
 
-TO DO
+In statistics, the coefficient of determination, denoted R² or r² and pronounced "R squared", is the proportion of the variance in the dependent variable that is predictable from the independent variable
 
 $$R^2 = 1 - \frac{RSS}{TSS}$$
 $$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y.
@@ -1047,9 +1089,7 @@ Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to 
 
 ### Definition
 
-TO DO
-
-DEFINITION
+In statistics, linear regression is a linear approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple linear regression.
 
 WHICH INDICATORS CAN WE USE
 
@@ -1816,12 +1856,10 @@ cv_results
 
 ### Definition
 
-TO DO
+Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable
 
-
-DEFINITION
-
-WHICH INDICATORS ?
+Formula and Calcualtion of Multiple Linear Regression
+$$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsilon$$
 
 ### Hospital Costs dataset
 
@@ -1868,7 +1906,7 @@ R2, RMSE and MAE are used to measure the regression model performance during cro
 
 ### Validation set approach
 
-TO DO
+The Validation Set Approach is a type of method that estimates a model error rate by holding out a subset of the data from the fitting process (creating a testing dataset). The model is then built using the other set of observations (the training dataset)
 
 #### Example on R
 
@@ -1891,7 +1929,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
 
 ### Leave One out cross-validation
 
-TO DO
+Leave-one-out cross-validation is a special case of cross-validation where the number of folds equals the number of instances in the data set.
 
 This method works as follow:
 
@@ -1914,7 +1952,7 @@ print(model)
 
 ### k-Fold Cross-Validation
 
-TO DO
+K-Fold Cross-Validation is where a given data set is split into a K number of sections/folds where each fold is used as a testing set at some point.
 
 We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part.
 
