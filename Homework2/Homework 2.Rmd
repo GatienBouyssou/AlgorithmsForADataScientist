@@ -207,8 +207,8 @@ The gap statistic compares the total within intra-cluster variation for differen
 
 The goal of PCA is to identify which features in the dataset explain the most variability.
 
-TO-DO 
-
+Principal Component Analysis, or PCA, is a dimensionality-reduction method that is often used to reduce the dimensionality of large data sets, by transforming a large set of variables into a smaller one that still contains most of the information in the large set.
+ 
 ## Different kinds of PCA 
 
 ### Standard PCA
@@ -217,15 +217,15 @@ TO-DO
 
 ### Incremental PCA
 
-TO-DO 
+The IncrementalPCA object uses a different form of processing and allows for partial computations which almost exactly match the results of PCA while processing the data in a minibatch fashion.
 
 ### Sparse PCA
 
-TO-DO 
+SparsePCA is a variant of PCA, with the goal of extracting the set of sparse components that best reconstruct the data.
 
 ### Kernel PCA
 
-TO-DO 
+KernelPCA is an extension of PCA which achieves non-linear dimensionality reduction through the use of kernels.
 
 ## Proportion of variance explained (PVE)
 
@@ -365,9 +365,7 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 
 #### CLARA - Clustering Large Applications 
 
-DEFINITION 
-
-TO DO
+CLARA (Clustering Large Applications, (Kaufman and Rousseeuw 1990)) is an extension to k-medoids (PAM) methods to deal with data containing a large number of objects (more than several thousand observations) in order to reduce computing time and RAM storage problem. This is achieved using the sampling approach.
 
 \clearpage
 
@@ -594,7 +592,7 @@ We can see that it is difficult to cluster the dead patients together because th
 
 ### Overall
 
-TO-DO 
+Fuzzy clustering is a clustering method where data points can belong in more than one group (“cluster”). Clustering divides data points into groups based in similarity between items and looks to find patterns or similarity between items in a set; Items in clusters should be as similar as possible to each other and as dissimilar as possible to items in other groups. Computationally, it’s much easier to create fuzzy boundaries than it is to settle on one cluster for one point. 
 
 ### Examples 
 
