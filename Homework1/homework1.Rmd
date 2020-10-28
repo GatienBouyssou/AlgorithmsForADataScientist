@@ -291,7 +291,7 @@ glm.fmesure
 ## Decision trees and Random Forest
 
 
-## Decision Tree
+### Decision Tree
 Decision Tree algorithm belongs to the family of supervised learning algorithms. Unlike other supervised learning algorithms, the decision tree algorithm can be used for solving regression and classification problems too.
 
 The goal of using a Decision Tree is to create a training model that can use to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data).
@@ -300,14 +300,14 @@ The goal of using a Decision Tree is to create a training model that can use to 
 
 Decision trees use multiple algorithms to decide to split a node into two or more sub-nodes. The creation of sub-nodes increases the homogeneity of resultant sub-nodes. In other words, we can say that the purity of the node increases with respect to the target variable. The decision tree splits the nodes on all available variables and then selects the split which results in most homogeneous sub-nodes.
 
-#### Random Forest
+### Random Forest
 
 Random forests or random decision forests are an ensemble learning method for classification, regression and other tasks that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes or mean/average prediction of the individual trees.
 
 
 ### Which indicator to construct the model ?
 
-#### Entropy
+### Entropy
 
 Entropy is a measure of the randomness in the information being processed. The higher the entropy, the harder it is to draw any conclusions from that information. Flipping a coin is an example of an action that provides information that is random.
 
@@ -320,7 +320,7 @@ Mathematically Entropy for multiple attributes is represented as:
 $$ E(T,X) = \sum_{c \in X}P(c)E(c)$$
 
 
-#### Gini
+### Gini
 
 You can understand the Gini index as a cost function used to evaluate splits in the dataset. It is calculated by subtracting the sum of the squared probabilities of each class from one. It favors larger partitions and easy to implement whereas information gain favors smaller partitions with distinct values.
 
