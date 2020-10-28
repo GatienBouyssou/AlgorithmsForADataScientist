@@ -327,7 +327,7 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 ```
 
 
-##### On python with scikit-learn 
+##### On Python with Scikit-learn 
 
 By applying Kmeans (with 2 clusters) from scikit-learn on the gene dataset, we have the following assgnation to clusters.
 The 20 first individuals (Healthy) are well separated from the 20 last individuals since there are not in the same cluster.
@@ -548,7 +548,7 @@ clusters_complete_euclidean_stats$clus.avg.silwidths
 
 It means that observations are well clustered but the distinction between clusters is not that easy.
 
-##### On python with scikit-learn 
+##### On Python with Scikit-learn 
 
 
 ```{python, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
