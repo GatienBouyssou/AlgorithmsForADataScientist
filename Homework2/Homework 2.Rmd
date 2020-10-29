@@ -213,7 +213,34 @@ Principal Component Analysis, or PCA, is a dimensionality-reduction method that 
 
 ### Standard PCA
 
-TO-DO
+To process the feature extraction, we need to associate eighenvector and eighenvalues to each feature of our dataset. For that, we will follow those steps one by one :
+
+- First, put your label column asside and keep all the independant features (the rest)
+- For each feature substract the mean of that column from each entry
+- Standardize the features if needed. This will form a new matrix S
+- Transpose this matrix and multiply it by itself ($ S^t S $). This is a new matrix.
+- Compute the eigenvectors and the eigenvalues of this new matrix and deduce its eigendecomposition $PDP^{-1}$ where P contains all the eigenvectors and D all the eigenvalues. The each eighenvalue is associated to a eighenvector (the first eighenvalue is associated to first column).
+- Sort the eigenvalues. Change P based on the new order given to the eigenvalues. This new matrix will be called P*
+- Then multiply S by P. SP* is a centered and standardized version of independant features.
+
+Now that we have all the eighenvectors and eighenvalues corresponding to our features, we can determine how much features we want to keep.
+
+## Deciding how many PCs to use
+
+For this part, we are going through two different methods the Proportion of variance explained and the Cumulative Proportion of variance explained that related.
+
+### Proportion of variance explained (PVE)
+
+This value for each column can be optained by taking the corresponding eighenvalue on the diagonal matrix and dividing it by the sum of all the eigenvalues. The graph representing the proportion of variance explained should be a decreasing curve since the eigenvalues have been sorted from the greatest to the lowest.
+
+
+### Cumulative Proportion of variance explained
+
+The cumulative Proportion of variance explained (CPVE) is the sum of the first components divided by all the others. For example, the CPVE for the third component is
+
+CPVE = $\frac{e_1 + e_2 + e_3}{e_1 + e_2 + e_3 + ... e_k}$
+
+Where $e_i$ is the eighenvalue for the ith value and k is the number of columns
 
 ### Incremental PCA
 
@@ -227,13 +254,7 @@ SparsePCA is a variant of PCA, with the goal of extracting the set of sparse com
 
 KernelPCA is an extension of PCA which achieves non-linear dimensionality reduction through the use of kernels.
 
-## Proportion of variance explained (PVE)
 
-TO-DO
-
-## Deciding how many PCs to use
-
-TO-DO
 
 ## Example
 
