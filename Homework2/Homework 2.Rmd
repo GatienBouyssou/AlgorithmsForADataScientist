@@ -305,197 +305,19 @@ tissu_dataset.head()
 ```
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-      <th>4</th>
-      <th>5</th>
-      <th>6</th>
-      <th>7</th>
-      <th>8</th>
-      <th>9</th>
-      <th>...</th>
-      <th>990</th>
-      <th>991</th>
-      <th>992</th>
-      <th>993</th>
-      <th>994</th>
-      <th>995</th>
-      <th>996</th>
-      <th>997</th>
-      <th>998</th>
-      <th>999</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>-0.961933</td>
-      <td>-0.292526</td>
-      <td>0.258788</td>
-      <td>-1.152132</td>
-      <td>0.195783</td>
-      <td>0.030124</td>
-      <td>0.085418</td>
-      <td>1.116610</td>
-      <td>-1.218857</td>
-      <td>1.267369</td>
-      <td>...</td>
-      <td>1.325041</td>
-      <td>-0.116171</td>
-      <td>-1.470146</td>
-      <td>-0.379272</td>
-      <td>-1.465006</td>
-      <td>1.075148</td>
-      <td>-1.226125</td>
-      <td>-3.056328</td>
-      <td>1.450658</td>
-      <td>0.717977</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.441803</td>
-      <td>-1.139267</td>
-      <td>-0.972845</td>
-      <td>-2.213168</td>
-      <td>0.593306</td>
-      <td>-0.691014</td>
-      <td>-1.113054</td>
-      <td>1.341700</td>
-      <td>-1.277279</td>
-      <td>-0.918349</td>
-      <td>...</td>
-      <td>0.740838</td>
-      <td>-0.162392</td>
-      <td>-0.633375</td>
-      <td>-0.895521</td>
-      <td>2.034465</td>
-      <td>3.003267</td>
-      <td>-0.501702</td>
-      <td>0.449889</td>
-      <td>1.310348</td>
-      <td>0.763482</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>-0.975005</td>
-      <td>0.195837</td>
-      <td>0.588486</td>
-      <td>-0.861525</td>
-      <td>0.282992</td>
-      <td>-0.403426</td>
-      <td>-0.677969</td>
-      <td>0.103278</td>
-      <td>-0.558925</td>
-      <td>-1.253500</td>
-      <td>...</td>
-      <td>-0.435533</td>
-      <td>-0.235912</td>
-      <td>1.446660</td>
-      <td>-1.127459</td>
-      <td>0.440849</td>
-      <td>-0.123441</td>
-      <td>-0.717430</td>
-      <td>1.880362</td>
-      <td>0.383837</td>
-      <td>0.313576</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1.417504</td>
-      <td>-1.281121</td>
-      <td>-0.800258</td>
-      <td>0.630925</td>
-      <td>0.247147</td>
-      <td>-0.729859</td>
-      <td>-0.562929</td>
-      <td>0.390963</td>
-      <td>-1.344493</td>
-      <td>-1.067114</td>
-      <td>...</td>
-      <td>-3.065529</td>
-      <td>1.597294</td>
-      <td>0.737478</td>
-      <td>-0.631248</td>
-      <td>-0.530442</td>
-      <td>-1.036740</td>
-      <td>-0.169113</td>
-      <td>-0.742841</td>
-      <td>-0.408860</td>
-      <td>-0.326473</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.818815</td>
-      <td>-0.251439</td>
-      <td>-1.820398</td>
-      <td>0.951772</td>
-      <td>1.978668</td>
-      <td>-0.364099</td>
-      <td>0.938194</td>
-      <td>-1.927491</td>
-      <td>1.159115</td>
-      <td>-0.240638</td>
-      <td>...</td>
-      <td>-2.378938</td>
-      <td>-0.086946</td>
-      <td>-0.122342</td>
-      <td>1.418029</td>
-      <td>1.075337</td>
-      <td>-1.270604</td>
-      <td>0.599530</td>
-      <td>2.238346</td>
-      <td>-0.471111</td>
-      <td>-0.158700</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 1000 columns</p>
-</div>
-
-
 ```python
 len(tissu_dataset)
 ```
 
-    40
 
 ```python
 tissu_dataset.isnull().values.any()
 ```
 
-    False
-
 
 ```python
 tissu_dataset.info()
 ```
-
-    <class 'pandas.core.frame.DataFrame'>
-    Int64Index: 40 entries, 0 to 39
-    Columns: 1000 entries, 0 to 999
-    dtypes: float64(1000)
-    memory usage: 312.8 KB
-
 
 
 ```python
@@ -511,8 +333,6 @@ plt.ylabel('CPVE')
 plt.show()
 ```
 
-
-![png](./Homework-2_files/figure-latex/output_9_0.png)
 
 According to the Cumulative Proportion of Variance Explained (CPVE), we can see that the first 35 eigenvalues correspond to approximately 98% of the variance. It means that we need only 35 components on 40. Being able to remove only 5 components is not enough.
 
@@ -597,9 +417,6 @@ plt.title("Sum of the squared distances depending on the number of clusters")
 plt.show()
 ```
 
-
-![png](./Homework-2_files/figure-latex/output_12_0.png)
-
 Using the values and the graph we can determine using the elbow method that 2 is the optimal number of cluster since it is the spot were the curve is bending.
 
 ```python
@@ -612,16 +429,12 @@ km = km.fit_predict(tissu_dataset)
 silhouette_score(tissu_dataset, km)
 ```
 
-    0.09607065301278585
-
 The silhouette coefficient estimates the average distance between clusters. If the coefficient tends toward 1 then it means that the values are well clustered. In that case it means that the clusters are overlaping. However the silhouette score is not negative. If it was it would have meant that the sample has been assigned to the wrong cluster.
 
 
 ```python
 davies_bouldin_score(tissu_dataset, km)
 ```
-
-    2.633190807264714
 
 The dunn index strengthen the idea that the value are well classified. If they were not the dunn index would have been close to 0.
 
@@ -846,14 +659,10 @@ agglo = FeatureAgglomeration(n_clusters=2)
 agglo.fit(tissu_dataset)
 ```
 
-    FeatureAgglomeration()
-
 ```python
 tissu_reduced = agglo.transform(tissu_dataset)
 tissu_reduced.shape
 ```
-
-    (40, 2)
 
 Hierarchical clustering allows us to keep only 2 features over 1000. It means that only 2 features were determinant to classify the 40 patients. With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm.
 
@@ -872,15 +681,10 @@ plt.title("Plotting the two clusters with their center depending on their label 
 plt.show()
 ```
 
-![png](./Homework-2_files/figure-latex/output_21_0.png)
-
 
 ```python
 km.labels_
 ```
-
-    array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=int32)
 
 Then, we are plotting the points with the colors changing depending on the predicted class label.
 
@@ -890,8 +694,6 @@ plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",
 plt.title("Plotting the two clusters with their center depending on their label class predicted by kMeans")
 plt.show()
 ```
-
-![png](./Homework-2_files/figure-latex/output_23_0.png)
 
 As we can see the predicted class correspond to the real class labels. The clusters are well done.
 
@@ -960,70 +762,6 @@ corona_dataset.head()
 ```
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>deceased</th>
-      <th>sex</th>
-      <th>age</th>
-      <th>country</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>male</td>
-      <td>78</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-      <td>male</td>
-      <td>94</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>female</td>
-      <td>87</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0</td>
-      <td>female</td>
-      <td>66</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>male</td>
-      <td>32</td>
-      <td>France</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
 We can observe here that the columns sex and country contain strings. Therefore, we need to convert those strings into numbers.
 
 ```python
@@ -1037,69 +775,6 @@ corona_train = corona_dataset.drop("deceased", axis=1)
 corona_dataset.head()
 ```
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>deceased</th>
-      <th>sex</th>
-      <th>age</th>
-      <th>country</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>0</td>
-      <td>78</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-      <td>0</td>
-      <td>94</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>1</td>
-      <td>87</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0</td>
-      <td>1</td>
-      <td>66</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>0</td>
-      <td>32</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
 
 Now, the dataset is ready to be processed by our clustering algorithms.
 
@@ -1107,13 +782,9 @@ Now, the dataset is ready to be processed by our clustering algorithms.
 len(corona_dataset)
 ```
 
-2010
-
 ```python
 len(corona_dataset[corona_dataset['deceased'] == 1])*100/len(corona_dataset)
 ```
-
-2.2388059701492535
 
 As we can see the dataset is unbalanced. There is only 2% of positive case for 98% negative case in the database.
 
@@ -1130,28 +801,11 @@ for k in K:
 Sum_of_squared_distances
 ```
 
-[1050887.1850746255,
- 306215.58323492145,
- 135440.7227382757,
- 76049.75877410552,
- 52924.07141619759,
- 39642.16044864058,
- 30152.14248407075,
- 21706.033779589932,
- 18350.901420650767,
- 15721.956420330924,
- 12784.807611938366,
- 11201.256483187695,
- 9608.78699789783,
- 8268.730827185469]
-
 
 ```python
 plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
 plt.show()
 ```
-
-![png](./Homework-2_files/figure-latex/output_11_0.png)
 
 First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. It should be 2 because there is only 2 different class labels with deceased = 1 or deceased = 0.
 
@@ -1162,9 +816,6 @@ predicted_labels = km.fit_predict(corona_train)
 ```python
 accuracy_score(corona_dataset['deceased'], predicted_labels)
 ```
-
-0.5313432835820896
-
 We can see that because the dataset is not balanced the accuracy score is low.
 
 
@@ -1172,13 +823,10 @@ We can see that because the dataset is not balanced the accuracy score is low.
 silhouette_score(corona_dataset, predicted_labels)
 ```
 
-0.6018549056315681
-
 
 ```python
 davies_bouldin_score(corona_dataset, predicted_labels)
 ```
-0.5326194326933178
 
 According to the silhouette score the average distance between clusters is small but better than the tissue dataset. Moreover thanks to the dunn index we can conclude that the diameter of the cluster is 2 times bigger than the separation intra clusters.
 
