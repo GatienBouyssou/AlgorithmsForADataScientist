@@ -46,7 +46,7 @@ library(fpc)
 Continuous data is data that can take any value while discrete data can take only certain values.
 with continuous (distance/similarity based) : Silhouette, Dunn, ...
 
-TO DO DISCRETE DATA SET 
+TO DO DISCRETE DATA SET
 
 with discrete (binary, graph based) : modularity, C measure, ...
 
@@ -54,12 +54,12 @@ with discrete (binary, graph based) : modularity, C measure, ...
 
 # Cluster validation techniques
 
-## Clustering Tendency 
+## Clustering Tendency
 
 ### Why assessing clustering tendency ?
 
 Clustering can create clusters even if there are no meaningful cluster. \newline
-Clustering tendency assessment methods are used to evaluate the validity of clustering analysis. It means evaluate if there are meaningful clusters in the data. 
+Clustering tendency assessment methods are used to evaluate the validity of clustering analysis. It means evaluate if there are meaningful clusters in the data.
 
 ### Methods
 
@@ -74,7 +74,7 @@ For D, a data set : \newline
 <li> For all $p_i \in D$, compute the distance to the nearest neighbor $x_{i} </li>
 <li> Generate ($random_D$) from a random uniform distribution with n points ($q_1$,..., $q_n$) with the same variation as D. </li>
 <li> For all $q_i \in random_D$, compute the distance to the nearest neighbor $y_{i}$ </li>
-<li> Calculate the Hopkins statistic (H). It is the mean of the nearest neighbor distances in $random_D$ divided by the sum of the mean nearest neighbor distances in D and $random_D$. </li> 
+<li> Calculate the Hopkins statistic (H). It is the mean of the nearest neighbor distances in $random_D$ divided by the sum of the mean nearest neighbor distances in D and $random_D$. </li>
 $$H = \frac{\Sigma_i^n y_i}{\Sigma_i^n X_i + \Sigma_i^n y_i}$$
 </ul>
 
@@ -101,23 +101,23 @@ Computing the visual form gives us colored squares along the diagonal. The VAT d
 
 Internal cluster validation uses the internal information of the clustering process to evaluate the clustering structure without any external information. \newline
 
-Internal validation measures reflect often the compactness, the connectedness and the separation of the cluster partitions. 
+Internal validation measures reflect often the compactness, the connectedness and the separation of the cluster partitions.
 
-#### Compactness 
+#### Compactness
 
 Compactness measures how close are the objects within the same cluster. \newline
-We evaluate it with the notion of distance such as the cluster-wise within average/median distances between observations. 
+We evaluate it with the notion of distance such as the cluster-wise within average/median distances between observations.
 
 #### Separation
 
 Separation measures how well clusters are separated from one another. \newline
-We evaluate it by looking at the distances between clusters' centers or with the pairwise minimum distances between objects in different clusters. 
+We evaluate it by looking at the distances between clusters' centers or with the pairwise minimum distances between objects in different clusters.
 
-#### Connectivity 
+#### Connectivity
 
 Connectivity corresponds to what extent items are placed in the same cluster as their nearest neighbors in the data space.
 
-#### Average silhouette 
+#### Average silhouette
 
 ##### Silhouette coefficient of an observation
 
@@ -129,20 +129,20 @@ $$Silhouette_i = \frac{b_i-a_i}{max(a_i,b_i)} $$
 
 Where : \newline
 
-* $a_i$ is the average distance between the observation i within its cluster 
+* $a_i$ is the average distance between the observation i within its cluster
 * $b_i$ is the average distance between the observation i and all the observations belonging to another cluster
 
 How to interprete the value of $S_i$ ? \newline
 
 A large $S_i$, almost 1, means the observation is very well clustered. \newline
 A small $S_i$, close to 0, means that the observation lies between two clusters. \newline
-A negative $S_i$ means the observation is probably placed in the wrong cluster. 
+A negative $S_i$ means the observation is probably placed in the wrong cluster.
 
 ##### Average silhouette
 
-The average silhouette is the mean of all silhouette coefficients. It is used to evaluate a clustering. 
+The average silhouette is the mean of all silhouette coefficients. It is used to evaluate a clustering.
 
-#### Dunn index 
+#### Dunn index
 
 The Dunn index is another internal clustering validation measure. \newline
 It is the minimal distance between two clusters (the smallest separation) over the maximal distance between the objects of one clusters (the biggest diameter of a cluster).
@@ -150,11 +150,11 @@ It is the minimal distance between two clusters (the smallest separation) over t
 $$Dunn\:index = \frac{min.separation}{max.diameter}$$
 Compact and well-separated clusters in a data set means a small diameter of the clusters and a large distance between the clusters. Thus, Dunn index should be maximized.
 
-###  External mesures 
+###  External mesures
 
 External cluster validation compares the results of a cluster analysis with an externally known result. It measures how well a cluster match extern class labels. We know k, the number of clusters, in advance. So we use this validation to choose the correct clustering method. \newline
 
-We compare the identified clusters to an external reference. 
+We compare the identified clusters to an external reference.
 
 ## Determining the Optimal number of Clusters
 
@@ -203,17 +203,44 @@ The gap statistic compares the total within intra-cluster variation for differen
 
 \clearpage
 
-# Principal Components Analysis 
+# Principal Components Analysis
 
 The goal of PCA is to identify which features in the dataset explain the most variability.
 
 Principal Component Analysis, or PCA, is a dimensionality-reduction method that is often used to reduce the dimensionality of large data sets, by transforming a large set of variables into a smaller one that still contains most of the information in the large set.
- 
-## Different kinds of PCA 
+
+## Different kinds of PCA
 
 ### Standard PCA
 
-TO-DO 
+To process the feature extraction, we need to associate eighenvector and eighenvalues to each feature of our dataset. For that, we will follow those steps one by one :
+
+- First, put your label column asside and keep all the independant features (the rest)
+- For each feature substract the mean of that column from each entry
+- Standardize the features if needed. This will form a new matrix S
+- Transpose this matrix and multiply it by itself ($ S^t S $). This is a new matrix.
+- Compute the eigenvectors and the eigenvalues of this new matrix and deduce its eigendecomposition $PDP^{-1}$ where P contains all the eigenvectors and D all the eigenvalues. The each eighenvalue is associated to a eighenvector (the first eighenvalue is associated to first column).
+- Sort the eigenvalues. Change P based on the new order given to the eigenvalues. This new matrix will be called P*
+- Then multiply S by P. SP* is a centered and standardized version of independant features.
+
+Now that we have all the eighenvectors and eighenvalues corresponding to our features, we can determine how much features we want to keep.
+
+## Deciding how many PCs to use
+
+For this part, we are going through two different methods the Proportion of variance explained and the Cumulative Proportion of variance explained that related.
+
+### Proportion of variance explained (PVE)
+
+This value for each column can be optained by taking the corresponding eighenvalue on the diagonal matrix and dividing it by the sum of all the eigenvalues. The graph representing the proportion of variance explained should be a decreasing curve since the eigenvalues have been sorted from the greatest to the lowest.
+
+
+### Cumulative Proportion of variance explained
+
+The cumulative Proportion of variance explained (CPVE) is the sum of the first components divided by all the others. For example, the CPVE for the third component is
+
+CPVE = $\frac{e_1 + e_2 + e_3}{e_1 + e_2 + e_3 + ... e_k}$
+
+Where $e_i$ is the eighenvalue for the ith value and k is the number of columns
 
 ### Incremental PCA
 
@@ -227,30 +254,24 @@ SparsePCA is a variant of PCA, with the goal of extracting the set of sparse com
 
 KernelPCA is an extension of PCA which achieves non-linear dimensionality reduction through the use of kernels.
 
-## Proportion of variance explained (PVE)
 
-TO-DO 
 
-## Deciding how many PCs to use
-
-TO-DO 
-
-## Example 
+## Example
 
 The following dataset consists of 40 tissue samples with measurements of 1,000 genes. The first 20 tissues
-come from healthy patients (H) and the remaining 20 come from a diseased patient group (D). 
+come from healthy patients (H) and the remaining 20 come from a diseased patient group (D).
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
 GeneData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
-colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "") 
-colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "") 
+colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "")
+colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "")
 row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
 genematrix <- t(GeneData)
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-pca <- prcomp(genematrix, scale=TRUE) 
+pca <- prcomp(genematrix, scale=TRUE)
 
 pr.var=pca$sdev^2
 pve=pr.var/sum(pr.var)
@@ -267,10 +288,78 @@ p=plot(pca$x[,1:2], type = "n")
 p=p+points(pca$x[0:20,1:2], pch = "H", col='green')
 p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 ```
+### On python with scikit-learn
+
+```python
+import pandas as pd
+import urllib
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans, FeatureAgglomeration
+from sklearn.metrics import silhouette_score, davies_bouldin_score
+```
+
+
+```python
+gene_dataset_url = "https://docs.google.com/uc?id=1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU&export=download"
+urlRequest = urllib.request.Request(gene_dataset_url)
+datasetFile = urllib.request.urlopen(urlRequest)
+```
+
+
+```python
+tissu_dataset = pd.read_csv(datasetFile, header=None)
+```
+
+
+```python
+trans_dataset = pd.DataFrame()
+for i in range(0, len(tissu_dataset)):
+    trans_dataset[i] = tissu_dataset.iloc[i]
+tissu_dataset = trans_dataset
+```
+
+
+```python
+tissu_dataset.head()
+```
+
+
+```python
+len(tissu_dataset)
+```
+
+
+```python
+tissu_dataset.isnull().values.any()
+```
+
+
+```python
+tissu_dataset.info()
+```
+
+
+```python
+pca = PCA(n_components=40)
+pca.fit(tissu_dataset)
+```
+
+
+```python
+plt.plot(pca.explained_variance_ratio_.cumsum())
+plt.xlabel('Principal Component')
+plt.ylabel('CPVE')
+plt.show()
+```
+
+
+According to the Cumulative Proportion of Variance Explained (CPVE), we can see that the first 35 eigenvalues correspond to approximately 98% of the variance. It means that we need only 35 components on 40. Being able to remove only 5 components is not enough.
 
 \clearpage
 
-# Clustering 
+# Clustering
 
 ## Partitioning Clustering
 
@@ -289,11 +378,11 @@ $$ TW = \Sigma_{j=1}^k W_j= \Sigma_{j=1}^k \Sigma_{x_i \in C_j} (x_i - \mu_k)^2$
 The first step when using k-means clustering is to indicate the number of clusters (k) that will be generated in the final solution.
 The algorithm starts by randomly selecting k objects from the data set to serve as the initial centers for the clusters. The selected objects are also known as cluster means or centroids.
 
-#### Choice of k 
+#### Choice of k
 
 We compute k-means clustering using different k, then we choose the number of cluster according to the location of a bend on the graph representing the Within-cluster variation according to k.
 
-#### Example 
+#### Example
 
 ##### On R
 
@@ -327,18 +416,52 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 ```
 
 
-##### On Python with Scikit-learn 
+##### On python with scikit-learn
 
-By applying Kmeans (with 2 clusters) from scikit-learn on the gene dataset, we have the following assgnation to clusters.
-The 20 first individuals (Healthy) are well separated from the 20 last individuals since there are not in the same cluster.
+With python we are going to repeat the experiment to validate the number of cluster and the different results found above. At first, we are going to loop through the number of clusters k and select one based on the sum of squared distances.
 
-```{python echo=FALSE}
-
+```python
+Sum_of_squared_distances = []
+K = range(1,15)
+for k in K:
+    km = KMeans(n_clusters=k)
+    km = km.fit(tissu_dataset)
+    Sum_of_squared_distances.append(km.inertia_)
 ```
+
+
+```python
+plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
+plt.xlabel('Sum squared distances')
+plt.ylabel('Number of clusters')
+plt.title("Sum of the squared distances depending on the number of clusters")
+plt.show()
+```
+
+Using the values and the graph we can determine using the elbow method that 2 is the optimal number of cluster since it is the spot were the curve is bending.
+
+```python
+km = KMeans(n_clusters=2)
+km = km.fit_predict(tissu_dataset)
+```
+
+
+```python
+silhouette_score(tissu_dataset, km)
+```
+
+The silhouette coefficient estimates the average distance between clusters. If the coefficient tends toward 1 then it means that the values are well clustered. In that case it means that the clusters are overlaping. However the silhouette score is not negative. If it was it would have meant that the sample has been assigned to the wrong cluster.
+
+
+```python
+davies_bouldin_score(tissu_dataset, km)
+```
+
+The dunn index strengthen the idea that the value are well classified. If they were not the dunn index would have been close to 0.
 
 ### K-medoids algorithm
 
-#### Principle 
+#### Principle
 
 The k-medoids algorithm is a clustering approach related to k-means clustering. In k-medoids clustering, each cluster is represented by one of the data point in the cluster.
 
@@ -351,7 +474,7 @@ pam <-pam(genematrix, 2, metric = "euclidean")
 pam$clustering
 ```
 
-We have the same Dunn index as with K-means on the same dataset. Both methods perform equally. 
+We have the same Dunn index as with K-means on the same dataset. Both methods perform equally.
 
 ```{r, eval=TRUE, echo=FALSE}
 pam_stats <- cluster.stats(dist(genematrix), pam$clustering)
@@ -363,7 +486,7 @@ fviz_cluster(pam, data = genematrix,
 palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, repel = TRUE, ggtheme = theme_minimal())
 ```
 
-#### CLARA - Clustering Large Applications 
+#### CLARA - Clustering Large Applications
 
 CLARA (Clustering Large Applications, (Kaufman and Rousseeuw 1990)) is an extension to k-medoids (PAM) methods to deal with data containing a large number of objects (more than several thousand observations) in order to reduce computing time and RAM storage problem. This is achieved using the sampling approach.
 
@@ -373,7 +496,7 @@ CLARA (Clustering Large Applications, (Kaufman and Rousseeuw 1990)) is an extens
 
 ### Dissimilarity function
 
-#### Euclidean distance 
+#### Euclidean distance
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
 c_euclidean<-dist(genematrix, method = 'euclidean')
@@ -385,7 +508,7 @@ round(as.matrix(c_euclidean)[1:10, 1:10], 1)
 Correlation-based distance considers two observations to be similar if their features are highly correlated, even though the observed values may be far apart in terms of Euclidean distance.
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 3, fig.width = 4, fig.align = "center"}
-c_pearson <- cor(t(genematrix), method="pearson") 
+c_pearson <- cor(t(genematrix), method="pearson")
 c_pearson <- as.dist(1-c_pearson)
 round(as.matrix(c_pearson)[1:10, 1:10], 1)
 ```
@@ -415,12 +538,12 @@ The distance between two clusters is defined as the distance between the centroi
 It minimizes the total within-cluster vari- ance. At each step the pair of clusters with minimum between-cluster distance are merged.
 
 
-### P-value 
+### P-value
 
 <ul>
 <li> Generate bootstraps samples </li>
 <li> Compute hierarchical clustering on each bootstrap copy </li>
-<li> Compute for each cluster :  
+<li> Compute for each cluster :
   <ul>
   <li>The bootstrap probability (BP) value : frequency that the cluster is identified in bootstrap copies.</li>
   <li>The approximately unbiased (AU) probability values (p-values) by multiscale bootstrap resampling. Clusters with p-value above 95% are considered to be strongly supported by data. </li>
@@ -440,7 +563,7 @@ The purpous is to see if smell, form and color are enough to cluster the mushroo
 n stands for non comestible  \newline
 c stands for comestible  \newline
 
-##### On R 
+##### On R
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 6, fig.align = "center"}
 
@@ -462,29 +585,29 @@ k2 <- kmeans(mushrooms, centers = 2, nstart = 10)
 
 c_euclidean<-dist(mushrooms, method = 'euclidean')
 c_daisy <- daisy(mushrooms)
-c_pearson <- cor(t(mushrooms), method="pearson") 
+c_pearson <- cor(t(mushrooms), method="pearson")
 c_pearson <- as.dist(1-c_pearson)
 
 clusters <- hclust(c_pearson, method = "complete")
 clusterCut <- cutree(clusters, 2)
 clusterCut
-``` 
+```
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 plot(clusters)
-``` 
+```
 
 \clearpage
- 
+
 #### Healthy and non-healthy tissues samples
 
 Using the tissue and genes data set, we apply hierarchical clustering.
 
-##### On R 
+##### On R
 
 ```{r, eval=TRUE, echo=FALSE}
 c_euclidean<-dist(genematrix, method = 'euclidean')
-c_pearson <- cor(t(genematrix), method="pearson") 
+c_pearson <- cor(t(genematrix), method="pearson")
 c_pearson <- as.dist(1-c_pearson)
 
 #complete
@@ -533,14 +656,14 @@ We can see that the use of euclidean distance in the three methods (complete, si
 
 Furthermore all methods, except Average with correlation-distance, divide the graph in two groups (healthy and non-healthy) which is very good. \newline
 
-We have the same Dunn index as with K-means and PAM on the same dataset (tissues samples). So k-means, PAM and hiearchical clustering (with euclidean distance and complete linkage) methods perform equally. 
+We have the same Dunn index as with K-means and PAM on the same dataset (tissues samples). So k-means, PAM and hiearchical clustering (with euclidean distance and complete linkage) methods perform equally.
 
 ```{r, eval=TRUE, echo=FALSE}
 clusters_complete_euclidean_stats <- cluster.stats(dist(genematrix), cutree(clusters_complete_euclidean, 2))
 clusters_complete_euclidean_stats$dunn
 ```
 
-The cluster average silhouette widths are : 
+The cluster average silhouette widths are :
 
 ```{r, eval=TRUE, echo=FALSE}
 clusters_complete_euclidean_stats$clus.avg.silwidths
@@ -548,17 +671,56 @@ clusters_complete_euclidean_stats$clus.avg.silwidths
 
 It means that observations are well clustered but the distinction between clusters is not that easy.
 
-##### On Python with Scikit-learn 
+##### On python with scikit-learn
 
+Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph.
 
-```{python, echo=FALSE, fig.height = 8, fig.width = 10, fig.align = "center"}
+```python
+agglo = FeatureAgglomeration(n_clusters=2)
+agglo.fit(tissu_dataset)
+```
 
+```python
+tissu_reduced = agglo.transform(tissu_dataset)
+tissu_reduced.shape
+```
+
+Hierarchical clustering allows us to keep only 2 features over 1000. It means that only 2 features were determinant to classify the 40 patients. With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm.
+
+```python
+km = KMeans(n_clusters=2)
+km = km.fit(tissu_reduced)
+```
+
+At first, we plot the points with the colors changing depending on the real class label.
+
+```python
+plt.plot(tissu_reduced[0:20,0],tissu_reduced[0:20,1], 'ro', marker = "+", color='g')
+plt.plot(tissu_reduced[21:40,0], tissu_reduced[21:40,1], 'ro', marker = "X",color='r')
+plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='b')
+plt.title("Plotting the two clusters with their center depending on their label class")
+plt.show()
 ```
 
 
-#### Corona dataset : the problem of over-represented category 
+```python
+km.labels_
+```
 
-The corona dataset contains information of patients who have caught Corona. It stores their age, sex and nationality but also if there are dead or not. \newline 
+Then, we are plotting the points with the colors changing depending on the predicted class label.
+
+```python
+plt.scatter(tissu_reduced[:,0], tissu_reduced[:,1], c=km.labels_)
+plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='r')
+plt.title("Plotting the two clusters with their center depending on their label class predicted by kMeans")
+plt.show()
+```
+
+As we can see the predicted class correspond to the real class labels. The clusters are well done.
+
+#### Corona dataset : the problem of over-represented category
+
+The corona dataset contains information of patients who have caught Corona. It stores their age, sex and nationality but also if there are dead or not. \newline
 
 The purpous is to use hiearchical clustering to see if the age, sex and nationality is enough to separate the dead from the living patients. H stands for Healthy now and D stands for Deceased.
 
@@ -569,11 +731,11 @@ d.corona <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
 
 deceased = d.corona[d.corona[,1] == 1,]
 row.names(deceased)[1:45] = paste(rep("D", 45), c(1:45), sep = "")
-colnames(deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "") 
+colnames(deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "")
 
 non_deceased = d.corona[d.corona[,1] == 0,]
 row.names(non_deceased)[1:1965] = paste(rep("H", 1965), c(1:1965), sep = "")
-colnames(non_deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "") 
+colnames(non_deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "")
 non_deceased = non_deceased[1:450,]
 
 d.corona=rbind(non_deceased,deceased)
@@ -588,16 +750,117 @@ tail(clusterCut, n=50)
 Looking at the clustering, 1 is the cluster of healthy patients, 2 is the cluster of dead patients. \newline
 We can see that it is difficult to cluster the dead patients together because there are only 45 deceased cases against 450 healthy patients. This is a problem of over-represented category.
 
-## Fuzzy Clustering 
+
+### On python with scikit-learn
+
+In python we are going to find out that the dataset is unbalanced. The aim is to show how an unbalanced dataset influence the results of the clustering algorithms.
+
+```python
+import pandas as pd
+import urllib
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans, FeatureAgglomeration
+from sklearn.metrics import silhouette_score, davies_bouldin_score, accuracy_score
+```
+
+
+```python
+corona_dataset_url = "https://docs.google.com/uc?id=1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw&export=download"
+urlRequest = urllib.request.Request(corona_dataset_url)
+datasetFile = urllib.request.urlopen(urlRequest)
+```
+
+
+```python
+corona_dataset = pd.read_csv(datasetFile)
+```
+
+
+```python
+corona_dataset.head()
+```
+
+
+We can observe here that the columns sex and country contain strings. Therefore, we need to convert those strings into numbers.
+
+```python
+corona_dataset['sex'] = pd.factorize(corona_dataset['sex'])[0]
+corona_dataset['country'] = pd.factorize(corona_dataset['country'])[0]
+corona_train = corona_dataset.drop("deceased", axis=1)
+```
+
+
+```python
+corona_dataset.head()
+```
+
+
+Now, the dataset is ready to be processed by our clustering algorithms.
+
+```python
+len(corona_dataset)
+```
+
+```python
+len(corona_dataset[corona_dataset['deceased'] == 1])*100/len(corona_dataset)
+```
+
+As we can see the dataset is unbalanced. There is only 2% of positive case for 98% negative case in the database.
+
+```python
+Sum_of_squared_distances = []
+K = range(1,15)
+for k in K:
+    km = KMeans(n_clusters=k)
+    km = km.fit(corona_train)
+    Sum_of_squared_distances.append(km.inertia_)
+```
+
+```python
+Sum_of_squared_distances
+```
+
+
+```python
+plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
+plt.show()
+```
+
+First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. It should be 2 because there is only 2 different class labels with deceased = 1 or deceased = 0.
+
+```python
+km = KMeans(n_clusters=2)
+predicted_labels = km.fit_predict(corona_train)
+
+```python
+accuracy_score(corona_dataset['deceased'], predicted_labels)
+```
+We can see that because the dataset is not balanced the accuracy score is low.
+
+
+```python
+silhouette_score(corona_dataset, predicted_labels)
+```
+
+
+```python
+davies_bouldin_score(corona_dataset, predicted_labels)
+```
+
+According to the silhouette score the average distance between clusters is small but better than the tissue dataset. Moreover thanks to the dunn index we can conclude that the diameter of the cluster is 2 times bigger than the separation intra clusters.
+
+## Fuzzy Clustering
 
 ### Overall
 
-Fuzzy clustering is a clustering method where data points can belong in more than one group (“cluster”). Clustering divides data points into groups based in similarity between items and looks to find patterns or similarity between items in a set; Items in clusters should be as similar as possible to each other and as dissimilar as possible to items in other groups. Computationally, it’s much easier to create fuzzy boundaries than it is to settle on one cluster for one point. 
+Fuzzy clustering is a clustering method where data points can belong in more than one group (“cluster”). Clustering divides data points into groups based in similarity between items and looks to find patterns or similarity between items in a set; Items in clusters should be as similar as possible to each other and as dissimilar as possible to items in other groups. Computationally, it’s much easier to create fuzzy boundaries than it is to settle on one cluster for one point.
 
-### Examples 
+### Examples
 
 The function fanny() computes fuzzy clustering. \newline
- 
+
 We use the tissue dataset. \newline
 For the dissimilarity function, the choice was euclidean distance. \newline
 2 is for the number of clusters expected. \newline
@@ -608,7 +871,7 @@ fuzzyclust <- fanny(genematrix, 2, metric = "euclidean", stand = TRUE)
 fuzzyclust$clustering
 ```
 
-We can see that every tissue sample was well clustered. 
+We can see that every tissue sample was well clustered.
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 fuzzyclust$coeff
@@ -616,7 +879,7 @@ fuzzyclust$coeff
 
 Looking at the Dunn coefficient, it is about 0.5 meaning that the diameter of one of the cluster is 2 times larger than the minimal separation of two cluster. \newline
 
-This makes sense looking at the following plot. 
+This makes sense looking at the following plot.
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 fviz_cluster(fuzzyclust, ellipse.type = "norm", repel = TRUE, palette = "jco", ggtheme = theme_minimal(), legend = "right")
@@ -624,13 +887,6 @@ fviz_cluster(fuzzyclust, ellipse.type = "norm", repel = TRUE, palette = "jco", g
 
 \clearpage
 
-# Choosing the best algorithm ? 
+# Choosing the best algorithm ?
 
-TO-DO 
-
-
-
-
-
-
-
+TO-DO
