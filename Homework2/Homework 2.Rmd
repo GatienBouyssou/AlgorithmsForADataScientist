@@ -14,10 +14,10 @@ library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
                       cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
 library(reticulate)
-use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
-knitr::knit_engines$set(python.reticulate =  FALSE)
-matplotlib <- import("matplotlib")
-matplotlib$use("Agg", force = TRUE)
+#use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
+knitr::knit_engines$set(python.reticulate =  TRUE)
+#py_install("matplotlib")
+#py_install("scikit-learn")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -255,8 +255,7 @@ SparsePCA is a variant of PCA, with the goal of extracting the set of sparse com
 KernelPCA is an extension of PCA which achieves non-linear dimensionality reduction through the use of kernels.
 
 
-
-## Example
+## Example on tissue samples
 
 The following dataset consists of 40 tissue samples with measurements of 1,000 genes. The first 20 tissues
 come from healthy patients (H) and the remaining 20 come from a diseased patient group (D).
@@ -269,6 +268,19 @@ colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "")
 row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
 genematrix <- t(GeneData)
 ```
+
+
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+import pandas as pd
+tissu_dataset = pd.DataFrame(r.genematrix)
+
+len(tissu_dataset)
+tissu_dataset.isnull().values.any()
+tissu_dataset.info()
+```
+
+
+### On R
 
 ```{r, eval=TRUE, echo=FALSE}
 pca <- prcomp(genematrix, scale=TRUE)
@@ -288,66 +300,15 @@ p=plot(pca$x[,1:2], type = "n")
 p=p+points(pca$x[0:20,1:2], pch = "H", col='green')
 p=p+points(pca$x[21:40,1:2], pch = "D",col='red')
 ```
-### On python with scikit-learn
 
-```python
-import pandas as pd
-import urllib
-import matplotlib.pyplot as plt
-import numpy as np
+### On Python with scikit-learn
+
+``` {python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans, FeatureAgglomeration
-from sklearn.metrics import silhouette_score, davies_bouldin_score
-```
-
-
-```python
-gene_dataset_url = "https://docs.google.com/uc?id=1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU&export=download"
-urlRequest = urllib.request.Request(gene_dataset_url)
-datasetFile = urllib.request.urlopen(urlRequest)
-```
-
-
-```python
-tissu_dataset = pd.read_csv(datasetFile, header=None)
-```
-
-
-```python
-trans_dataset = pd.DataFrame()
-for i in range(0, len(tissu_dataset)):
-    trans_dataset[i] = tissu_dataset.iloc[i]
-tissu_dataset = trans_dataset
-```
-
-
-```python
-tissu_dataset.head()
-```
-
-
-```python
-len(tissu_dataset)
-```
-
-
-```python
-tissu_dataset.isnull().values.any()
-```
-
-
-```python
-tissu_dataset.info()
-```
-
-
-```python
 pca = PCA(n_components=40)
 pca.fit(tissu_dataset)
-```
 
-
-```python
+import matplotlib.pyplot as plt
 plt.plot(pca.explained_variance_ratio_.cumsum())
 plt.xlabel('Principal Component')
 plt.ylabel('CPVE')
@@ -382,7 +343,7 @@ The algorithm starts by randomly selecting k objects from the data set to serve 
 
 We compute k-means clustering using different k, then we choose the number of cluster according to the location of a bend on the graph representing the Within-cluster variation according to k.
 
-#### Example
+#### Example on tissue samples
 
 ##### On R
 
@@ -416,21 +377,22 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 ```
 
 
-##### On python with scikit-learn
+##### On Python with scikit-learn
 
 With python we are going to repeat the experiment to validate the number of cluster and the different results found above. At first, we are going to loop through the number of clusters k and select one based on the sum of squared distances.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.cluster import KMeans, FeatureAgglomeration
+from sklearn.metrics import silhouette_score, davies_bouldin_score
+import numpy as np
+
 Sum_of_squared_distances = []
 K = range(1,15)
 for k in K:
     km = KMeans(n_clusters=k)
     km = km.fit(tissu_dataset)
     Sum_of_squared_distances.append(km.inertia_)
-```
 
-
-```python
 plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
 plt.xlabel('Sum squared distances')
 plt.ylabel('Number of clusters')
@@ -440,20 +402,25 @@ plt.show()
 
 Using the values and the graph we can determine using the elbow method that 2 is the optimal number of cluster since it is the spot were the curve is bending.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.cluster import KMeans, FeatureAgglomeration
 km = KMeans(n_clusters=2)
 km = km.fit_predict(tissu_dataset)
 ```
 
+This is the silhouette score : 
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.metrics import silhouette_score, davies_bouldin_score
 silhouette_score(tissu_dataset, km)
 ```
 
 The silhouette coefficient estimates the average distance between clusters. If the coefficient tends toward 1 then it means that the values are well clustered. In that case it means that the clusters are overlaping. However the silhouette score is not negative. If it was it would have meant that the sample has been assigned to the wrong cluster.
 
+This is the dunn index : 
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.metrics import silhouette_score, davies_bouldin_score
 davies_bouldin_score(tissu_dataset, km)
 ```
 
@@ -535,8 +502,7 @@ The distance between two clusters is defined as the distance between the centroi
 
 #### Ward’s minimum variance method
 
-It minimizes the total within-cluster vari- ance. At each step the pair of clusters with minimum between-cluster distance are merged.
-
+It minimizes the total within-cluster variance. At each step the pair of clusters with minimum between-cluster distance are merged.
 
 ### P-value
 
@@ -554,52 +520,7 @@ It minimizes the total within-cluster vari- ance. At each step the pair of clust
 
 ### Examples
 
-#### Mushrooms dataset
-
-The mushrooms data set contains information about 24 mushrooms. It indicates the smell, form and color but also whether it is possible to eat or not. \newline
-
-The purpous is to see if smell, form and color are enough to cluster the mushrooms into comestible and non-comestible.  \newline
-
-n stands for non comestible  \newline
-c stands for comestible  \newline
-
-##### On R
-
-```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 6, fig.align = "center"}
-
-mushrooms =  xlsx::read.xlsx("/Users/caro/Desktop/Master\ DNM/Pattern\ mining/Pattern\ Mining/Homework/Homework2/mushrooms.XLS", sheetIndex=1)
-
-mushrooms_com = mushrooms[mushrooms[,7]==1,]
-row.names(mushrooms_com) = paste(rep("c", 18), c(1:18), sep = "")
-mushrooms_nocom = mushrooms[mushrooms[,7]==0,]
-row.names(mushrooms_nocom) = paste(rep("nc", 6), c(1:6), sep = "")
-
-mushrooms = rbind(mushrooms_com, mushrooms_nocom)
-mushrooms = mushrooms[,2:6]
-
-rows <- sample(nrow(mushrooms))
-mushrooms <- mushrooms[rows, ]
-
-k2 <- kmeans(mushrooms, centers = 2, nstart = 10)
-
-
-c_euclidean<-dist(mushrooms, method = 'euclidean')
-c_daisy <- daisy(mushrooms)
-c_pearson <- cor(t(mushrooms), method="pearson")
-c_pearson <- as.dist(1-c_pearson)
-
-clusters <- hclust(c_pearson, method = "complete")
-clusterCut <- cutree(clusters, 2)
-clusterCut
-```
-
-```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
-plot(clusters)
-```
-
-\clearpage
-
-#### Healthy and non-healthy tissues samples
+#### Example on tissues samples
 
 Using the tissue and genes data set, we apply hierarchical clustering.
 
@@ -671,30 +592,33 @@ clusters_complete_euclidean_stats$clus.avg.silwidths
 
 It means that observations are well clustered but the distinction between clusters is not that easy.
 
-##### On python with scikit-learn
+##### On Python with scikit-learn
 
-Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph.
+Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph. \newline
 
-```python
+Feature Agglomeration recursively merges features instead of samples. In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
+
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.cluster import KMeans, FeatureAgglomeration
 agglo = FeatureAgglomeration(n_clusters=2)
 agglo.fit(tissu_dataset)
-```
 
-```python
 tissu_reduced = agglo.transform(tissu_dataset)
 tissu_reduced.shape
 ```
 
-Hierarchical clustering allows us to keep only 2 features over 1000. It means that only 2 features were determinant to classify the 40 patients. With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm.
+This hierarchical clustering allows us to keep only 2 features over 1000. It means that only 2 features were determinant to classify the 40 patients. \newline
 
-```python
+With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm.
+
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 km = KMeans(n_clusters=2)
 km = km.fit(tissu_reduced)
 ```
 
 At first, we plot the points with the colors changing depending on the real class label.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 plt.plot(tissu_reduced[0:20,0],tissu_reduced[0:20,1], 'ro', marker = "+", color='g')
 plt.plot(tissu_reduced[21:40,0], tissu_reduced[21:40,1], 'ro', marker = "X",color='r')
 plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='b')
@@ -702,14 +626,15 @@ plt.title("Plotting the two clusters with their center depending on their label 
 plt.show()
 ```
 
+The clustering obtained is : 
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 km.labels_
 ```
 
 Then, we are plotting the points with the colors changing depending on the predicted class label.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 plt.scatter(tissu_reduced[:,0], tissu_reduced[:,1], c=km.labels_)
 plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='r')
 plt.title("Plotting the two clusters with their center depending on their label class predicted by kMeans")
@@ -718,7 +643,7 @@ plt.show()
 
 As we can see the predicted class correspond to the real class labels. The clusters are well done.
 
-#### Corona dataset : the problem of over-represented category
+#### Example on Corona dataset : the problem of over-represented category
 
 The corona dataset contains information of patients who have caught Corona. It stores their age, sex and nationality but also if there are dead or not. \newline
 
@@ -726,126 +651,104 @@ The purpous is to use hiearchical clustering to see if the age, sex and national
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 id <- "1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw" # google file ID
-d.corona <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
-                             id), header = F)
+datacorona <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
+                             id), header = T)
 
-deceased = d.corona[d.corona[,1] == 1,]
+deceased = datacorona[datacorona[,1] == 1,]
 row.names(deceased)[1:45] = paste(rep("D", 45), c(1:45), sep = "")
-colnames(deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "")
 
-non_deceased = d.corona[d.corona[,1] == 0,]
+non_deceased = datacorona[datacorona[,1] == 0,]
 row.names(non_deceased)[1:1965] = paste(rep("H", 1965), c(1:1965), sep = "")
-colnames(non_deceased)[1:4] = paste(rep("C", 4), c(1:4), sep = "")
 non_deceased = non_deceased[1:450,]
 
-d.corona=rbind(non_deceased,deceased)
-d.corona= d.corona[,2:4]
-
-c_daisy <- daisy(d.corona)
-
-clusters <- hclust(c_daisy, method = "complete")
-clusterCut <- cutree(clusters, 2)
-tail(clusterCut, n=50)
+datacorona=rbind(non_deceased,deceased)
+datacorona_R= datacorona[,2:4]
 ```
-Looking at the clustering, 1 is the cluster of healthy patients, 2 is the cluster of dead patients. \newline
-We can see that it is difficult to cluster the dead patients together because there are only 45 deceased cases against 450 healthy patients. This is a problem of over-represented category.
 
-
-### On python with scikit-learn
-
-In python we are going to find out that the dataset is unbalanced. The aim is to show how an unbalanced dataset influence the results of the clustering algorithms.
-
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 import pandas as pd
-import urllib
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans, FeatureAgglomeration
-from sklearn.metrics import silhouette_score, davies_bouldin_score, accuracy_score
-```
-
-
-```python
-corona_dataset_url = "https://docs.google.com/uc?id=1CA1RPRYqU9oTIaHfSroitnWrI6WpUeBw&export=download"
-urlRequest = urllib.request.Request(corona_dataset_url)
-datasetFile = urllib.request.urlopen(urlRequest)
-```
-
-
-```python
-corona_dataset = pd.read_csv(datasetFile)
-```
-
-
-```python
+corona_dataset = pd.DataFrame(r.datacorona)
 corona_dataset.head()
 ```
 
-
 We can observe here that the columns sex and country contain strings. Therefore, we need to convert those strings into numbers.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 corona_dataset['sex'] = pd.factorize(corona_dataset['sex'])[0]
 corona_dataset['country'] = pd.factorize(corona_dataset['country'])[0]
 corona_train = corona_dataset.drop("deceased", axis=1)
 ```
 
+This is the percentage of death in the data set : 
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+len(corona_dataset[corona_dataset['deceased'] == 1])*100/len(corona_dataset)
+```
+As we can see the dataset is unbalanced. There is only 2% of positive case for 98% negative case in the database.
 
-```python
-corona_dataset.head()
+##### On R
+
+Since we have discrete features, we use the daisy distance.
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
+c_daisy <- daisy(datacorona_R)
+
+clusters <- hclust(c_daisy, method = "complete")
+clusterCut <- cutree(clusters, 2)
+tail(clusterCut, n=50)
 ```
 
+Looking at the clustering, 1 is the cluster of healthy patients, 2 is the cluster of dead patients. \newline
+We can see that it is difficult to cluster the dead patients together because there are only 45 deceased cases against 450 healthy patients. This is a problem of over-represented category.
+
+
+##### On Python with scikit-learn
+
+In python we are going to find out that the dataset is unbalanced. The aim is to show how an unbalanced dataset influence the results of the clustering algorithms.
 
 Now, the dataset is ready to be processed by our clustering algorithms.
 
-```python
-len(corona_dataset)
-```
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans, FeatureAgglomeration
+from sklearn.metrics import silhouette_score, davies_bouldin_score, accuracy_score
 
-```python
-len(corona_dataset[corona_dataset['deceased'] == 1])*100/len(corona_dataset)
-```
-
-As we can see the dataset is unbalanced. There is only 2% of positive case for 98% negative case in the database.
-
-```python
 Sum_of_squared_distances = []
 K = range(1,15)
 for k in K:
     km = KMeans(n_clusters=k)
     km = km.fit(corona_train)
     Sum_of_squared_distances.append(km.inertia_)
-```
 
-```python
 Sum_of_squared_distances
 ```
 
-
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
 plt.show()
 ```
 
 First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. It should be 2 because there is only 2 different class labels with deceased = 1 or deceased = 0.
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
+from sklearn.cluster import KMeans, FeatureAgglomeration
+
 km = KMeans(n_clusters=2)
 predicted_labels = km.fit_predict(corona_train)
 
-```python
 accuracy_score(corona_dataset['deceased'], predicted_labels)
 ```
 We can see that because the dataset is not balanced the accuracy score is low.
 
+The silhouette score is :
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 silhouette_score(corona_dataset, predicted_labels)
 ```
 
+The dunn index is : 
 
-```python
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 davies_bouldin_score(corona_dataset, predicted_labels)
 ```
 
