@@ -14,8 +14,10 @@ library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
                       cache=TRUE, size="scriptsize",fig.width=6, fig.height=5)
 library(reticulate)
-use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
-knitr::knit_engines$set(python.reticulate =  FALSE)
+#use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
+knitr::knit_engines$set(python.reticulate =  TRUE)
+#py_install("matplotlib")
+#py_install("scikit-learn")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -49,9 +51,9 @@ Classification algorithms have categorical responses. In classification we build
 
 ## Possibilities of models
 
-There are classifiers as logistic regression, Decision tree, Perceptron / Neural networks, K-nearest-neighbors, linear and quadratic logistic regression, Bayes  ...
+There are classifiers as logistic regression, Decision trees, Perceptron / Neural networks, K-nearest-neighbors, linear and quadratic logistic regression, Bayes classifiers  ...
 
-## Some indicators
+## Some indicators to analyze the results
 
 ### Sensitivity and recall
 
@@ -127,6 +129,8 @@ $$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
+
+### MSE : Mean Squarred Error
 
 Let's define the mean squared error or MSE.
 $$MSE = \frac{1}{n} \sum_i 1_{y_i-\hat{f}(x_i)}$$ where :
@@ -205,7 +209,6 @@ We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
-head(tennis)
 
 # test and train set
 n = dim(tennis)[1]
@@ -218,9 +221,8 @@ tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
 head(tennis)
 ```
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 import pandas as pd
-import urllib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -228,17 +230,12 @@ import numpy as np
 tennis_dataset = r.tennis
 
 # Overview of the data
-tennis_dataset.info()
-# Check if the dataset is balanced
+#tennis_dataset.info()
+print("Looking if the dataset is balanced : \n")
 tennis_dataset["Result"].value_counts() 
-
-# Feature selection
-tennis_dataset['ACE'] = tennis_dataset['ACE.1'] - tennis_dataset["ACE.2"]
-tennis_dataset['UFE'] = tennis_dataset['UFE.1'] - tennis_dataset["UFE.2"]
-tennis_dataset = tennis_dataset.drop(columns=["ACE.1","UFE.1","ACE.2", "UFE.2"])
 tennis_dataset.describe()
 
-plt.scatter(tennis_dataset["ACE"], tennis_dataset["UFE"], c=tennis_dataset["Result"])
+plt.scatter(tennis_dataset["ACEdiff"], tennis_dataset["UFEdiff"], c=tennis_dataset["Result"])
 plt.show()
 ```
 
@@ -254,7 +251,7 @@ summary(r.tennis2)
 
 With the model, we can draw the slope which indicates the category of a point.
 
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 #We calculate the slope
 glm.b = -r.tennis2$coefficients[2]/r.tennis2$coefficients[3]
 glm.a = -r.tennis2$coefficients[1]/r.tennis2$coefficients[3]
@@ -310,9 +307,10 @@ glm.fmesure
 
 #### On Python with Scikit-learn
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
+import numpy as np
 
 def defineTestTrainDatasetRandomly():
     msk = np.random.rand(len(tennis_dataset)) < 0.75
@@ -320,10 +318,10 @@ def defineTestTrainDatasetRandomly():
     train = tennis_dataset[msk]
     test = tennis_dataset[~msk]
 
-    trainX = train[['ACE', 'UFE']]
+    trainX = train[['ACEdiff', 'UFEdiff']]
     trainY = train[['Result']]
 
-    testX = test[['ACE', 'UFE']]
+    testX = test[['ACEdiff', 'UFEdiff']]
     testY = test[['Result']]
     return (trainX, trainY, testX, testY)
 
@@ -338,7 +336,9 @@ for i in range(0,nbrOfIteration):
     meanAccuracy += clf.score(testX, testY.values.ravel())
 meanAccuracy /= nbrOfIteration
 meanPerfModel = [i/nbrOfIteration for i in meanPerfModel]
+print("Mean accuracy is : \n")
 print(meanAccuracy)
+print("Mean performance is : \n")
 print(meanPerfModel)
 sensivity = meanPerfModel[0]/(meanPerfModel[0]+meanPerfModel[2])
 print("The Sensitivity is : " + str(sensivity))
@@ -462,7 +462,7 @@ model.fmesure
 
 #### On Python with Scikit-learn
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 from sklearn.ensemble import RandomForestClassifier
 
 meanAccuracy = 0
@@ -489,6 +489,113 @@ Fmesure = (2*precision*sensivity)/(precision+sensivity)
 print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 ```
 
+## KNN : K-nearest neighbors
+
+### How does it work ? 
+
+To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then x is assigned to the class to which the most of these observations belong. We just need to defnine the notion of distance which can be euclidean. \\
+
+### Comments 
+
+KNN is very good for non-linear classification. \\
+
+However it doesn't give the coefficient for the predictors so we can't see their impacts. \\
+
+It also needs a lot od training observations well-balanced. Otherwise if a class is over-represented, it would assign too much this label. \\
+
+### Choosing k
+
+To choose k, it can be useful to use cross-validation. We test multiple times the model with different k and we choose the one with the smallest error. 
+
+## Linear and quadratic Discriminant Analysis 
+
+### Bayes theorem
+
+TO DO 
+
+### Linear Discriminant Analysis
+
+TO DO 
+
+### Quadratic Discriminant Analysis 
+
+TO DO 
+
+
+## Support Vector machines
+
+### Maximal margin classifier
+
+A hyperplane in p dimensions can be written as follow : \newline
+
+$$\beta_0 + \beta_1 * x_1 + \beta_2 * x_2 + ... + \beta_p * x_p = \beta_0 + X^T \beta = 0$$
+It is a a p-1 dimensional subspace of $R^p$ \newline
+
+The hyperplane leads to a natural classifier, depending on the side of the hyperplane where the new observation lies. \newline
+
+If $\beta_0 + X^T \beta > 0 $ : it lies on one side of the hyperplane meaning it belongs to class labelled 1. \newline
+If $\beta_0 + X^T \beta < 0 $ : it lies on the opposite side of the hyperplane meaning it belongs to class labelled -1. \newline
+
+Thus $y_i * (\beta_0 + X^T \beta) >0$ \newline
+
+The distance of any point x to the hyperplane is given by :  \newline
+$$d = \frac{1}{||\beta||}(\beta_0 + X^T \beta)$$
+
+The best hyperplane is the maximal margin hyperplane which maximises the distance d from the training observations. \newline
+
+It is an optimization problem : we want to classify well all observations and maximize d.  \newline
+
+Let's call M, the minimal distance from the observations to the hyperplan. We write the problem :  \newline
+
+\begin{align}
+  & \max_{\beta_0, \beta} M \\
+  & \text{subject to} \notag \Sigma_j \beta_j^2 = 1 \\ 
+  & \text{for all training observations} \notag  y_i * (\beta_0 + X^T \beta) > M \\
+\end{align}
+
+### Support vector classifier 
+
+For some data sets a separating hyperplane does not exist, the data set is non-separable. \newline 
+
+To obtain a support vector classifier we relax the conditions that we had for the maximal margin hyperplane by allowing for a “budget” C of misclassifications. \newline
+
+We write the new problem :  \newline
+
+\begin{align}
+& \max_{\beta_0, \beta} M \\
+& \text{subject to} \Sigma_j \beta_j^2 = 1  \\
+& \text{for all training observations} y_i * (\beta_0 + X^T \beta) > M*(1-\epsilon_i)\\
+& 0 \leq \epsilon_i \text{and} \Sigma_i \epsilon_i \leq C \\
+\end{align}
+
+Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
+
+### Support Vector Machines  
+
+For some datasets a non-linear decicion boundary between the classes is more suitable than a linear decision boundary. \newline
+
+To compute the boundary, we use interactions terms between predictors or functions on predictors. \newline
+
+An example can be : \newline
+$$\beta_0 + \beta_1 * x_1^2 + \beta_2 * x_2 * x_1 + ... + \beta_p * x_p^3  = 0$$
+
+
+$$f(X_i) = \beta_0 + \Sigma_i \beta_i * K(x_i,x_j) $$ where K is a function between $x_i$ and $x_j$ \newline
+
+We write the new problem : \newline
+
+\begin{align}
+& \max_{\beta_0, \beta} M \\
+& \text{for all training observations} y_i * f(X_i) > M*(1-\epsilon_i)\\
+& 0 \leq \epsilon_i \text{and} \Sigma_i \epsilon_i \leq C \\
+\end{align}
+
+Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
+
+## Neural networks 
+
+TO DO 
+
 \clearpage
 
 # Regression
@@ -496,10 +603,6 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 ## Overall
 
 Regression is a statistical method used in finance, investing, and other disciplines that attempts to determine the strength and character of the relationship between one dependent variable (usually denoted by Y) and a series of other variables (known as independent variables).
-
-## Possibilities of models
-
-Linear Regression, Multiple linear Regression, Logistic Regression, etc. 
 
 ## Accuracy of a model
 
@@ -512,7 +615,7 @@ The test MSE is use to choose between models already trained.
 \\
 
 Let's define the mean squared error or MSE.
-$$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$
+$$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$ where $\hat{f}(x_i)$ is the prediction of $y_i$ obtained with the model.
 
 Then the expected test MSE refers to the average test MSE that we would obtain if we repeatedly estimated
 f using a large number of training sets, and tested each at $x_0$. So that the expected test MSE is :
@@ -535,11 +638,15 @@ $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refe
 
 Root Mean Squared Error (RMSE), which measures the average prediction error made by the model in predicting the outcome for an observation. That is, the average difference between the observed known outcome values and the values predicted by the model. The lower the RMSE, the better the model.
 
+$$RMSE = \sqrt {MSE} = \sqrt {\frac{1}{n} \sum_i (y_i-\hat{f}(x_i))^2} $$
+
 ### RSS : Residual Sum of Squares
 
-We define the residual sum of squares (RSS) as :
+We define the residual sum of squares (RSS) as the sum of the squares of residuals (deviations predicted from actual empirical values of data) : \\
 
-$$RSS = \Sigma (y_i - \hat{y}_i)^2$$
+Since $\hat{f}(x_i) = a + b * x_i$ and $y_i = a + b * x_i + \epsilon_i$ \\
+
+$$RSS = \Sigma \epsilon_i^2 = \Sigma (y_i - \hat{f}(x_i))^2 = n * MSE$$
 
 We want to minimize the RSS.
 
@@ -560,10 +667,11 @@ TSS − RSS measures the amount of variability in the response that is explained
 
 $R^2$ measures the proportion of variability in Y that can be explained using X.
 
-### MAE
+### MAE : Mean Absolute Error
 
-Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model
+Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model is.
 
+$$MAE = \frac{1}{n} \sum_i |y_i-\hat{f}(x_i)|$$
 
 ## Simple Linear Regression
 
@@ -571,10 +679,17 @@ Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to 
 
 In statistics, linear regression is a linear approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple linear regression.
 
-WHICH INDICATORS CAN WE USE
-
 Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as
 $$Y ≈ \beta_0 + \beta_1 * X$$
+
+## Multiple Linear Regression
+
+### Definition 
+
+Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable
+
+Formula and Calcualtion of Multiple Linear Regression
+$$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsilon$$
 
 ### Hospital Costs dataset
 
@@ -587,7 +702,7 @@ head(hospitaldata)
 ```
 
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE }
 # We only look at complete cases
 hospitaldata <- hospitaldata[complete.cases(hospitaldata), ]
 hospitaldata <- hospitaldata[hospitaldata$totcst > 0, ]
@@ -605,39 +720,35 @@ hist(hospitaldata$hrt, main = 'hrt')
 hist(hospitaldata$resp, main = 'resp')
 hist(hospitaldata$temp, main = 'temp')
 hist(hospitaldata$pafi, main = 'pafi')
+```
 
+```{r, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center" }
 #transformation
 par(mfrow = c(1, 2))
 hist(hospitaldata$totcst, main = 'totcst')
 hist(log(hospitaldata$totcst), main = 'log(totcst)')
 ```
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 ggplot() + geom_point(aes(age, totcst, color = as.factor(dzgroup) ), data = hospitaldata)
 ```
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 from sklearn import linear_model
-
-hopital_dataset_url = "https://docs.google.com/uc?id=1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO&export=download"
-urlRequest = urllib.request.Request(hopital_dataset_url)
-datasetFile = urllib.request.urlopen(urlRequest)
-hopital_dataset = pd.read_csv(datasetFile, header=0)
-
+hopital_dataset = r.hospitaldata
 hopital_dataset.tail()
 ```
 
 We can see that there is a lot of NaN values. \\
 Remove NaN and null data :
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 hopital_dataset.describe()
-hopital_dataset.isnull().sum()
 hopital_dataset = hopital_dataset.dropna()
-hopital_dataset.info()
+#hopital_dataset.info()
 ```
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 hopital_dataset = hopital_dataset[hopital_dataset["totcst"]>0]
 
 # cost to log(cost)
@@ -657,8 +768,9 @@ hopital_dataset = hopital_dataset.drop("pafi", axis=1)
 
 We would like to build models that help us to understand which predictors are mostly driving the total cost.
 
-Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. Moreover it seems that only age and disease have an impact.
+Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. \\
 
+We can calculate the MSE on the test set to evaluate the simple linear regression model.
 ```{r, eval=TRUE, echo=FALSE}
 set.seed(12345)
 train.proportion = 0.7
@@ -668,24 +780,9 @@ hospitaldata.test = hospitaldata[-train.ind, ]
 
 fit = lm(log(totcst)~ age + temp + edu + resp + num.co + as.factor(dzgroup),
          data = hospitaldata.train)
-summary(fit)
-```
 
-We can that just age and dzgroup seem to have an impact on totcst.
+fit$coefficients
 
-```{r, eval=TRUE, echo=FALSE}
-fit = lm(log(totcst)~ age + as.factor(dzgroup) , data = hospitaldata.train)
-summary(fit)
-```
-
-We can write :
-
-$$log(totcost) = 8.0823597 -0.0069950 * age + x_{ij} * \beta_j$$
-where $x_{ij}$ is 1 if patient i has disease j and $\beta_j$ is the coefficient matchinf the disease in the previous tab.
-
-
-We can calculate the MSE on the test set to evaluate the simple linear regression model.
-```{r, eval=TRUE, echo=FALSE}
 predictions <- fit %>% predict(hospitaldata.test)
 data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
             R2 = R2(predictions, log(hospitaldata.test$totcst)),
@@ -695,7 +792,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
 
 #### On Python with Scikit-learn
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
 
 def defineTestTrainDatasetRandomly():
     msk = np.random.rand(len(hopital_dataset)) < 0.75
@@ -719,15 +816,11 @@ print(lm_reg.coef_)
 lm_reg.intercept_
 ```
 
-
-## Multiple linear regression
+## Linear regression with interaction terms
 
 ### Definition
 
-Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable
-
-Formula and Calcualtion of Multiple Linear Regression
-$$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsilon$$
+It is a regression which introduces an operation between two predictors like multiplication, division ... 
 
 ### Hospital Costs dataset
 
@@ -736,8 +829,8 @@ $$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsi
 We use the same example than for simple linear regression.
 
 ```{r, eval=TRUE, echo=FALSE}
-fit_multiple = lm(log(totcst)~age*as.factor(dzgroup), data = hospitaldata.train)
-summary(fit_multiple)
+fit_multiple = lm(log(totcst)~age*as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata.train)
+fit_multiple$coefficients
 ```
 
 We can calculate the MSE on the test set to evaluate the multiple linear regression model.
@@ -754,7 +847,15 @@ The MSE-test for multiple linear regression is worst than for simple linear regr
 
 Simple linear regression is the best model so far for this problem.
 
+## K-nearest neighbor regression 
 
+It works the same way as the KNN for classification. \\
+
+Given a value for k and a prediction point $x_i$, KNN regression identifies the k closest training observations to $x_i$ represented by $N_i$.\\
+
+Then it estimates $f(x_i)$ using the average of all the training responses in $N_i$.  \\
+
+$$\hat{y_i} = f(x_i) = \frac{1}{k} \Sigma_{x_j \in N_i} y_j$$
 \clearpage
 
 # Validation techniques
@@ -776,12 +877,12 @@ The Validation Set Approach is a type of method that estimates a model error rat
 ```{r, eval=TRUE, echo=FALSE}
 # Split the data into training and test set
 set.seed(123)
-training.samples <- log(hospitaldata$totcst) %>% createDataPartition(p = 0.8, list = FALSE)
+training.samples <- log(hospitaldata$totcst) %>% createDataPartition(p = 0.75, list = FALSE)
 hospitaldata.train2  <- hospitaldata[training.samples, ]
 hospitaldata.test2 <- hospitaldata[-training.samples, ]
 # Build the model
-model <- lm(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata.train2)
-print(model)
+model <- lm(log(totcst) ~ age + as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata.train2)
+
 # Make predictions and compute the R2, RMSE and MAE
 predictions <- model %>% predict(hospitaldata.test2)
 data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
@@ -792,7 +893,40 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
 
 #### Example on Python 
 
-```{python, eval=FALSE, echo=FALSE}
+```{python, eval=TRUE, echo=FALSE}
+from sklearn import linear_model
+from sklearn.model_selection import cross_validate
+import numpy as np
+import pandas as pd 
+
+hopital_dataset = r.hospitaldata
+hopital_dataset = hopital_dataset.dropna()
+hopital_dataset = hopital_dataset[hopital_dataset["totcst"]>0]
+hopital_dataset["totcst"] = np.log(hopital_dataset["totcst"])
+hopital_dataset["dzgroup"] = pd.factorize(hopital_dataset["dzgroup"])[0]
+hopital_dataset = hopital_dataset.drop("scoma", axis=1)
+hopital_dataset = hopital_dataset.drop("race", axis=1)
+hopital_dataset = hopital_dataset.drop("meanbp", axis=1)
+hopital_dataset = hopital_dataset.drop("income", axis=1)
+hopital_dataset = hopital_dataset.drop("hrt", axis=1)
+hopital_dataset = hopital_dataset.drop("pafi", axis=1)
+
+def defineTestTrainDatasetRandomly():
+    msk = np.random.rand(len(hopital_dataset)) < 0.75
+
+    train = hopital_dataset[msk]
+    test = hopital_dataset[~msk]
+
+    trainX = train.drop("totcst", axis=1)
+    trainY = train[['totcst']]
+
+    testX = test.drop("totcst", axis=1)
+    testY = test[['totcst']]
+    return (trainX, trainY, testX, testY)
+
+trainX, trainY, testX, testY = defineTestTrainDatasetRandomly()
+lm_reg = linear_model.Ridge(alpha=.5)
+lm_reg.fit(trainX, trainY.values.ravel())
 cv_results = cross_validate(lm_reg, trainX, trainY, cv=5,
                             scoring={'r2':'r2', 'MSE': 'neg_mean_squared_error',
                                     'MAE':"neg_median_absolute_error",
@@ -818,7 +952,7 @@ Compute the overall prediction error by taking the average of all these test err
 # Define training control
 train.control <- trainControl(method = "LOOCV")
 # Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",
+model <- train(log(totcst) ~ age + as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata, method = "lm",
                trControl = train.control)
 # Summarize the results
 print(model)
@@ -832,23 +966,20 @@ We divide the set of data in k equals part and we use k-1 parts to train the mod
 
 Here are the steps :
 
-1.Split the dataset into k equal partitions (or "folds")
+1.Split the dataset into k equal partitions (or "folds") \\
 
+2.For each fold \\
 
-2.For each fold
+  One fold is used as the testing set and the union of the other folds as the training set \\
 
-
-  One fold is used as the testing set and the union of the other folds as the training set
-
-
-  Calculate testing accuracy for this fold :
+  Calculate testing accuracy for this fold : \\
 
   $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
   $$MSE = \frac{k}{n}\sum_i{I(y_i≠\hat{y_i})}$$
 
-3.Use the average testing accuracy as the estimate of out-of-sample accuracy :
+3.Use the average testing accuracy as the estimate of out-of-sample accuracy : \\
 
-We would use the cross-validation error :
+We would use the cross-validation error : \\
 $$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
 with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
 
@@ -858,148 +989,9 @@ with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate
 # Define training control
 train.control <- trainControl(method = "cv", number = 10)
 # Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup), data = hospitaldata, method = "lm",
+model <- train(log(totcst) ~ age + as.factor(dzgroup)+ temp + edu + resp + num.co, data = hospitaldata, method = "lm",
                trControl = train.control)
 # Summarize the results
 print(model)
 ```
 
-
-\clearpage
-
-# Comparaison between R and sckit-learn in python
-
-## On classification
-
-### Logistic Regression
-
-TO DO  : comparaison between R and python
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-sensitivity &  0.6153846 &  \\
-\hline
-specificity & 0.8823529 &  \\
-\hline
-precision   & 0.8 &  \\
-\hline
-f mesure    & 0.6956522 &  \\
-\hline
-AIC         & 105.1 &  \\
-\hline
-\end{tabular}
-\end{center}
-
-### Decision trees
-
-TO DO  : comparaison between R and python
-
-either knn, or decsion trees, or linear discriminant analysis or quadratic discriminant analysis
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-sensitivity & 0.6923077 &  \\
-\hline
-specificity & 0.5882353 &  \\
-\hline
-precision   & 0.5625 &  \\
-\hline
-f mesure    & 0.6206897 &  \\
-\hline
-AIC         &  &  \\
-\hline
-\end{tabular}
-\end{center}
-
-
-## On Regression
-
-### Simple Linear Regression
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-RMSE & 0.9496248 &  \\
-\hline
-Rsquared & 0.3660489 & \\
-\hline
-MAE & 0.751934 & \\
-\hline
-\end{tabular}
-\end{center}
-
-
-### Multiple Linear Regression
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-RMSE & 0.9475793 &  \\
-\hline
-Rsquared & 0.3687867 & \\
-\hline
-MAE & 0.7486429 & \\
-\hline
-\end{tabular}
-\end{center}
-
-## On Cross Validation
-
-### Validation set approach
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-RMSE & 0.956954 &  \\
-\hline
-Rsquared & 0.3497368 & \\
-\hline
-MAE & 0.7521536 & \\
-\hline
-\end{tabular}
-\end{center}
-
-### Leave One out cross-validation
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-RMSE & 0.944522 &  \\
-\hline
-Rsquared & 0.3656192 & \\
-\hline
-MAE & 0.7552076 & \\
-\hline
-\end{tabular}
-\end{center}
-
-
-### k-fold Cross Validation
-
-\begin{center}
-\begin{tabular} { | c | c | c |}
-\hline
-  & R & Scikit-learn \\
-\hline
-RMSE & 0.9442358 &  \\
-\hline
-Rsquared & 0.3678628 & \\
-\hline
-MAE & 0.7551859 & \\
-\hline
-\end{tabular}
-\end{center}
