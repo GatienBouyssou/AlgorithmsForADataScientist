@@ -212,16 +212,40 @@ n = dim(tennis)[1]
 n2 = n*(3/4)
 set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
+
+# reduction to two variables
+tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
+tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
+head(tennis)
+```
+```{python, eval=FALSE, echo=FALSE}
+import pandas as pd
+import urllib
+import matplotlib.pyplot as plt
+import numpy as np
+
+#Collecting the dataset
+tennis_dataset = r.tennis
+
+# Overview of the data
+tennis_dataset.info()
+# Check if the dataset is balanced
+tennis_dataset["Result"].value_counts() 
+
+# Feature selection
+tennis_dataset['ACE'] = tennis_dataset['ACE.1'] - tennis_dataset["ACE.2"]
+tennis_dataset['UFE'] = tennis_dataset['UFE.1'] - tennis_dataset["UFE.2"]
+tennis_dataset = tennis_dataset.drop(columns=["ACE.1","UFE.1","ACE.2", "UFE.2"])
+tennis_dataset.describe()
+
+plt.scatter(tennis_dataset["ACE"], tennis_dataset["UFE"], c=tennis_dataset["Result"])
+plt.show()
 ```
 
 
 #### On R
 
 ```{r, eval=TRUE, echo=FALSE}
-# reduction to two variables
-tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
-tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
-head(tennis)
 tennisTest = tennis[-train, ]
 tennisTrain = tennis[train, ]
 r.tennis2 = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomial")
@@ -245,7 +269,6 @@ We can write :
 $$ \begin{aligned}
 logit(p_i) = log(\frac{p_i}{1-p_i}) &= 0,31318 + 0,20856 * ACEDiff - 0,08272 * UFEDiff
 \end{aligned}$$
-
 
 We can observe AIC =  105.1
 
@@ -288,39 +311,8 @@ glm.fmesure
 #### On Python with Scikit-learn
 
 ```{python, eval=FALSE, echo=FALSE}
-import pandas as pd
-import urllib
-import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import cross_validate
-
-#Collecting the dataset
-tennis_dataset = r.tennis
-
-# Overview of the data
-
-len(tennis_dataset)
-tennis_dataset.shape
-tennis_dataset.head()
-tennis_dataset.info()
-tennis_dataset.describe()
-tennis_dataset["Result"].value_counts() # Check if the dataset is balanced
-
-# Feature selection
-
-tennis_dataset['ACE'] = tennis_dataset['ACE.1'] - tennis_dataset["ACE.2"]
-tennis_dataset['UFE'] = tennis_dataset['UFE.1'] - tennis_dataset["UFE.2"]
-
-
-tennis_dataset.describe()
-
-tennis_dataset = tennis_dataset.drop(columns=["ACE.1","UFE.1","ACE.2", "UFE.2"])
-tennis_dataset.describe()
-
-plt.scatter(tennis_dataset["ACE"], tennis_dataset["UFE"], c=tennis_dataset["Result"])
-plt.show()
 
 def defineTestTrainDatasetRandomly():
     msk = np.random.rand(len(tennis_dataset)) < 0.75
@@ -472,12 +464,6 @@ model.fmesure
 
 ```{python, eval=FALSE, echo=FALSE}
 from sklearn.ensemble import RandomForestClassifier
-import pandas as pd
-import urllib
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
 
 meanAccuracy = 0
 meanPerfModel = [0,0,0,0] # mean respectively of tn, fp, fn, tp
@@ -630,6 +616,43 @@ hist(log(hospitaldata$totcst), main = 'log(totcst)')
 ggplot() + geom_point(aes(age, totcst, color = as.factor(dzgroup) ), data = hospitaldata)
 ```
 
+```{python, eval=FALSE, echo=FALSE}
+from sklearn import linear_model
+
+hopital_dataset_url = "https://docs.google.com/uc?id=1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO&export=download"
+urlRequest = urllib.request.Request(hopital_dataset_url)
+datasetFile = urllib.request.urlopen(urlRequest)
+hopital_dataset = pd.read_csv(datasetFile, header=0)
+
+hopital_dataset.tail()
+```
+
+We can see that there is a lot of NaN values. \\
+Remove NaN and null data :
+
+```{python, eval=FALSE, echo=FALSE}
+hopital_dataset.describe()
+hopital_dataset.isnull().sum()
+hopital_dataset = hopital_dataset.dropna()
+hopital_dataset.info()
+```
+
+```{python, eval=FALSE, echo=FALSE}
+hopital_dataset = hopital_dataset[hopital_dataset["totcst"]>0]
+
+# cost to log(cost)
+hopital_dataset["totcst"] = np.log(hopital_dataset["totcst"])
+# change the text labels to numbers because it's easier to process
+hopital_dataset["dzgroup"] = pd.factorize(hopital_dataset["dzgroup"])[0]
+
+hopital_dataset = hopital_dataset.drop("scoma", axis=1)
+hopital_dataset = hopital_dataset.drop("race", axis=1)
+hopital_dataset = hopital_dataset.drop("meanbp", axis=1)
+hopital_dataset = hopital_dataset.drop("income", axis=1)
+hopital_dataset = hopital_dataset.drop("hrt", axis=1)
+hopital_dataset = hopital_dataset.drop("pafi", axis=1)
+```
+
 #### On R
 
 We would like to build models that help us to understand which predictors are mostly driving the total cost.
@@ -673,57 +696,6 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
 #### On Python with Scikit-learn
 
 ```{python, eval=FALSE, echo=FALSE}
-hopital_dataset_url = "https://docs.google.com/uc?id=1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO&export=download"
-urlRequest = urllib.request.Request(hopital_dataset_url)
-datasetFile = urllib.request.urlopen(urlRequest)
-hopital_dataset = pd.read_csv(datasetFile, header=0)
-
-# Overview of the dataset
-len(hopital_dataset)
-
-hopital_dataset.tail()
-```
-
-
-We can see that there is a lot of NaN values
-
-
-```{python, eval=FALSE, echo=FALSE}
-hopital_dataset.info()
-hopital_dataset.describe()
-hopital_dataset.isnull().sum()
-hopital_dataset = hopital_dataset.dropna()
-hopital_dataset.info()
-```
-
-Remove NaN and null data :
-
-```{python, eval=FALSE, echo=FALSE}
-hopital_dataset.isnull().sum()
-
-hopital_dataset = hopital_dataset[hopital_dataset["totcst"]>0]
-
-# cost to log(cost)
-hopital_dataset["totcst"] = np.log(hopital_dataset["totcst"])
-# change the text labels to numbers because it's easier to process
-hopital_dataset["dzgroup"] = pd.factorize(hopital_dataset["dzgroup"])[0]
-
-hopital_dataset = hopital_dataset.drop("scoma", axis=1)
-hopital_dataset = hopital_dataset.drop("race", axis=1)
-hopital_dataset = hopital_dataset.drop("meanbp", axis=1)
-hopital_dataset = hopital_dataset.drop("income", axis=1)
-hopital_dataset = hopital_dataset.drop("hrt", axis=1)
-hopital_dataset = hopital_dataset.drop("pafi", axis=1)
-```
-
-
-```{python, eval=FALSE, echo=FALSE}
-import pandas as pd
-import urllib
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import cross_validate
 
 def defineTestTrainDatasetRandomly():
     msk = np.random.rand(len(hopital_dataset)) < 0.75
@@ -818,7 +790,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
             MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
 ```
 
-#### Example on Python
+#### Example on Python 
 
 ```{python, eval=FALSE, echo=FALSE}
 cv_results = cross_validate(lm_reg, trainX, trainY, cv=5,
