@@ -127,7 +127,7 @@ $$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
 
 ## Accuracy of a model
 
-How do we determine which model is best? Various statistics can be used to judge the quality of a model. \\
+How do we determine which model is best? Various statistics can be used to judge the quality of a model. \newline
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
 
 ### MSE : Mean Squarred Error
@@ -356,9 +356,9 @@ Using the Logistic Regression model in scikit we obtain an accuracy of 0.74. In 
 
 
 ### Decision Tree
-Decision Tree algorithm belongs to the family of supervised learning algorithms. Unlike other supervised learning algorithms, the decision tree algorithm can be used for solving regression and classification problems too. \\
+Decision Tree algorithm belongs to the family of supervised learning algorithms. Unlike other supervised learning algorithms, the decision tree algorithm can be used for solving regression and classification problems too. \newline
 
-The goal of using a Decision Tree is to create a training model that can use to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data). \\
+The goal of using a Decision Tree is to create a training model that can use to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data). \newline
 
 Decision trees use multiple algorithms to decide to split a node into two or more sub-nodes. The creation of sub-nodes increases the homogeneity of resultant sub-nodes. In other words, we can say that the purity of the node increases with respect to the target variable. The decision tree splits the nodes on all available variables and then selects the split which results in most homogeneous sub-nodes.
 
@@ -493,15 +493,15 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 
 ### How does it work ?
 
-To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then x is assigned to the class to which the most of these observations belong. We just need to defnine the notion of distance which can be euclidean. \\
+To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then x is assigned to the class to which the most of these observations belong. We just need to defnine the notion of distance which can be euclidean.\newline
 
 ### Comments
 
-KNN is very good for non-linear classification. \\
+KNN is very good for non-linear classification. \newline
 
-However it doesn't give the coefficient for the predictors so we can't see their impacts. \\
+However it doesn't give the coefficient for the predictors so we can't see their impacts. \newline
 
-It also needs a lot od training observations well-balanced. Otherwise if a class is over-represented, it would assign too much this label. \\
+It also needs a lot od training observations well-balanced. Otherwise if a class is over-represented, it would assign too much this label. \newline
 
 ### Choosing k
 
@@ -512,16 +512,16 @@ To choose k, it can be useful to use cross-validation. We test multiple times th
 Discriminant analysis is a technique that helps classifying 2 or more groups into clusters. This technique uses
 - the Bayes' theorem
 - the covariance (the shape of one group of point)
-- and the center of this group.
+- and the center of this group. \newline
 
-The aim is to use those 3 components to create boundaries between the classes. The boundaries are composed by a set of points that have the same chance to belong to either classes.
+The aim is to use those 3 components to create boundaries between the classes. The boundaries are composed by a set of points that have the same chance to belong to either classes. \newline
 
-There is two types of discriminant Analysis. The first one is the Linear Discriminant Analysis (LDA). To use that model, each class need to be drawn from a multivariate Gaussian distribution and the covariance for each class needs to be equals (the groups of points need to have the same shape).
+There is two types of discriminant Analysis. The first one is the Linear Discriminant Analysis (LDA). To use that model, each class need to be drawn from a multivariate Gaussian distribution and the covariance for each class needs to be equals (the groups of points need to have the same shape). \newline
 
 
-Quadratic Discriminant Analysis (QDA) is a bit similar to (LDA) because it assumes that each class are drawn from a Gaussian distribution. However, the covariance doesn't need to be the same for each class.
+Quadratic Discriminant Analysis (QDA) is a bit similar to (LDA) because it assumes that each class are drawn from a Gaussian distribution. However, the covariance doesn't need to be the same for each class. \newline
 
-The advantages of such models is that they have a good accuracy and they are robust to outliers (because it is based on statistical distribution of all the observations).
+The advantages of such models is that they have a good accuracy and they are robust to outliers (because it is based on statistical distribution of all the observations). \newline
 
 ## Support Vector machines
 
@@ -616,10 +616,10 @@ Regression is a statistical method used in finance, investing, and other discipl
 ### MSE : Mean Squarred Error
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
-There are two MSE : the train MSE and the test MSE. \\
-The train MSE is use to fit a model while training. \\
+There are two MSE : the train MSE and the test MSE. \newline
+The train MSE is use to fit a model while training. \newline
 The test MSE is use to choose between models already trained.
-\\
+\newline
 
 Let's define the mean squared error or MSE.
 $$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$ where $\hat{f}(x_i)$ is the prediction of $y_i$ obtained with the model.
@@ -649,9 +649,9 @@ $$RMSE = \sqrt {MSE} = \sqrt {\frac{1}{n} \sum_i (y_i-\hat{f}(x_i))^2} $$
 
 ### RSS : Residual Sum of Squares
 
-We define the residual sum of squares (RSS) as the sum of the squares of residuals (deviations predicted from actual empirical values of data) : \\
+We define the residual sum of squares (RSS) as the sum of the squares of residuals (deviations predicted from actual empirical values of data) : \newline
 
-Since $\hat{f}(x_i) = a + b * x_i$ and $y_i = a + b * x_i + \epsilon_i$ \\
+Since $\hat{f}(x_i) = a + b * x_i$ and $y_i = a + b * x_i + \epsilon_i$ \newline
 
 $$RSS = \Sigma \epsilon_i^2 = \Sigma (y_i - \hat{f}(x_i))^2 = n * MSE$$
 
@@ -746,7 +746,7 @@ hopital_dataset = r.hospitaldata
 hopital_dataset.tail()
 ```
 
-We can see that there is a lot of NaN values. \\
+We can see that there is a lot of NaN values. \newline
 Remove NaN and null data :
 
 ```{python, eval=TRUE, echo=FALSE}
@@ -775,7 +775,7 @@ hopital_dataset = hopital_dataset.drop("pafi", axis=1)
 
 We would like to build models that help us to understand which predictors are mostly driving the total cost.
 
-Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. \\
+Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. \newline
 
 We can calculate the MSE on the test set to evaluate the simple linear regression model.
 ```{r, eval=TRUE, echo=FALSE}
@@ -856,11 +856,11 @@ Simple linear regression is the best model so far for this problem.
 
 ## K-nearest neighbor regression
 
-It works the same way as the KNN for classification. \\
+It works the same way as the KNN for classification. \newline
 
-Given a value for k and a prediction point $x_i$, KNN regression identifies the k closest training observations to $x_i$ represented by $N_i$.\\
+Given a value for k and a prediction point $x_i$, KNN regression identifies the k closest training observations to $x_i$ represented by $N_i$.\newline
 
-Then it estimates $f(x_i)$ using the average of all the training responses in $N_i$.  \\
+Then it estimates $f(x_i)$ using the average of all the training responses in $N_i$.  \newline
 
 $$\hat{y_i} = f(x_i) = \frac{1}{k} \Sigma_{x_j \in N_i} y_j$$
 \clearpage
@@ -973,20 +973,20 @@ We divide the set of data in k equals part and we use k-1 parts to train the mod
 
 Here are the steps :
 
-1.Split the dataset into k equal partitions (or "folds") \\
+1.Split the dataset into k equal partitions (or "folds") \newline
 
-2.For each fold \\
+2.For each fold \newline
 
-  One fold is used as the testing set and the union of the other folds as the training set \\
+  One fold is used as the testing set and the union of the other folds as the training set \newline
 
-  Calculate testing accuracy for this fold : \\
+  Calculate testing accuracy for this fold : \newline
 
   $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
   $$MSE = \frac{k}{n}\sum_i{I(y_i≠\hat{y_i})}$$
 
-3.Use the average testing accuracy as the estimate of out-of-sample accuracy : \\
+3.Use the average testing accuracy as the estimate of out-of-sample accuracy : \newline
 
-We would use the cross-validation error : \\
+We would use the cross-validation error : \newline
 $$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
 with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
 
