@@ -232,7 +232,7 @@ tennis_dataset = r.tennis
 # Overview of the data
 #tennis_dataset.info()
 print("Looking if the dataset is balanced : \n")
-tennis_dataset["Result"].value_counts() 
+tennis_dataset["Result"].value_counts()
 tennis_dataset.describe()
 
 plt.scatter(tennis_dataset["ACEdiff"], tennis_dataset["UFEdiff"], c=tennis_dataset["Result"])
@@ -491,11 +491,11 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 
 ## KNN : K-nearest neighbors
 
-### How does it work ? 
+### How does it work ?
 
 To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then x is assigned to the class to which the most of these observations belong. We just need to defnine the notion of distance which can be euclidean. \\
 
-### Comments 
+### Comments
 
 KNN is very good for non-linear classification. \\
 
@@ -505,22 +505,23 @@ It also needs a lot od training observations well-balanced. Otherwise if a class
 
 ### Choosing k
 
-To choose k, it can be useful to use cross-validation. We test multiple times the model with different k and we choose the one with the smallest error. 
+To choose k, it can be useful to use cross-validation. We test multiple times the model with different k and we choose the one with the smallest error.
 
-## Linear and quadratic Discriminant Analysis 
+## Discriminant Analysis
 
-### Bayes theorem
+Discriminant analysis is a technique that helps classifying 2 or more groups into clusters. This technique uses
+- the Bayes' theorem
+- the covariance (the shape of one group of point)
+- and the center of this group.
 
-TO DO 
+The aim is to use those 3 components to create boundaries between the classes. The boundaries are composed by a set of points that have the same chance to belong to either classes.
 
-### Linear Discriminant Analysis
+There is two types of discriminant Analysis. The first one is the Linear Discriminant Analysis (LDA). To use that model, each class need to be drawn from a multivariate Gaussian distribution and the covariance for each class needs to be equals (the groups of points need to have the same shape).
 
-TO DO 
 
-### Quadratic Discriminant Analysis 
+Quadratic Discriminant Analysis (QDA) is a bit similar to (LDA) because it assumes that each class are drawn from a Gaussian distribution. However, the covariance doesn't need to be the same for each class.
 
-TO DO 
-
+The advantages of such models is that they have a good accuracy and they are robust to outliers (because it is based on statistical distribution of all the observations).
 
 ## Support Vector machines
 
@@ -549,13 +550,13 @@ Let's call M, the minimal distance from the observations to the hyperplan. We wr
 
 \begin{align}
   & \max_{\beta_0, \beta} M \\
-  & \text{subject to} \notag \Sigma_j \beta_j^2 = 1 \\ 
+  & \text{subject to} \notag \Sigma_j \beta_j^2 = 1 \\
   & \text{for all training observations} \notag  y_i * (\beta_0 + X^T \beta) > M \\
 \end{align}
 
-### Support vector classifier 
+### Support vector classifier
 
-For some data sets a separating hyperplane does not exist, the data set is non-separable. \newline 
+For some data sets a separating hyperplane does not exist, the data set is non-separable. \newline
 
 To obtain a support vector classifier we relax the conditions that we had for the maximal margin hyperplane by allowing for a “budget” C of misclassifications. \newline
 
@@ -570,7 +571,7 @@ We write the new problem :  \newline
 
 Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
 
-### Support Vector Machines  
+### Support Vector Machines
 
 For some datasets a non-linear decicion boundary between the classes is more suitable than a linear decision boundary. \newline
 
@@ -592,9 +593,15 @@ We write the new problem : \newline
 
 Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
 
-## Neural networks 
+## Neural networks
 
-TO DO 
+Neural network structure
+
+Neural networks can be decomposed as three parts the input the hidden layers and the output. Those parts are in fact nodes link together with edges that are given weights describing the strenght of the connection. With a given input the value of the first node of the hidden layer will correspond to the inputs time the weights on the edges going to the node. This product will give a result that needs to go through an activation function before giving the value of the current node. This process of computing the values of the nodes from the inputs to the output is called feedforward.
+
+Once, we have computed the output, we compare our prediction to the answer. Then, we backpropagate the error. It means that depending on the error, the value of the nodes and the learning rate, we are going to updates the weights.
+
+Once the weights are updated we iterate until the amount of errors become acceptable.
 
 \clearpage
 
@@ -684,7 +691,7 @@ $$Y ≈ \beta_0 + \beta_1 * X$$
 
 ## Multiple Linear Regression
 
-### Definition 
+### Definition
 
 Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable
 
@@ -820,7 +827,7 @@ lm_reg.intercept_
 
 ### Definition
 
-It is a regression which introduces an operation between two predictors like multiplication, division ... 
+It is a regression which introduces an operation between two predictors like multiplication, division ...
 
 ### Hospital Costs dataset
 
@@ -847,7 +854,7 @@ The MSE-test for multiple linear regression is worst than for simple linear regr
 
 Simple linear regression is the best model so far for this problem.
 
-## K-nearest neighbor regression 
+## K-nearest neighbor regression
 
 It works the same way as the KNN for classification. \\
 
@@ -891,13 +898,13 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test2$totcst))^2),
             MAE = MAE(predictions, log(hospitaldata.test2$totcst)))
 ```
 
-#### Example on Python 
+#### Example on Python
 
 ```{python, eval=TRUE, echo=FALSE}
 from sklearn import linear_model
 from sklearn.model_selection import cross_validate
 import numpy as np
-import pandas as pd 
+import pandas as pd
 
 hopital_dataset = r.hospitaldata
 hopital_dataset = hopital_dataset.dropna()
@@ -994,4 +1001,3 @@ model <- train(log(totcst) ~ age + as.factor(dzgroup)+ temp + edu + resp + num.c
 # Summarize the results
 print(model)
 ```
-
