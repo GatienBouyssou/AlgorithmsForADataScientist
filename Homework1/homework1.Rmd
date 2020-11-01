@@ -47,7 +47,7 @@ library(fpc)
 
 ## Overall
 
-Classification algorithms have categorical responses. In classification we build a function f(X) that takes a vector of input variables X and predicts its class membership, such that Y in C.
+Classification algorithms have categorical responses. In classification, we create a function f(X) that takes a vector of input variables X and predicts its class Y belonging to the set of classes C.
 
 ## Possibilities of models
 
@@ -108,7 +108,7 @@ $$ RI(\pi_1, \pi_2) = \frac{a + d}{a + b + c + d}$$
 
 ### Mutual information
 
-Mutual information is calculated between two variables and measures the reduction in uncertainty for one variable given a known value of the other variable.
+Mutual information is calculated between two variables. It measures the reduction of uncertainty for one variable given a known value of the other variable.
 The mutual information between two random variables X and Y can be stated formally as follows:
 
 $$ MI= I(X ; Y) = H(X) – H(X | Y)$$
@@ -121,7 +121,7 @@ In binary classification, where the number of classes M equals 2, cross-entropy 
 
 $$ CE = − (y\log(p)+(1 − y)\log(1 − p))$$
 
-If M>2 (i.e. multiclass classification), we calculate a separate loss for each class label per observation and sum the result.
+If M>2 (i.e. multiclass classification), we compute a separate loss for each class label per observation and sum the result.
 
 $$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
 
@@ -148,7 +148,7 @@ RSS and $R^2$ are not suitable for selecting the best model among a collection o
 
 ### Mallow’s Cp
 
-Mallows’s Cp addresses the issue of overfitting, in which model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model
+Mallows’s Cp addresses the issue of overfitting/ Indeed, model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model.
 
 If there are d predictors :
 
@@ -204,7 +204,7 @@ The goal is to maximise it by adjusting $\beta$ vector.
 
 ### Example on the the Wimbledon tennis tournament
 
-We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on the number of aces won by each player and the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics.
+We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on : the number of aces won by each player, and, the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics.
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
@@ -350,7 +350,7 @@ Fmesure = (2*precision*sensivity)/(precision+sensivity)
 print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 ```
 
-Using the Logistic Regression model in scikit we obtain an accuracy of 0.74. In average, this model has 9.48 True Positive, 3.23 False Positive, 4.4 False Negative, 12.63 True Positive.
+Using the Logistic Regression model in scikit, we obtain an accuracy of 0.74. In average, this model has 9.48 True Positive, 3.23 False Positive, 4.4 False Negative, 12.63 True Positive.
 
 ## Decision trees and Random Forest
 
@@ -358,13 +358,13 @@ Using the Logistic Regression model in scikit we obtain an accuracy of 0.74. In 
 ### Decision Tree
 Decision Tree algorithm belongs to the family of supervised learning algorithms. Unlike other supervised learning algorithms, the decision tree algorithm can be used for solving regression and classification problems too. \newline
 
-The goal of using a Decision Tree is to create a training model that can use to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data). \newline
+The goal of using a Decision Tree is to create a training model. It can be used to predict the class or value of the target variable by learning simple decision rules inferred from prior data(training data). \newline
 
 Decision trees use multiple algorithms to decide to split a node into two or more sub-nodes. The creation of sub-nodes increases the homogeneity of resultant sub-nodes. In other words, we can say that the purity of the node increases with respect to the target variable. The decision tree splits the nodes on all available variables and then selects the split which results in most homogeneous sub-nodes.
 
 ### Random Forest
 
-Random forests or random decision forests are an ensemble learning method for classification, regression and other tasks that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes or mean/average prediction of the individual trees.
+Random forests or random decision forests are an ensemble learning method for classification, regression and other tasks. During their training, they are creating a multitude of decision trees to output the class that is the mode of the classes or mean/average prediction of the individual trees.
 
 
 ### Which indicator to construct the model ?
@@ -384,7 +384,7 @@ $$ E(T,X) = \sum_{c \in X}P(c)E(c)$$
 
 #### Gini
 
-You can understand the Gini index as a cost function used to evaluate splits in the dataset. It is calculated by subtracting the sum of the squared probabilities of each class from one. It favors larger partitions and easy to implement whereas information gain favors smaller partitions with distinct values.
+You can understand the Gini index as a cost function used to evaluate splits in the dataset. It is calculated by subtracting the sum of the squared probabilities of each class from one. It favors larger partitions and it is easy to implement, whereas information gain, favors smaller partitions with distinct values.
 
 $$ Gini = 1 - \sum_{i =1}^c(p_{i})^2$$
 
@@ -493,15 +493,15 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 
 ### How does it work ?
 
-To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then x is assigned to the class to which the most of these observations belong. We just need to defnine the notion of distance which can be euclidean.\newline
+To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then, x is assigned to the class to which the most of these observations belong. We just need to define the notion of distance which can be euclidean.\newline
 
 ### Comments
 
 KNN is very good for non-linear classification. \newline
 
-However it doesn't give the coefficient for the predictors so we can't see their impacts. \newline
+However, it doesn't give the coefficient for the predictors so we can't see their impacts. \newline
 
-It also needs a lot od training observations well-balanced. Otherwise if a class is over-represented, it would assign too much this label. \newline
+It also needs a lot of training observations well-balanced. Otherwise, if a class is over-represented, it would assign too much this label. \newline
 
 ### Choosing k
 
@@ -516,8 +516,7 @@ Discriminant analysis is a technique that helps classifying 2 or more groups int
 
 The aim is to use those 3 components to create boundaries between the classes. The boundaries are composed by a set of points that have the same chance to belong to either classes. \newline
 
-There is two types of discriminant Analysis. The first one is the Linear Discriminant Analysis (LDA). To use that model, each class need to be drawn from a multivariate Gaussian distribution and the covariance for each class needs to be equals (the groups of points need to have the same shape). \newline
-
+Here, we are going to talk about two models. The first one is the Linear Discriminant Analysis (LDA). To use that model, each class need to be drawn from a multivariate Gaussian distribution and the covariance for each class needs to be equals (the groups of points need to have the same shape). \newline
 
 Quadratic Discriminant Analysis (QDA) is a bit similar to (LDA) because it assumes that each class are drawn from a Gaussian distribution. However, the covariance doesn't need to be the same for each class. \newline
 
@@ -558,7 +557,7 @@ Let's call M, the minimal distance from the observations to the hyperplan. We wr
 
 For some data sets a separating hyperplane does not exist, the data set is non-separable. \newline
 
-To obtain a support vector classifier we relax the conditions that we had for the maximal margin hyperplane by allowing for a “budget” C of misclassifications. \newline
+To obtain a support vector classifier, we relax the conditions that we had for the maximal margin hyperplane by allowing for a “budget” C of misclassifications. \newline
 
 We write the new problem :  \newline
 
@@ -601,7 +600,7 @@ Neural networks can be decomposed as three parts the input the hidden layers and
 
 Once, we have computed the output, we compare our prediction to the answer. Then, we backpropagate the error. It means that depending on the error, the value of the nodes and the learning rate, we are going to updates the weights.
 
-Once the weights are updated we iterate until the amount of errors become acceptable.
+Once the weights are updated, we iterate until the amount of errors made by the model becomes acceptable.
 
 \clearpage
 
@@ -617,14 +616,14 @@ Regression is a statistical method used in finance, investing, and other discipl
 
 The MSE mesures the mean accuracy of the predicted responses values for given observations.
 There are two MSE : the train MSE and the test MSE. \newline
-The train MSE is use to fit a model while training. \newline
-The test MSE is use to choose between models already trained.
+The train MSE is used to fit a model while training. \newline
+The test MSE is used to choose between models already trained.
 \newline
 
 Let's define the mean squared error or MSE.
 $$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$ where $\hat{f}(x_i)$ is the prediction of $y_i$ obtained with the model.
 
-Then the expected test MSE refers to the average test MSE that we would obtain if we repeatedly estimated
+Then, the expected test MSE refers to the average test MSE that we would obtain if we repeatedly estimated
 f using a large number of training sets, and tested each at $x_0$. So that the expected test MSE is :
 
 $$E(y_0 - \hat{f}(x_0))^2 $$
