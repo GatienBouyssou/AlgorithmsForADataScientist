@@ -58,7 +58,7 @@ There are classifiers as logistic regression, Decision trees, Perceptron / Neura
 ### Sensitivity and recall
 
 The sensitivity (also named recall) is the percentage of true defaulters that are identified (True positive tests).
-For example, probability of predicting disease given true state is disease.
+It is the probability that our model predicts a patient positive given the fact that he is sick.
 
 $$sensitivity = recall = \frac{TruePositiveTests}{PositivePopulation}$$
 
@@ -66,7 +66,7 @@ $$sensitivity = recall = \frac{TruePositiveTests}{PositivePopulation}$$
 
 The specificity  is the percentage of non-defaulters that are correctly identified (True negative tests).
 1 - specificity is the Type 1 error, it is the false positive rate.
-For example, probability of predicting non-disease given true state is non- disease.
+It is the probability that our model predicts a patient positive given the fact that he doesn't have the disease.
 
 $$specificity = \frac{TrueNegativeTests}{NegativePopulation}$$
 

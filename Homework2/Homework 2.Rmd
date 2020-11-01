@@ -105,7 +105,7 @@ Internal validation measures reflect often the compactness, the connectedness an
 
 #### Compactness
 
-Compactness measures how close are the objects within the same cluster. \newline
+Compactness measures how close the objects are, within the same cluster. \newline
 We evaluate it with the notion of distance such as the cluster-wise within average/median distances between observations.
 
 #### Separation
@@ -162,11 +162,11 @@ Determining the optimal number of clusters in a data set is fundamental because,
 
 ### Elbow method
 
-The Elbow method looks at the total within-cluster sum of square as a function of the number of clusters.
+The Elbow method looks at the total within-cluster sum of squares over the number of clusters.
 
 <ul>
 <li> Compute the clustering algorithm chosen with k going from 1 to 10 for example. </li>
-<li> Calcultate the within-cluster sum of square for each k </li>
+<li> Calculate the within-cluster sum of squares for each k </li>
 <li> Plot the curve of WSS according to k </li>
 <li> The location of a bend (knee) in the plot is generally considered as an indicator of the appropriate number of clusters. </li>
 </ul>
@@ -179,22 +179,22 @@ Average silhouette method computes the average silhouette of observations for di
 
 <ul>
 <li> Compute the clustering algorithm chosen with k going from 1 to 10 for example. </li>
-<li> Calcultate the average silhouette coeffcients of observations for each k </li>
+<li> Calculate the average silhouette coefficients of observations for each k </li>
 <li> Plot the curve of AVG.S according to k </li>
 <li> The location of the maximum is considered as the appropriate number of clusters. </li>
 </ul>
 
 ### Gap statistic method
 
-The gap statistic compares the total within intra-cluster variation for different values of k with their expected values under null reference. We choose k when it maximizes the  gap statistic so that the clustering structure is far away from the random uniform distribution of points.
+The gap statistic compares the total within intra-cluster variation for different values of k with their expected values under null reference. We choose k when it maximizes the gap statistic so that the clustering structure is far away from the random uniform distribution of points.
 
 <ul>
 <li> Compute the clustering algorithm chosen with k going from 1 to 10 for example.</li>
-<li> Calcultate the within-cluster sum of square for each k $W_k$ </li>
+<li> Calculate the within-cluster sum of squares for each k $W_k$ </li>
 <li> Generate B reference data sets with a random uniform distribution. </li>
 <ul>
 <li> Compute the clustering algorithm chosen on these reference data sets with k going from 1 to $k_max$.</li>
-<li> Calcultate the within-cluster sum of square for each k $W_kb$
+<li> Calculate the within-cluster sum of squares for each k $W_kb$
 </ul>
 <li> Compute the gap : $$Gap(k) = \frac{1}{B} \Sigma_{b=1}^B log(W_{kb}) - log(W_k)$$ </li>
 <li> Compute the standard deviation of the statistics $s_k$. </li>
@@ -213,21 +213,21 @@ Principal Component Analysis, or PCA, is a dimensionality-reduction method that 
 
 ### Standard PCA
 
-To process the feature extraction, we need to associate eighenvector and eighenvalues to each feature of our dataset. For that, we will follow those steps one by one :
+To process the feature extraction, we need to associate eighenvectors and eighenvalues to each feature of our dataset. For that, we will follow those steps one by one :
 
 - First, put your label column asside and keep all the independant features (the rest)
 - For each feature substract the mean of that column from each entry
 - Standardize the features if needed. This will form a new matrix S
 - Transpose this matrix and multiply it by itself ($ S^t S $). This is a new matrix.
-- Compute the eigenvectors and the eigenvalues of this new matrix and deduce its eigendecomposition $PDP^{-1}$ where P contains all the eigenvectors and D all the eigenvalues. The each eighenvalue is associated to a eighenvector (the first eighenvalue is associated to first column).
+- Compute the eigenvectors and the eigenvalues of this new matrix and deduce its eigendecomposition $PDP^{-1}$ where P contains all the eigenvectors and D all the eigenvalues on the diagonal. Each eighenvalue is associated to a eighenvector (the first eighenvalue is associated to first column).
 - Sort the eigenvalues. Change P based on the new order given to the eigenvalues. This new matrix will be called P*
-- Then multiply S by P. SP* is a centered and standardized version of independant features.
+- Then multiply S by P*. SP* is a centered and standardized version of independant features.
 
 Now that we have all the eighenvectors and eighenvalues corresponding to our features, we can determine how much features we want to keep.
 
 ## Deciding how many PCs to use
 
-For this part, we are going through two different methods the Proportion of variance explained and the Cumulative Proportion of variance explained that related.
+For this part, we are going through two different methods the Proportion of variance explained and the Cumulative Proportion of variance explained.
 
 ### Proportion of variance explained (PVE)
 
@@ -236,7 +236,7 @@ This value for each column can be optained by taking the corresponding eighenval
 
 ### Cumulative Proportion of variance explained
 
-The cumulative Proportion of variance explained (CPVE) is the sum of the first components divided by all the others. For example, the CPVE for the third component is
+The Cumulative Proportion of Variance Explained (CPVE) is the sum of the first components divided by all the others. For example, the CPVE for the third component is
 
 CPVE = $\frac{e_1 + e_2 + e_3}{e_1 + e_2 + e_3 + ... e_k}$
 
@@ -315,8 +315,7 @@ plt.ylabel('CPVE')
 plt.show()
 ```
 
-
-According to the Cumulative Proportion of Variance Explained (CPVE), we can see that the first 35 eigenvalues correspond to approximately 98% of the variance. It means that we need only 35 components on 40. Being able to remove only 5 components is not enough.
+According to the Cumulative Proportion of Variance Explained (CPVE), we can see that the first 35 eigenvalues correspond to approximately 98% of the variance. It means that we need only 35 patients on 40.
 
 \clearpage
 
@@ -379,7 +378,7 @@ palette = c("#2E9FDF", "#FC4E07"), ellipse.type = "euclid", star.plot = TRUE, re
 
 ##### On Python with scikit-learn
 
-With python we are going to repeat the experiment to validate the number of cluster and the different results found above. At first, we are going to loop through the number of clusters k and select one based on the sum of squared distances.
+With python, we are going to repeat the experiment to validate the number of cluster and the different results found above. At first, we are going to loop through the number of clusters k, and select one, based on the sum of squared distances.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
@@ -408,23 +407,23 @@ km = KMeans(n_clusters=2)
 km = km.fit_predict(tissu_dataset)
 ```
 
-This is the silhouette score : 
+This is the silhouette score :
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 silhouette_score(tissu_dataset, km)
 ```
 
-The silhouette coefficient estimates the average distance between clusters. If the coefficient tends toward 1 then it means that the values are well clustered. In that case it means that the clusters are overlaping. However the silhouette score is not negative. If it was it would have meant that the sample has been assigned to the wrong cluster.
+The silhouette coefficient estimates the average distance between clusters. If the coefficient tends toward 1, it means that the values are well clustered. In that case, the silhouette score is equal to 0. It means that the clusters are overlaping. However, the silhouette score is not negative. It would have meant that the sample has been assigned to the wrong cluster.
 
-This is the dunn index : 
+This is the dunn index :
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 davies_bouldin_score(tissu_dataset, km)
 ```
 
-The dunn index strengthen the idea that the value are well classified. If they were not the dunn index would have been close to 0.
+The dunn index strengthen the idea that the value are well classified. If they were not well classified the dunn index would have been close to 0.
 
 ### K-medoids algorithm
 
@@ -596,7 +595,7 @@ It means that observations are well clustered but the distinction between cluste
 
 Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph. \newline
 
-Feature Agglomeration recursively merges features instead of samples. In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
+Feature Agglomeration recursively merges features. In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
@@ -626,7 +625,7 @@ plt.title("Plotting the two clusters with their center depending on their label 
 plt.show()
 ```
 
-The clustering obtained is : 
+The clustering obtained is :
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 km.labels_
@@ -679,7 +678,7 @@ corona_dataset['country'] = pd.factorize(corona_dataset['country'])[0]
 corona_train = corona_dataset.drop("deceased", axis=1)
 ```
 
-This is the percentage of death in the data set : 
+This is the percentage of death in the data set :
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 len(corona_dataset[corona_dataset['deceased'] == 1])*100/len(corona_dataset)
 ```
@@ -746,7 +745,7 @@ The silhouette score is :
 silhouette_score(corona_dataset, predicted_labels)
 ```
 
-The dunn index is : 
+The dunn index is :
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 davies_bouldin_score(corona_dataset, predicted_labels)
