@@ -67,6 +67,8 @@ library(fpc)
 
 ## Interesting rules
 
+\clearpage
+
 # Algorithm principle
 
 ## Apriori principle

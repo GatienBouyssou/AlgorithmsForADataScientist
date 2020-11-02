@@ -57,29 +57,30 @@ There are classifiers as logistic regression, Decision trees, Perceptron / Neura
 
 ### Sensitivity and recall
 
-The sensitivity (also named recall) is the percentage of true defaulters that are identified (True positive tests).
-It is the probability that our model predicts a patient positive given the fact that he is sick.
+The sensitivity (also named recall) is the percentage of true defaulters that are identified (True positive tests). \newline
+It is the probability that our model predicts a patient positive given the fact that he has the disease.
 
 $$sensitivity = recall = \frac{TruePositiveTests}{PositivePopulation}$$
 
 ### Specificity
 
-The specificity  is the percentage of non-defaulters that are correctly identified (True negative tests).
-1 - specificity is the Type 1 error, it is the false positive rate.
-It is the probability that our model predicts a patient positive given the fact that he doesn't have the disease.
+The specificity  is the percentage of non-defaulters that are correctly identified (True negative tests). \newline
+It is the probability that our model predicts a patient negative given the fact that he doesn't have the disease. \newline
+
+1 - specificity is the Type 1 error, it is the false positive rate. 
 
 $$specificity = \frac{TrueNegativeTests}{NegativePopulation}$$
 
 ### Precision
 
-The precision is the proportion of true positive tests among the positive tests.
+The precision is the proportion of true positive tests (individuals tested positive and really positive) among the positive tests (which can be right or not).
 $$precision = \frac{TruePositiveTests}{PositiveTests}$$
 
 ### F-Mesure
 
 The traditional F measure is calculated as follows:
 
-$$F_Measure = \frac{(2 * Precision * Recall)}{ (Precision + Recall)}$$
+$$F_{Measure} = \frac{(2 * Precision * Recall)}{ (Precision + Recall)}$$
 
 ### Rand index
 
@@ -125,7 +126,7 @@ If M>2 (i.e. multiclass classification), we compute a separate loss for each cla
 
 $$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
 
-## Accuracy of a model
+## Metrics
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \newline
 These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
@@ -137,46 +138,35 @@ $$MSE = \frac{1}{n} \sum_i 1_{y_i-\hat{f}(x_i)}$$ where :
 
 $$1_{y_i-\hat{f}(x_i)} = \left\{
     \begin{array}{ll}
-        1 & \mbox{if } y_i != \hat{f}(x_i) \\
+        1 & \mbox{if } y_i \neq \hat{f}(x_i) \\
         0 & \mbox{otherwise}
     \end{array}
 \right. $$
 
-Recall : $$RSS = MSE * n$$
-
-RSS and $R^2$ are not suitable for selecting the best model among a collection of models with different numbers of predictors.
-
-### Mallow’s Cp
-
-Mallows’s Cp addresses the issue of overfitting/ Indeed, model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model.
-
-If there are d predictors :
-
-$$ C_p = \frac{RSS + 2 d \hat{\sigma}^2}{n}$$
+It is a too much simple indicator so let's look at other evalutaion criterions.
 
 ### AIC : Akaike information criterion
 
-The Akaike information criterion (AIC) is an estimator of in-sample prediction error and thereby relative quality of statistical models for a given set of data.[1] In-sample prediction error is the expected error in predicting the resampled response to a training sample
+The Akaike information criterion (AIC) is an estimator of in-sample prediction error. In-sample fit estimates the likelihood of a model to predict the future values. \newline
+The AIC score rewards models that achieve a high goodness-of-fit score and penalizes them if they become overly complex. \newline
 
 The AIC criterion is defined for a large class of models fit by maximum likelihood.
 
-$$ AIC = \frac{RSS + 2 d \hat{\sigma}^2}{n\hat{\sigma}^2}$$
+$$ AIC = -2*\log{L} + 2 p$$ where : L is the likelihood function of the parameters in the model and p the number of predictors used in the model.\newline
 
-To use AIC for model selection, we simply choose the model giving small- est AIC over the set of models considered.
+To use AIC for model selection, we simply choose the model giving the smallest AIC over the set of models considered.
 
 ### BIC : Bayesian information criterion
 
-In statistics, the Bayesian information criterion or Schwarz information criterion is a criterion for model selection among a finite set of models; the model with the lowest BIC is preferred. It is based, in part, on the likelihood function and it is closely related to the Akaike information criterion
+In statistics, the Bayesian information criterion or Schwarz information criterion is a criterion for model selection among a finite set of models. It is based, in part, on the likelihood function and it is closely related to the Akaike information criterion. \newline
 
-BIC is derived from a Bayesian point of view, but ends up looking similar to Cp (and AIC) as well. For the least squares model with d predictors, the BIC is, up to irrelevant constants, given by
+BIC measures the trade-off between model fit and complexity of the model. \newline
 
-$$ BIC = \frac{RSS + log(n) d \hat{\sigma}^2}{n}$$
+BIC is derived from a Bayesian point of view, but ends up looking similar to Cp (and AIC) as well. For the least squares model with d predictors, the BIC is, up to irrelevant constants, given by :
 
-### Adjusted R statistic
+$$ BIC = -2*\log{L} + p*log(n)$$ where : L is the likelihood function of the parameters in the model, p the number of predictors used in the model and n the number of data.
 
-The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model. The adjusted R-squared increases only if the new term improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance
-
-$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
+To use BIC for model selection, we simply choose the model giving the smallest BIC over the set of models considered.
 
 ## Logistic Regression
 
@@ -610,7 +600,7 @@ Once the weights are updated, we iterate until the amount of errors made by the 
 
 Regression is a statistical method used in finance, investing, and other disciplines that attempts to determine the strength and character of the relationship between one dependent variable (usually denoted by Y) and a series of other variables (known as independent variables).
 
-## Accuracy of a model
+## Metrics
 
 ### MSE : Mean Squarred Error
 
@@ -673,15 +663,34 @@ TSS − RSS measures the amount of variability in the response that is explained
 
 $R^2$ measures the proportion of variability in Y that can be explained using X.
 
+### Adjusted R statistic
+
+The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model. The adjusted R-squared increases only if the new term improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance
+
+$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
+
 ### MAE : Mean Absolute Error
 
 Mean Absolute Error (MAE), an alternative to the RMSE that is less sensitive to outliers. It corresponds to the average absolute difference between observed and predicted outcomes. The lower the MAE, the better the model is.
 
 $$MAE = \frac{1}{n} \sum_i |y_i-\hat{f}(x_i)|$$
 
-## Simple Linear Regression
 
-### Definition
+### Mallow’s Cp
+
+Mallows’s Cp addresses the issue of overfitting. Indeed, model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model. \newline
+
+Recall : $RSS = MSE*n$
+
+If there are p predictors :
+
+$$ C_p = \frac{RSS + 2 p \hat{\sigma}^2}{n}$$ where $\sigma$ is the variance estimate of the error.
+
+### AIC and BIC
+
+AIC and BIC can both be used with the likelihood : $L = RSS/n$.
+
+## Simple Linear Regression
 
 In statistics, linear regression is a linear approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple linear regression.
 
@@ -866,17 +875,13 @@ $$\hat{y_i} = f(x_i) = \frac{1}{k} \Sigma_{x_j \in N_i} y_j$$
 
 # Validation techniques
 
-## Sampling
-
-This consists in dividing the dataset into a training set and a test set.
-
-## Cross validation
+These are techniques of Cross validation :  \newline
 
 R2, RMSE and MAE are used to measure the regression model performance during cross-validation.
 
-### Validation set approach
+### Validation set approach 
 
-The Validation Set Approach is a type of method that estimates a model error rate by holding out a subset of the data from the fitting process (creating a testing dataset). The model is then built using the other set of observations (the training dataset)
+The Validation Set Approach, also called Sampling, is a type of cross-validation that estimates a model error rate by holding out a subset of the data from the fitting process (creating a testing dataset). The model is then built using the other set of observations (the training dataset).
 
 #### Example on R
 
