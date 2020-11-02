@@ -1,0 +1,81 @@
+---
+subtitle: "Pattern Mining and Social Network Analysis"
+title: "Homework 3"
+author: "BOUYSSOU Gatien , de POURTALES Caroline, LAMBA Ankit"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+    toc_depth: 6
+---
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+library(reticulate)
+#use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
+knitr::knit_engines$set(python.reticulate =  TRUE)
+#py_install("matplotlib")
+#py_install("scikit-learn")
+```
+
+```{r rpackages,eval=TRUE,echo=FALSE}
+#install.packages("fpc")
+library(magrittr)
+library(knitr)
+library(rmarkdown)
+library(xlsx)
+library(ggplot2)
+library(ggfortify)
+library(MASS)
+library(dplyr)
+library(ISLR)
+library(readr)
+library(randomForest)
+library(tidyverse)
+library(caret)
+library(cluster)
+library(factoextra)
+library(fpc)
+```
+
+\clearpage
+
+
+# Frequent patterns 
+
+## Efficient and scalable methods
+
+## Transactionnal patterns
+
+## Sequential Patterns
+
+## Graph patterns
+
+\clearpage
+
+# Association rules 
+
+## Concept
+
+## Support and Confidence
+
+### Properties
+
+### Example
+
+## Interesting rules
+
+# Algorithm principle
+
+## Apriori principle
+
+## Basic algorithm
+
+## Cumulate Algorithm
+
+
+
+
+
