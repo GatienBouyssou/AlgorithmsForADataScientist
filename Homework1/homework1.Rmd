@@ -17,7 +17,7 @@ library(reticulate)
 #use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
 knitr::knit_engines$set(python.reticulate =  TRUE)
 #py_install("matplotlib")
-#py_install("scikit-learn")
+py_install("scikit-learn")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -57,17 +57,17 @@ There are classifiers as logistic regression, Decision trees, Perceptron / Neura
 
 ### Sensitivity and recall
 
-The sensitivity (also named recall) is the percentage of true defaulters that are identified (True positive tests). \newline
+The sensitivity (also named recall) is the percentage of true defaulters that are identified. \newline
 It is the probability that our model predicts a patient positive given the fact that he has the disease.
 
 $$sensitivity = recall = \frac{TruePositiveTests}{PositivePopulation}$$
 
 ### Specificity
 
-The specificity  is the percentage of non-defaulters that are correctly identified (True negative tests). \newline
+The specificity  is the percentage of non-defaulters that are correctly identified. \newline
 It is the probability that our model predicts a patient negative given the fact that he doesn't have the disease. \newline
 
-1 - specificity is the Type 1 error, it is the false positive rate. 
+1 - specificity is the Type 1 error, it is the probability that our model predicts a patient positive given the fact that he doesn't have the disease.
 
 $$specificity = \frac{TrueNegativeTests}{NegativePopulation}$$
 
@@ -129,7 +129,7 @@ $$ CE = - \sum_{ c = 1 }^{b}y_{o, c}\log(p_{o, c})$$
 ## Metrics
 
 How do we determine which model is best? Various statistics can be used to judge the quality of a model. \newline
-These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
+These include Akaike information criterion (AIC) and Bayesian information criterion (BIC).
 
 ### MSE : Mean Squarred Error
 
@@ -211,6 +211,8 @@ tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
 head(tennis)
 ```
+This is the plot of UFE difference according to ACE difference between Player 1 and 2 with different colors for different results.
+
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -226,6 +228,10 @@ tennis_dataset["Result"].value_counts()
 tennis_dataset.describe()
 
 plt.scatter(tennis_dataset["ACEdiff"], tennis_dataset["UFEdiff"], c=tennis_dataset["Result"])
+plt.legend()
+plt.ylabel("UFE difference")
+plt.xlabel("ACE difference")
+plt.title("Repartion of Result according to ACE and UFE differences")
 plt.show()
 ```
 
@@ -239,7 +245,7 @@ r.tennis2 = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomi
 summary(r.tennis2)
 ```
 
-With the model, we can draw the slope which indicates the category of a point.
+With the model, we can draw the slope which indicates the sepration between classes.
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 #We calculate the slope
@@ -326,9 +332,9 @@ for i in range(0,nbrOfIteration):
     meanAccuracy += clf.score(testX, testY.values.ravel())
 meanAccuracy /= nbrOfIteration
 meanPerfModel = [i/nbrOfIteration for i in meanPerfModel]
-print("Mean accuracy is : \n")
+print("The mean accuracy is : \n")
 print(meanAccuracy)
-print("Mean performance is : \n")
+print("The confusion matrix  : \n")
 print(meanPerfModel)
 sensivity = meanPerfModel[0]/(meanPerfModel[0]+meanPerfModel[2])
 print("The Sensitivity is : " + str(sensivity))
@@ -340,7 +346,8 @@ Fmesure = (2*precision*sensivity)/(precision+sensivity)
 print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 ```
 
-Using the Logistic Regression model in scikit, we obtain an accuracy of 0.74. In average, this model has 9.48 True Positive, 3.23 False Positive, 4.4 False Negative, 12.63 True Positive.
+Using the Logistic Regression model in scikit, we obtain an accuracy of 0.74. \newline 
+In average, this model has 9.48 True Positive, 3.23 False Positive, 4.4 False Negative, 12.63 True Positive.
 
 ## Decision trees and Random Forest
 
@@ -361,7 +368,7 @@ Random forests or random decision forests are an ensemble learning method for cl
 
 #### Entropy
 
-Entropy is a measure of the randomness in the information being processed. The higher the entropy, the harder it is to draw any conclusions from that information. Flipping a coin is an example of an action that provides information that is random.
+Entropy is a measure of the randomness in the information being processed. The higher the entropy, the harder it is to draw any conclusions from that information. Flipping a coin is an example of an action that provides information that is random. \newline
 
 Mathematically Entropy for 1 attribute is represented as:
 
@@ -384,45 +391,33 @@ $$ Gini = 1 - \sum_{i =1}^c(p_{i})^2$$
 #### On R
 
 ```{r, eval=TRUE, echo=FALSE}
-accuracyrate <- rep(NA,40)
-deg = 1:40
+set.seed(71)
+accuracyrate <- rep(NA,20)
+deg = 1:20
 for (d in deg) {
-  model <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain,
-                          mtry = 2, ntree = 500, nodesize=d,importance = TRUE)
-  yRandomForest = predict(model, newdata = tennisTest)
-  model.Result_probs = predict(model, newdata = tennisTest)
-  model.Result_pred = ifelse(model.Result_probs > 0.5, 1, 0)
-  model.confusion_matrix = table(model.Result_pred, tennisTest$Result)
-  model.accuracyrate = (model.confusion_matrix[2,2] + model.confusion_matrix[1,1]) /30
+  model <-  randomForest(as.factor(Result) ~ ACEdiff + UFEdiff, data=tennisTrain,
+                        mtry = 2, ntree = 500, nodesize=d)
+  model.confusion_matrix = model$confusion
+  model.accuracyrate = (model.confusion_matrix[1,1] + model.confusion_matrix[2,2]) / (model.confusion_matrix[1,1] + model.confusion_matrix[1,2] + model.confusion_matrix[2,1] +model.confusion_matrix[2,2])
   accuracyrate[d] = model.accuracyrate
+   model.accuracyrate
 }
 
-#The model with the smallest MSE has 14 nodesizes
-which.min(accuracyrate)
-
 #The best model is
-model <-  randomForest(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTrain,
-                        mtry = 2, ntree = 500, nodesize=which.min(accuracyrate),importance = TRUE)
-
-predictions <- model %>% predict(tennisTest)
-data.frame( MSE = mean((predictions - tennisTest$Result)^2),
-            R2 = R2(predictions, tennisTest$Result),
-            RMSE = RMSE(predictions, tennisTest$Result),
-            MAE = MAE(predictions, tennisTest$Result))
+model <-  randomForest(as.factor(Result) ~ ACEdiff + UFEdiff, data=tennisTrain,
+                        mtry = 2, ntree = 500, nodesize=which.max(accuracyrate))
 ```
 
 The confusion matrix is :
 
 ```{r, eval=TRUE, echo=FALSE}
-model.Result_probs = predict(model, newdata = tennisTest)
-model.Result_pred = ifelse(model.Result_probs > 0.5, 1, 0)
-model.confusion_matrix = table(model.Result_pred, tennisTest$Result)
+model.confusion_matrix = model$confusion
 model.confusion_matrix
 ```
 
 The accuracy rate is :
 ```{r, eval=TRUE, echo=FALSE}
-model.accuracyrate = (model.confusion_matrix[2,2] + model.confusion_matrix[1,1]) /30
+model.accuracyrate = (model.confusion_matrix[1,1] + model.confusion_matrix[2,2]) / (model.confusion_matrix[1,1] + model.confusion_matrix[1,2] + model.confusion_matrix[2,1] +model.confusion_matrix[2,2])
 model.accuracyrate
 ```
 
@@ -466,7 +461,9 @@ for i in range(0,nbrOfIteration):
     meanAccuracy += clf.score(testX, testY.values.ravel())
 meanAccuracy /= nbrOfIteration
 meanPerfModel = [i/nbrOfIteration for i in meanPerfModel]
+print("The mean accuracy is : \n")
 print(meanAccuracy)
+print("The confusion matrix is : \n")
 print(meanPerfModel)
 
 sensivity = meanPerfModel[0]/(meanPerfModel[0]+meanPerfModel[2])
@@ -539,8 +536,8 @@ Let's call M, the minimal distance from the observations to the hyperplan. We wr
 
 \begin{align}
   & \max_{\beta_0, \beta} M \\
-  & \text{subject to} \notag \Sigma_j \beta_j^2 = 1 \\
-  & \text{for all training observations} \notag  y_i * (\beta_0 + X^T \beta) > M \\
+  & \text{subject to } \notag \Sigma_j \beta_j^2 = 1 \\
+  & \text{for all training observations } \notag  y_i * (\beta_0 + X^T \beta) > M 
 \end{align}
 
 ### Support vector classifier
@@ -553,9 +550,9 @@ We write the new problem :  \newline
 
 \begin{align}
 & \max_{\beta_0, \beta} M \\
-& \text{subject to} \Sigma_j \beta_j^2 = 1  \\
-& \text{for all training observations} y_i * (\beta_0 + X^T \beta) > M*(1-\epsilon_i)\\
-& 0 \leq \epsilon_i \text{and} \Sigma_i \epsilon_i \leq C \\
+& \text{subject to } \Sigma_j \beta_j^2 = 1  \\
+& \text{for all training observations } y_i * (\beta_0 + X^T \beta) > M*(1-\epsilon_i)\\
+& 0 \leq \epsilon_i \text{ and } \Sigma_i \epsilon_i \leq C 
 \end{align}
 
 Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
@@ -576,21 +573,19 @@ We write the new problem : \newline
 
 \begin{align}
 & \max_{\beta_0, \beta} M \\
-& \text{for all training observations} y_i * f(X_i) > M*(1-\epsilon_i)\\
-& 0 \leq \epsilon_i \text{and} \Sigma_i \epsilon_i \leq C \\
+& \text{for all training observations } y_i * f(X_i) > M*(1-\epsilon_i)\\
+& 0 \leq \epsilon_i \text{ and } \Sigma_i \epsilon_i \leq C 
 \end{align}
 
 Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
 
 ## Neural networks
 
-Neural network structure
+Neural networks can be decomposed as three parts the input the hidden layers and the output. Those parts are in fact nodes link together with edges that are given weights describing the strenght of the connection. With a given input the value of the first node of the hidden layer will correspond to the inputs time the weights on the edges going to the node. This product will give a result that needs to go through an activation function before giving the value of the current node. This process of computing the values of the nodes from the inputs to the output is called feedforward. \newline
 
-Neural networks can be decomposed as three parts the input the hidden layers and the output. Those parts are in fact nodes link together with edges that are given weights describing the strenght of the connection. With a given input the value of the first node of the hidden layer will correspond to the inputs time the weights on the edges going to the node. This product will give a result that needs to go through an activation function before giving the value of the current node. This process of computing the values of the nodes from the inputs to the output is called feedforward.
+Once, we have computed the output, we compare our prediction to the answer. Then, we backpropagate the error. It means that depending on the error, the value of the nodes and the learning rate, we are going to updates the weights. \newline
 
-Once, we have computed the output, we compare our prediction to the answer. Then, we backpropagate the error. It means that depending on the error, the value of the nodes and the learning rate, we are going to updates the weights.
-
-Once the weights are updated, we iterate until the amount of errors made by the model becomes acceptable.
+Once the weights are updated, we iterate until the amount of errors made by the model becomes acceptable. \newline
 
 \clearpage
 
@@ -611,7 +606,7 @@ The test MSE is used to choose between models already trained.
 \newline
 
 Let's define the mean squared error or MSE.
-$$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$ where $\hat{f}(x_i)$ is the prediction of $y_i$ obtained with the model.
+$$MSE = \frac{1}{n} \sum_i(y_i-\hat{f}(x_i))^2$$ where $\hat{f}(x_i)$ is the prediction of $y_i$ obtained with the model. \newline
 
 Then, the expected test MSE refers to the average test MSE that we would obtain if we repeatedly estimated
 f using a large number of training sets, and tested each at $x_0$. So that the expected test MSE is :
@@ -623,9 +618,9 @@ E(y_0-\hat{f}(x_0))^2 &=
 Var(\hat{f}(x_0))  + (f(x_0)-E(\hat{f}(x_0)))^2 + Var(\varepsilon)
 \end{aligned}$$
 
-$Var(\varepsilon)$ represents the irreductible error. This term can not be reduced regardless how well our statstical model fits the data.
+$Var(\varepsilon)$ represents the irreductible error. This term can not be reduced regardless how well our statstical model fits the data. \newline
 
-$(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and refers to the error that is introduced by approximating a real-life problem, which may be extremely complicated, by a much simpler model. If the bias is low the model gives a prediction which is close to the true value.
+$(f(x_0)-E(\hat{f}(x_0))^2 = [Bias(\hat{f}(x_0))]^2$ is the squared Bias and refers to the error that is introduced by approximating a real-life problem, which may be extremely complicated, by a much simpler model. If the bias is low the model gives a prediction which is close to the true value. \newline
 
 $Var(\hat{f}(x_0))$ is the Variance of the prediction at $\hat{f}(x_0)$ and refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. If the variance is high, there is a large uncertainty associated with the prediction.
 
@@ -657,9 +652,9 @@ $$RSE = \sqrt{\frac{1}{n-2}RSS}$$
 In statistics, the coefficient of determination, denoted R² or r² and pronounced "R squared", is the proportion of the variance in the dependent variable that is predictable from the independent variable
 
 $$R^2 = 1 - \frac{RSS}{TSS}$$
-$$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y.
+$$TSS = \Sigma (y_i - \bar{y}_i)^2$$ is the total sum of squares. TSS measures the total variance in the response Y. \newline
 
-TSS − RSS measures the amount of variability in the response that is explained.
+TSS − RSS measures the amount of variability in the response that is explained. \newline
 
 $R^2$ measures the proportion of variability in Y that can be explained using X.
 
@@ -667,7 +662,7 @@ $R^2$ measures the proportion of variability in Y that can be explained using X.
 
 The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model. The adjusted R-squared increases only if the new term improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance
 
-$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-d-1}}{\frac{TSS}{n-1}}$$
+$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-p-1}}{\frac{TSS}{n-1}}$$ where : p is the number of predictors in the model the size of the data set.
 
 ### MAE : Mean Absolute Error
 
@@ -680,7 +675,7 @@ $$MAE = \frac{1}{n} \sum_i |y_i-\hat{f}(x_i)|$$
 
 Mallows’s Cp addresses the issue of overfitting. Indeed, model selection statistics such as the residual sum of squares always get smaller as more variables are added to a model. \newline
 
-Recall : $RSS = MSE*n$
+Recall : $RSS = MSE*n$ \newline
 
 If there are p predictors :
 
@@ -692,23 +687,23 @@ AIC and BIC can both be used with the likelihood : $L = RSS/n$.
 
 ## Simple Linear Regression
 
-In statistics, linear regression is a linear approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple linear regression.
+In statistics, linear regression is a linear approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple linear regression. \newline
 
-Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as
+Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response Y on the basis of a single predictor variable X. It assumes that there is approximately a linear relationship between X and Y. Mathematically, we can write this linear relationship as \newline
 $$Y ≈ \beta_0 + \beta_1 * X$$
 
 ## Multiple Linear Regression
 
 ### Definition
 
-Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable
+Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable \newline
 
 Formula and Calcualtion of Multiple Linear Regression
 $$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsilon$$
 
 ### Hospital Costs dataset
 
-The next dataset (source F. E. Harrell, Regression Modeling Strategies) contains the total hospital costs of 9105 patients with certain diseases in American hospitals between 1989 and 1991. The different variables are :
+The next dataset (source F. E. Harrell, Regression Modeling Strategies) contains the total hospital costs of 9105 patients with certain diseases in American hospitals between 1989 and 1991. The different variables are : \newline
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1heRtzi8vBoBGMaM2-ivBQI5Ki3HgJTmO" # google file ID
@@ -781,11 +776,11 @@ hopital_dataset = hopital_dataset.drop("pafi", axis=1)
 
 #### On R
 
-We would like to build models that help us to understand which predictors are mostly driving the total cost.
+We would like to build models that help us to understand which predictors are mostly driving the total cost.\newline
 
 Looking at the distribution of the cost we see we should apply a log transformation for a better distribution. \newline
 
-We can calculate the MSE on the test set to evaluate the simple linear regression model.
+We can calculate the MSE on the test set to evaluate the linear regression model.\newline
 ```{r, eval=TRUE, echo=FALSE}
 set.seed(12345)
 train.proportion = 0.7
@@ -808,6 +803,9 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
 #### On Python with Scikit-learn
 
 ```{python, eval=TRUE, echo=FALSE}
+import numpy as np
+import sklearn
+from sklearn import linear_model
 
 def defineTestTrainDatasetRandomly():
     msk = np.random.rand(len(hopital_dataset)) < 0.75
@@ -826,29 +824,29 @@ def defineTestTrainDatasetRandomly():
 trainX, trainY, testX, testY = defineTestTrainDatasetRandomly()
 lm_reg = linear_model.Ridge(alpha=.5)
 lm_reg.fit(trainX, trainY.values.ravel())
-print(lm_reg.coef_)
 
-lm_reg.intercept_
+print("The MSE is :" + str(sklearn.metrics.mean_squared_error(testY,lm_reg.predict(testX))))
+print("The R squared statistic is :" + str(lm_reg.score(testX, testY)))
 ```
 
 ## Linear regression with interaction terms
 
 ### Definition
 
-It is a regression which introduces an operation between two predictors like multiplication, division ...
+It is a regression which introduces operations between multiple predictors like multiplication, division ...
 
 ### Hospital Costs dataset
 
 ####  On R
 
-We use the same example than for simple linear regression.
+We use the same example than for linear regression with interaction terms.
 
 ```{r, eval=TRUE, echo=FALSE}
 fit_multiple = lm(log(totcst)~age*as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata.train)
 fit_multiple$coefficients
 ```
 
-We can calculate the MSE on the test set to evaluate the multiple linear regression model.
+We can calculate the MSE on the test set to evaluate this linear regression model.
 
 ```{r, eval=TRUE, echo=FALSE}
 predictions <- fit_multiple %>% predict(hospitaldata.test)
@@ -858,9 +856,7 @@ data.frame( MSE = mean((predictions - log(hospitaldata.test$totcst))^2),
             MAE = MAE(predictions, log(hospitaldata.test$totcst)))
 ```
 
-The MSE-test for multiple linear regression is worst than for simple linear regression.
-
-Simple linear regression is the best model so far for this problem.
+The MSE-test for linear regression with interaction terms is better than for mutliple linear regression.
 
 ## K-nearest neighbor regression
 
@@ -943,39 +939,17 @@ cv_results = cross_validate(lm_reg, trainX, trainY, cv=5,
                                     'MAE':"neg_median_absolute_error",
                                     'RMSE': "neg_root_mean_squared_error"})
 
-cv_results
-```
-
-### Leave One out cross-validation
-
-Leave-one-out cross-validation is a special case of cross-validation where the number of folds equals the number of instances in the data set.
-
-This method works as follow:
-
-Leave out one data point and build the model on the rest of the data set
-Test the model against the data point that is left out at step 1 and record the test error associated with the prediction
-Repeat the process for all data points
-Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
-
-#### Example on R
-
-```{r, eval=TRUE, echo=FALSE}
-# Define training control
-train.control <- trainControl(method = "LOOCV")
-# Train the model
-model <- train(log(totcst) ~ age + as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata, method = "lm",
-               trControl = train.control)
-# Summarize the results
-print(model)
+print("The MSE is : " + str(sklearn.metrics.mean_squared_error(testY,lm_reg.predict(testX))))
+print("The R squared statistic is : " + str(lm_reg.score(testX, testY)))
 ```
 
 ### k-Fold Cross-Validation
 
-K-Fold Cross-Validation is where a given data set is split into a K number of sections/folds where each fold is used as a testing set at some point.
+K-Fold Cross-Validation is where a given data set is split into a K number of sections/folds where each fold is used as a testing set at some point. \newline
 
-We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part.
+We divide the set of data in k equals part and we use k-1 parts to train the model and 1 to test. We do do that k times in order to use each part as a test part. \newline
 
-Here are the steps :
+Here are the steps : \newline
 
 1.Split the dataset into k equal partitions (or "folds") \newline
 
@@ -1001,6 +975,29 @@ with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate
 train.control <- trainControl(method = "cv", number = 10)
 # Train the model
 model <- train(log(totcst) ~ age + as.factor(dzgroup)+ temp + edu + resp + num.co, data = hospitaldata, method = "lm",
+               trControl = train.control)
+# Summarize the results
+print(model)
+```
+
+### Leave One out cross-validation
+
+Leave-one-out cross-validation is a special case of cross-validation where the number of folds equals the number of instances in the data set.
+
+This method works as follow:
+
+Leave out one data point and build the model on the rest of the data set \newline
+Test the model against the data point that is left out at step 1 and record the test error associated with the prediction \newline
+Repeat the process for all data points \newline
+Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2. \newline
+
+#### Example on R
+
+```{r, eval=TRUE, echo=FALSE}
+# Define training control
+train.control <- trainControl(method = "LOOCV")
+# Train the model
+model <- train(log(totcst) ~ age + as.factor(dzgroup) + temp + edu + resp + num.co, data = hospitaldata, method = "lm",
                trControl = train.control)
 # Summarize the results
 print(model)
