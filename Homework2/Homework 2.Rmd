@@ -39,16 +39,6 @@ library(cluster)
 library(factoextra)
 library(fpc)
 ```
-\clearpage
-
-# Continuous and discrete data sets
-
-Continuous data is data that can take any value while discrete data can take only certain values.
-with continuous (distance/similarity based) : Silhouette, Dunn, ...
-
-TO DO DISCRETE DATA SET
-
-with discrete (binary, graph based) : modularity, C measure, ...
 
 \clearpage
 
@@ -393,9 +383,9 @@ for k in K:
     Sum_of_squared_distances.append(km.inertia_)
 
 plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
-plt.xlabel('Sum squared distances')
-plt.ylabel('Number of clusters')
-plt.title("Sum of the squared distances depending on the number of clusters")
+plt.ylabel('Sum squared distances')
+plt.xlabel('Number of clusters')
+plt.title("Sum of the squared distances")
 plt.show()
 ```
 
@@ -595,7 +585,7 @@ It means that observations are well clustered but the distinction between cluste
 
 Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph. \newline
 
-Feature Agglomeration recursively merges features. In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
+Feature Agglomeration begin with each element as its own cluster and recursively merges them to make larger clusters In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
@@ -608,7 +598,7 @@ tissu_reduced.shape
 
 This hierarchical clustering allows us to keep only 2 features over 1000. It means that only 2 features were determinant to classify the 40 patients. \newline
 
-With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm.
+With the dataset simplifyied it will be easier to plot the performances of the Kmeans algorithm (with only 2 genes).
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 km = KMeans(n_clusters=2)
@@ -621,7 +611,9 @@ At first, we plot the points with the colors changing depending on the real clas
 plt.plot(tissu_reduced[0:20,0],tissu_reduced[0:20,1], 'ro', marker = "+", color='g')
 plt.plot(tissu_reduced[21:40,0], tissu_reduced[21:40,1], 'ro', marker = "X",color='r')
 plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='b')
-plt.title("Plotting the two clusters with their center depending on their label class")
+plt.xlabel('Gene 1')
+plt.ylabel('Gene 2')
+plt.title("Clusters and their center according to data")
 plt.show()
 ```
 
@@ -636,7 +628,9 @@ Then, we are plotting the points with the colors changing depending on the predi
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 plt.scatter(tissu_reduced[:,0], tissu_reduced[:,1], c=km.labels_)
 plt.plot(km.cluster_centers_[:,0], km.cluster_centers_[:,1], 'ro', marker = "X",color='r')
-plt.title("Plotting the two clusters with their center depending on their label class predicted by kMeans")
+plt.title("Clusters prediction and their center with kMeans")
+plt.xlabel('Gene 1')
+plt.ylabel('Gene 2')
 plt.show()
 ```
 
@@ -719,15 +713,16 @@ for k in K:
     km = km.fit(corona_train)
     Sum_of_squared_distances.append(km.inertia_)
 
-Sum_of_squared_distances
 ```
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 plt.plot(np.linspace(1,14,14), Sum_of_squared_distances)
+plt.title('Sum of squared distances')
+plt.xlabel('Number of clusters')
 plt.show()
 ```
 
-First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. It should be 2 because there is only 2 different class labels with deceased = 1 or deceased = 0.
+First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. We see a bend around 2 so it shoulc be 2. Moreover there is only 2 different labels : deceased = 1 or deceased = 0.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
