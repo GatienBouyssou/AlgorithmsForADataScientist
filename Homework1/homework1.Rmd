@@ -154,6 +154,9 @@ The AIC criterion is defined for a large class of models fit by maximum likeliho
 
 $$ AIC = -2*\log{L} + 2 p$$ where : L is the likelihood function of the parameters in the model and p the number of predictors used in the model.\newline
 
+$2p$ is a penalization term : adding predictor which don't improve well enough L gives a worse AIC. \newline
+
+
 To use AIC for model selection, we simply choose the model giving the smallest AIC over the set of models considered.
 
 ### BIC : Bayesian information criterion
@@ -162,9 +165,11 @@ In statistics, the Bayesian information criterion or Schwarz information criteri
 
 BIC measures the trade-off between model fit and complexity of the model. \newline
 
-BIC is derived from a Bayesian point of view, but ends up looking similar to Cp (and AIC) as well. For the least squares model with d predictors, the BIC is, up to irrelevant constants, given by :
+For the least squares model, the BIC is, up to irrelevant constants, given by :
 
 $$ BIC = -2*\log{L} + p*log(n)$$ where : L is the likelihood function of the parameters in the model, p the number of predictors used in the model and n the number of data.
+
+$p*log(n)$ is a penalization term : adding predictor which don't improve well enough L gives a worse BIC. \newline
 
 To use BIC for model selection, we simply choose the model giving the smallest BIC over the set of models considered.
 
@@ -172,7 +177,7 @@ To use BIC for model selection, we simply choose the model giving the smallest B
 
 ### How it works
 
-In logistic regression, for covariates (X_1 , . . . , X_p ), we want to estimate $p_i = P_r(Y_i = 1 | X_1,...,X_p)$
+In logistic regression, for covariates ($X_1$ , . . . , $X_p$ ), we want to estimate $p_i = P_r(Y_i = 1 | X_1,...,X_p)$
 
 $$p_i = \frac{e^{\beta_0+ \beta_1x_{i1} + \beta_2x_{i2} + \beta_3x_{i3} + \beta_4x_{i4} + ...}}{1+ e^{\beta_0+ \beta_1x_{i1} + \beta_2x_{i2} + \beta_3x_{i3} + \beta_4x_{i4}+ ...}}$$
 
@@ -194,7 +199,9 @@ The goal is to maximise it by adjusting $\beta$ vector.
 
 ### Example on the the Wimbledon tennis tournament
 
-We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on : the number of aces won by each player, and, the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics.
+We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on : the number of aces won by each player, and, the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics. \newline
+
+We want to predict if Player-1 is a winner.
 
 ```{r, eval=TRUE, echo=FALSE}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
@@ -211,6 +218,15 @@ tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
 head(tennis)
 ```
+Instead of 4 variables, we decrease to two variables : \newline
+ACEdiff = ACE.1 - ACE.2 and \newline
+UFEdiff = UFE.1 - UFE.2 \newline
+
+
+ACEdiff is the amount of aces Player-1 in addition to Player-2.\newline
+UFEdiff is the amount of unforced errors Player-1 in addition to Player-2.\newline
+
+
 This is the plot of UFE difference according to ACE difference between Player 1 and 2 with different colors for different results.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
@@ -241,7 +257,7 @@ plt.show()
 ```{r, eval=TRUE, echo=FALSE}
 tennisTest = tennis[-train, ]
 tennisTrain = tennis[train, ]
-r.tennis2 = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomial")
+r.tennis2 = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain)
 summary(r.tennis2)
 ```
 
@@ -480,15 +496,13 @@ print("So, we can deduce that the F-mesure is : " + str(Fmesure))
 
 ### How does it work ?
 
-To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then, x is assigned to the class to which the most of these observations belong. We just need to define the notion of distance which can be euclidean.\newline
+To make predictions for an observation x, the KNN use the training observations to find the k closest training observations to x. Then, x is assigned to the class to which the most of these observations belong. We just need to define the notion of distance which can be euclidean.
 
 ### Comments
 
 KNN is very good for non-linear classification. \newline
-
 However, it doesn't give the coefficient for the predictors so we can't see their impacts. \newline
-
-It also needs a lot of training observations well-balanced. Otherwise, if a class is over-represented, it would assign too much this label. \newline
+It also needs a lot of training observations well-balanced. Otherwise, if a class is over-represented, it would assign too much this label. 
 
 ### Choosing k
 
@@ -507,21 +521,20 @@ Here, we are going to talk about two models. The first one is the Linear Discrim
 
 Quadratic Discriminant Analysis (QDA) is a bit similar to (LDA) because it assumes that each class are drawn from a Gaussian distribution. However, the covariance doesn't need to be the same for each class. \newline
 
-The advantages of such models is that they have a good accuracy and they are robust to outliers (because it is based on statistical distribution of all the observations). \newline
+The advantages of such models is that they have a good accuracy and they are robust to outliers (because it is based on statistical distribution of all the observations).
 
 ## Support Vector machines
 
 ### Maximal margin classifier
 
-A hyperplane in p dimensions can be written as follow : \newline
-
+A hyperplane in p dimensions can be written as follow : 
 $$\beta_0 + \beta_1 * x_1 + \beta_2 * x_2 + ... + \beta_p * x_p = \beta_0 + X^T \beta = 0$$
 It is a a p-1 dimensional subspace of $R^p$ \newline
 
 The hyperplane leads to a natural classifier, depending on the side of the hyperplane where the new observation lies. \newline
+If $$ \beta_0 + X^T \beta > 0 $$ it lies on one side of the hyperplane meaning it belongs to class labelled 1. \newline
 
-If $\beta_0 + X^T \beta > 0 $ : it lies on one side of the hyperplane meaning it belongs to class labelled 1. \newline
-If $\beta_0 + X^T \beta < 0 $ : it lies on the opposite side of the hyperplane meaning it belongs to class labelled -1. \newline
+If $$ \beta_0 + X^T \beta < 0 $$ it lies on the opposite side of the hyperplane meaning it belongs to class labelled -1. \newline
 
 Thus $y_i * (\beta_0 + X^T \beta) >0$ \newline
 
@@ -529,9 +542,7 @@ The distance of any point x to the hyperplane is given by :  \newline
 $$d = \frac{1}{||\beta||}(\beta_0 + X^T \beta)$$
 
 The best hyperplane is the maximal margin hyperplane which maximises the distance d from the training observations. \newline
-
 It is an optimization problem : we want to classify well all observations and maximize d.  \newline
-
 Let's call M, the minimal distance from the observations to the hyperplan. We write the problem :  \newline
 
 \begin{align}
@@ -543,16 +554,14 @@ Let's call M, the minimal distance from the observations to the hyperplan. We wr
 ### Support vector classifier
 
 For some data sets a separating hyperplane does not exist, the data set is non-separable. \newline
-
 To obtain a support vector classifier, we relax the conditions that we had for the maximal margin hyperplane by allowing for a “budget” C of misclassifications. \newline
-
 We write the new problem :  \newline
 
 \begin{align}
-& \max_{\beta_0, \beta} M \\
-& \text{subject to } \Sigma_j \beta_j^2 = 1  \\
-& \text{for all training observations } y_i * (\beta_0 + X^T \beta) > M*(1-\epsilon_i)\\
-& 0 \leq \epsilon_i \text{ and } \Sigma_i \epsilon_i \leq C 
+  & \max_{\beta_0, \beta} M \\
+  & \text{subject to } \Sigma_j \beta_j^2 = 1  \\
+  & \text{for all training observations } y_i * (\beta_0 + X^T \beta) > M*(1-\epsilon_i)\\
+  & 0 \leq \epsilon_i \text{ and } \Sigma_i \epsilon_i \leq C 
 \end{align}
 
 Once we have the hyperplane, we can deduce to which class the observation belong by projection. \newline
@@ -560,9 +569,7 @@ Once we have the hyperplane, we can deduce to which class the observation belong
 ### Support Vector Machines
 
 For some datasets a non-linear decicion boundary between the classes is more suitable than a linear decision boundary. \newline
-
 To compute the boundary, we use interactions terms between predictors or functions on predictors. \newline
-
 An example can be : \newline
 $$\beta_0 + \beta_1 * x_1^2 + \beta_2 * x_2 * x_1 + ... + \beta_p * x_p^3  = 0$$
 
@@ -662,7 +669,7 @@ $R^2$ measures the proportion of variability in Y that can be explained using X.
 
 The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model. The adjusted R-squared increases only if the new term improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance
 
-$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-p-1}}{\frac{TSS}{n-1}}$$ where : p is the number of predictors in the model the size of the data set.
+$$ Adusted R^2 = 1 -  \frac{\frac{RSS}{n-p-1}}{\frac{TSS}{n-1}}$$ where : p is the number of predictors in the model and n the size of the data set.
 
 ### MAE : Mean Absolute Error
 
@@ -679,11 +686,19 @@ Recall : $RSS = MSE*n$ \newline
 
 If there are p predictors :
 
-$$ C_p = \frac{RSS + 2 p \hat{\sigma}^2}{n}$$ where $\sigma$ is the variance estimate of the error.
+$$ C_p = \frac{RSS + 2 p \hat{\sigma}^2}{n}$$ where $\hat{\sigma}$ is the variance estimate of the error.
 
 ### AIC and BIC
 
 AIC and BIC can both be used with the likelihood : $L = RSS/n$.
+
+If p is the number a predictors used in the model and n the size of the data set :
+
+$$ AIC = -2*\log{\frac{RSS}{n}} + 2 p$$
+
+$$ BIC = -2*\log{\frac{RSS}{n}} + p*log(n)$$
+
+Both AIC and BIC penalize the model if adding one predictor doesn't improve well enough the model. They both need to be minimalized. 
 
 ## Simple Linear Regression
 
@@ -699,7 +714,7 @@ $$Y ≈ \beta_0 + \beta_1 * X$$
 Multiple linear regression (MLR), also known simply as multiple regression, is a statistical technique that uses several explanatory variables to predict the outcome of a response variable. Multiple regression is an extension of linear (OLS) regression that uses just one explanatory variable \newline
 
 Formula and Calcualtion of Multiple Linear Regression
-$$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x{i2} + \beta_{p}x_{ip} + \epsilon$$
+$$ y_{i}= \beta_{0} + \beta_{1}x_{i1} + \beta_{2}x_{i2} + ... + \beta_{p}x_{ip} + \epsilon$$
 
 ### Hospital Costs dataset
 
@@ -952,11 +967,8 @@ We divide the set of data in k equals part and we use k-1 parts to train the mod
 Here are the steps : \newline
 
 1.Split the dataset into k equal partitions (or "folds") \newline
-
 2.For each fold \newline
-
   One fold is used as the testing set and the union of the other folds as the training set \newline
-
   Calculate testing accuracy for this fold : \newline
 
   $$\hat{f_i}=\frac{1}{K}\sum_{j \in N_0}(y_j)$$
@@ -964,7 +976,7 @@ Here are the steps : \newline
 
 3.Use the average testing accuracy as the estimate of out-of-sample accuracy : \newline
 
-We would use the cross-validation error : \newline
+We would use the cross-validation error : 
 $$CV_{k}=\frac{1}{k}\sum_i{MSE_i}$$
 with $I(y_i≠\hat{y_i}) = 1$ if $y_i≠\hat{y_i}$, 0 else. So that we calculate the average of wrong predicted values.
 
@@ -986,10 +998,12 @@ Leave-one-out cross-validation is a special case of cross-validation where the n
 
 This method works as follow:
 
-Leave out one data point and build the model on the rest of the data set \newline
-Test the model against the data point that is left out at step 1 and record the test error associated with the prediction \newline
-Repeat the process for all data points \newline
-Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2. \newline
+\begin{itemize}
+\item Leave out one data point and build the model on the rest of the data set
+\item Test the model against the data point that is left out at step 1 and record the test error associated with the prediction 
+\item Repeat the process for all data points
+\item Compute the overall prediction error by taking the average of all these test error estimates recorded at step 2.
+\end{itemize}
 
 #### Example on R
 
