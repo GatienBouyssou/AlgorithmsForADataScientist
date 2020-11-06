@@ -22,22 +22,13 @@ knitr::knit_engines$set(python.reticulate =  TRUE)
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
 #install.packages("fpc")
+#install.packages("arules")
+#install.packages("arulesViz")
 library(magrittr)
 library(knitr)
 library(rmarkdown)
-library(xlsx)
-library(ggplot2)
-library(ggfortify)
-library(MASS)
-library(dplyr)
-library(ISLR)
-library(readr)
-library(randomForest)
-library(tidyverse)
-library(caret)
-library(cluster)
-library(factoextra)
-library(fpc)
+library(arules)
+library(arulesViz)
 ```
 
 \clearpage
@@ -45,10 +36,6 @@ library(fpc)
 # Association rules Mining
 
 ## Definition and concept
-
-TO DO
-
-## Properties
 
 TO DO
 
@@ -95,19 +82,58 @@ TO DO
 
 TO DO
 
-## Evaluation of an association rule 
+## Parameters in association rules
 
-TO DO
+There are three parameters controlling the number of rules to be generated.
 
 ### Support and Confidence
 
 TO DO
 
-### Statistical criteria
+Support is an indication of how frequently the itemset appears in the dataset.
 
-TO DO
+$$Support = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction}} = P(A \cap B)$$
+Confidence is an indication of how often the rule has been found to be true.
 
+$$Confidence = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)}$$
+
+Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
+
+$$Lift = \frac{P(A \cap B)}{P(A) *P(B)}$$
 \clearpage
+
+# Apriori algorithm
+
+## Definition 
+
+## Example on Groceries data
+
+```{r, eval=TRUE, echo=FALSE}
+data("Groceries")
+inspect(head(Groceries,5))
+```
+```{r, eval=FALSE, echo=FALSE}
+frequentItems <- eclat (Groceries, parameter = list(supp = 0.07, maxlen = 15))
+```
+```{r, eval=TRUE, echo=FALSE}
+inspect(frequentItems)
+itemFrequencyPlot(Groceries, topN=10, type="absolute", main="Item Frequency") 
+```
+
+### On R 
+
+```{r, eval=FALSE, echo=FALSE}
+grocery_rules <- apriori(Groceries, parameter = list(support = 0.01, confidence = 0.5))
+```
+```{r, eval=TRUE, echo=FALSE}
+inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
+```
+
+### On Python with scikit-learn 
+
+```{python}
+data = r.Groceries
+```
 
 # Frequent pattern-based cluster analysis
 
