@@ -46,11 +46,19 @@ library(fpc)
 
 ## Definition and concept
 
+TO DO
+
 ## Properties
+
+TO DO
 
 ## Kinds of mining 
 
 ### Frequent pattern Itemset mining
+
+Definition 
+
+Kinds of Frequent Pattern Itemset mining :
 
 Closed frequent itemset
 
@@ -66,23 +74,38 @@ Top-k frequent itemset
 
 ### Sequential Pattern
 
+TO DO
+
 ### Structured Pattern 
+
+TO DO
 
 ## Kinds of association rule mining 
 
-### Single dimensional association rule mining
+### Single dimensional VS Multi dimensional association rule mining
 
-### Multi dimensional association rule mining
+TO DO
 
-### Boolean  association rule mining
 
-### Quantitative association rule mining
+### Boolean VS Quantitative association rule mining
+
+TO DO
+
+### Correlation rule 
+
+TO DO
 
 ## Evaluation of an association rule 
 
+TO DO
+
 ### Support and Confidence
 
+TO DO
+
 ### Statistical criteria
+
+TO DO
 
 \clearpage
 
