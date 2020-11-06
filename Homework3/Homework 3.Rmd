@@ -42,19 +42,6 @@ library(fpc)
 
 \clearpage
 
-
-# Frequent patterns 
-
-## Efficient and scalable methods
-
-## Transactionnal patterns
-
-## Sequential Patterns
-
-## Graph patterns
-
-\clearpage
-
 # Association rules 
 
 ## Concept
@@ -63,19 +50,32 @@ library(fpc)
 
 ### Properties
 
-### Example
-
 ## Interesting rules
 
 \clearpage
 
-# Algorithm principle
+# Frequent pattern-based cluster analysis
 
-## Apriori principle
+## The CLIQUE algorithm
 
-## Basic algorithm
+## The ENCLUS algorithm
 
-## Cumulate Algorithm
+\clearpage
+
+# Frequent pattern-based classification
+
+## Classification based on Association
+
+## Classification based on Multiple Association Rules
+
+## Classification based on Predictive Association Rules
+
+\clearpage
+
+# Evaluation
+
+Compare the algorithms
+
 
 
 
