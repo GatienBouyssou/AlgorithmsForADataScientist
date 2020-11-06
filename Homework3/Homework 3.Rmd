@@ -32,10 +32,6 @@ library(arulesViz)
 ```
 
 
-TO DO : 
-Comprendre dans Ruleinduction la différence entre ptree et apriori => grosse diff dans data adult
-
-
 \clearpage
 
 # Parameters in association rules
@@ -110,9 +106,6 @@ This algorithm uses simple intersection operations for equivalence class cluster
 data("Adult")
 class(Adult)
 inspect(head(Adult,5))
-
-# delete row with capital-gain=None or capital-loss=None
- #TO DO
 ```
 
 ```{r, eval=FALSE, echo=FALSE}
@@ -128,7 +121,7 @@ If in control method = "apriori" is used, a very simple rule induction method is
 
 ```{r}
 ## Create rules from the itemsets
-rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.2, control = list(method = "apriori"))
+rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "apriori"))
 inspect(head(rulesAdult))
 ```
 
@@ -136,7 +129,7 @@ If in control method = "ptree" is used, the transactions are counted into a pref
 
 ```{r}
 ## Create rules from the itemsets
-rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.2, control = list(method = "ptree"))
+rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "ptree"))
 inspect(head(rulesAdult))
 ```
 
