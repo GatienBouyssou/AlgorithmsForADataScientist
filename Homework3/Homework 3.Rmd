@@ -31,100 +31,50 @@ library(arules)
 library(arulesViz)
 ```
 
+
+TO DO : 
+Comprendre dans Ruleinduction la différence entre ptree et apriori => grosse diff dans data adult
+
+
 \clearpage
 
-# Association rules Mining
+# Parameters in association rules
 
-## Definition and concept
+There are parameters controlling the number of rules to be generated.
 
-TO DO
-
-## Kinds of mining 
-
-### Frequent pattern Itemset mining
-
-Definition 
-
-Kinds of Frequent Pattern Itemset mining :
-
-Closed frequent itemset
-
-Maximal frequent itemset
-
-Constrained frequent itemset
-
-Approximate frequent itemset
-
-Near-match frequent itemset
-
-Top-k frequent itemset
-
-### Sequential Pattern
-
-TO DO
-
-### Structured Pattern 
-
-TO DO
-
-## Kinds of association rule mining 
-
-### Single dimensional VS Multi dimensional association rule mining
-
-TO DO
-
-
-### Boolean VS Quantitative association rule mining
-
-TO DO
-
-### Correlation rule 
-
-TO DO
-
-## Parameters in association rules
-
-There are three parameters controlling the number of rules to be generated.
-
-### Support and Confidence
-
-TO DO
+## Support
 
 Support is an indication of how frequently the itemset appears in the dataset.
 
 $$Support = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction}} = P(A \cap B)$$
+
+## Confidence 
+
 Confidence is an indication of how often the rule has been found to be true.
 
 $$Confidence = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)}$$
 
+## Lift 
+
 Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
 
 $$Lift = \frac{P(A \cap B)}{P(A) *P(B)}$$
-\clearpage
 
 # Apriori algorithm
 
 ## Definition 
 
-## Example on Groceries data
+Apriori searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
+The database is scanned at each level of lattice. Additionally, Apriori uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
 
-```{r, eval=TRUE, echo=FALSE}
-data("Groceries")
-inspect(head(Groceries,5))
-```
-```{r, eval=FALSE, echo=FALSE}
-frequentItems <- eclat (Groceries, parameter = list(supp = 0.07, maxlen = 15))
-```
-```{r, eval=TRUE, echo=FALSE}
-inspect(frequentItems)
-itemFrequencyPlot(Groceries, topN=10, type="absolute", main="Item Frequency") 
-```
+## Example on Groceries data
 
 ### On R 
 
 ```{r, eval=FALSE, echo=FALSE}
-grocery_rules <- apriori(Groceries, parameter = list(support = 0.01, confidence = 0.5))
+grocery_rules <- apriori(Groceries, parameter = list(support = 0.01, confidence = 0.4))
 ```
+
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 ```
@@ -134,6 +84,63 @@ inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 ```{python}
 data = r.Groceries
 ```
+
+\clearpage
+
+## Example on personal data
+
+We cal also use the ruleInduction method to find closed frequent itemset. 
+
+ruleInduction has as attribute a method function.
+
+
+Closed Frequent itemsets : 
+
+An itemset X is a closed frequent itemset in set S if X is both closed and frequent in S.
+
+
+Eclat algorithm :
+
+Mine frequent itemsets \newline
+This algorithm uses simple intersection operations for equivalence class clustering along with bottom-up lattice traversal.
+
+### On R
+
+```{r, eval=TRUE, echo=FALSE}
+data("Adult")
+class(Adult)
+inspect(head(Adult,5))
+
+# delete row with capital-gain=None or capital-loss=None
+ #TO DO
+```
+
+```{r, eval=FALSE, echo=FALSE}
+frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.1, maxlen = 100))
+```
+
+```{r, eval=TRUE, echo=FALSE}
+#inspect(head(frequentItemsAdult,5))
+itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency") 
+```
+
+If in control method = "apriori" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using Apriori with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow (e.g., for itemsets with many elements or very low support).
+
+```{r}
+## Create rules from the itemsets
+rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.2, control = list(method = "apriori"))
+inspect(head(rulesAdult))
+```
+
+If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
+
+```{r}
+## Create rules from the itemsets
+rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.2, control = list(method = "ptree"))
+inspect(head(rulesAdult))
+```
+
+\clearpage
 
 # Frequent pattern-based cluster analysis
 
