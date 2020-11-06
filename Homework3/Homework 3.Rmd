@@ -158,6 +158,12 @@ inspect(head(rulesAdult))
 
 \clearpage
 
+# Clustering with Apriori algorithm as dissimilarity measure 
+
+## Concept 
+
+TO DO 
+
 ## Example on tennis data
 
 ### On R 
@@ -186,31 +192,31 @@ tennis[["UFE.1"]] <- ordered(cut(tennis[[ "UFE.1"]],
 
 tennis[["Result"]] <- as.factor(tennis[["Result"]])
   
-str(tennis)
 tennis <- as(tennis, "transactions")
-class(tennis)
+
+inspect(head(tennis,5))
 ```
 
 The associations rules for Player-1 winning : 
 
 ```{r, eval=FALSE, echo=FALSE}
-tennis_rules_winning <- apriori(tennis, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.1, confidence = 0.4))
+tennis_rules_winning <- apriori(tennis, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_winning
-inspect(head(sort(tennis_rules_winning, by = "confidence", decreasing=TRUE), 5))
+inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
 ```
 
 The associations rules for Player-1 loosing : 
 
 ```{r, eval=FALSE, echo=FALSE}
-tennis_rules_loosing <- apriori(tennis, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.1, confidence = 0.4))
+tennis_rules_loosing <- apriori(tennis, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_loosing
-inspect(head(sort(tennis_rules_loosing, by = "confidence", decreasing=TRUE), 5))
+inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
 ```
 
 All the rules with Result as association : 
@@ -221,7 +227,7 @@ tennis_rules <- apriori(tennis, appearance = list (default="lhs",rhs=list("Resul
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules
-inspect(head(sort(tennis_rules, by = "confidence", decreasing=TRUE), 5))
+inspect(head(sort(tennis_rules, by = "lift", decreasing=TRUE), 5))
 ```
 
 
