@@ -42,15 +42,47 @@ library(fpc)
 
 \clearpage
 
-# Association rules 
+# Association rules Mining
 
-## Concept
+## Definition and concept
 
-## Support and Confidence
+## Properties
 
-### Properties
+## Kinds of mining 
 
-## Interesting rules
+### Frequent pattern Itemset mining
+
+Closed frequent itemset
+
+Maximal frequent itemset
+
+Constrained frequent itemset
+
+Approximate frequent itemset
+
+Near-match frequent itemset
+
+Top-k frequent itemset
+
+### Sequential Pattern
+
+### Structured Pattern 
+
+## Kinds of association rule mining 
+
+### Single dimensional association rule mining
+
+### Multi dimensional association rule mining
+
+### Boolean  association rule mining
+
+### Quantitative association rule mining
+
+## Evaluation of an association rule 
+
+### Support and Confidence
+
+### Statistical criteria
 
 \clearpage
 
