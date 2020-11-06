@@ -29,6 +29,7 @@ library(knitr)
 library(rmarkdown)
 library(arules)
 library(arulesViz)
+library(cluster)
 ```
 
 
@@ -37,6 +38,8 @@ library(arulesViz)
 # Parameters in association rules
 
 There are parameters controlling the number of rules to be generated.
+
+For A => B : 
 
 ## Support
 
@@ -55,6 +58,7 @@ $$Confidence = \frac{\text{Number of transaction with both A and B}}{\text{Total
 Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
 
 $$Lift = \frac{P(A \cap B)}{P(A) *P(B)}$$
+\clearpage
 
 # Apriori algorithm
 
@@ -65,14 +69,33 @@ The database is scanned at each level of lattice. Additionally, Apriori uses a p
 
 ## Example on Groceries data
 
+```{r}
+data("Groceries")
+class(Groceries)
+inspect(head(Groceries))
+```
+
 ### On R 
 
 ```{r, eval=FALSE, echo=FALSE}
-grocery_rules <- apriori(Groceries, parameter = list(support = 0.01, confidence = 0.4))
+grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
+summary(grocery_rules)
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
+```
+
+```{r}
+#A DEVELOPPER
+d <- dissimilarity(grocery_rules,method = "Jaccard")
+pam <- pam(d, k = 5)
+pam$clustering
+
+clusters_hiearchical <- hclust(d, method = "complete")
+clusterCut <- cutree(clusters_hiearchical, 3)
+clusterCut
+plot(clusters_hiearchical)
 ```
 
 ### On Python with scikit-learn 
@@ -132,6 +155,89 @@ If in control method = "ptree" is used, the transactions are counted into a pref
 rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "ptree"))
 inspect(head(rulesAdult))
 ```
+
+\clearpage
+
+## Example on tennis data
+
+### On R 
+
+```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
+id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
+tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
+tennis <- tennis[,3:7]
+tennis <- data.frame(tennis)
+
+tennis[["ACE.1"]] <- ordered(cut(tennis[[ "ACE.1"]],
+  c(-Inf,0, median(tennis[[ "ACE.1"]][tennis[[ "ACE.1"]]>0]),
+  Inf)), labels = c("None", "Low", "High"))
+
+tennis[["ACE.2"]] <- ordered(cut(tennis[[ "ACE.2"]],
+  c(-Inf,0, median(tennis[[ "ACE.2"]][tennis[[ "ACE.2"]]>0]),
+  Inf)), labels = c("None", "Low", "High"))
+
+tennis[["UFE.2"]] <- ordered(cut(tennis[[ "UFE.2"]],
+  c(-Inf,0, median(tennis[[ "UFE.2"]][tennis[[ "UFE.2"]]>0]),
+  Inf)), labels = c("Low", "High"))
+
+tennis[["UFE.1"]] <- ordered(cut(tennis[[ "UFE.1"]],
+  c(-Inf,0, median(tennis[[ "UFE.1"]][tennis[[ "UFE.1"]]>0]),
+  Inf)), labels = c("Low", "High"))
+
+tennis[["Result"]] <- as.factor(tennis[["Result"]])
+  
+str(tennis)
+tennis <- as(tennis, "transactions")
+class(tennis)
+```
+
+The associations rules for Player-1 winning : 
+
+```{r, eval=FALSE, echo=FALSE}
+tennis_rules_winning <- apriori(tennis, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.1, confidence = 0.4))
+```
+
+```{r, eval=TRUE, echo=FALSE}
+tennis_rules_winning
+inspect(head(sort(tennis_rules_winning, by = "confidence", decreasing=TRUE), 5))
+```
+
+The associations rules for Player-1 loosing : 
+
+```{r, eval=FALSE, echo=FALSE}
+tennis_rules_loosing <- apriori(tennis, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.1, confidence = 0.4))
+```
+
+```{r, eval=TRUE, echo=FALSE}
+tennis_rules_loosing
+inspect(head(sort(tennis_rules_loosing, by = "confidence", decreasing=TRUE), 5))
+```
+
+All the rules with Result as association : 
+
+```{r, eval=FALSE, echo=FALSE}
+tennis_rules <- apriori(tennis, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
+```
+
+```{r, eval=TRUE, echo=FALSE}
+tennis_rules
+inspect(head(sort(tennis_rules, by = "confidence", decreasing=TRUE), 5))
+```
+
+
+Cluster the results : 
+
+```{r}
+inspect(tennis_rules)
+
+d <- dissimilarity(tennis_rules,method = "Jaccard")
+clusters_hiearchical <- hclust(d, method = "complete")
+clusterCut <- cutree(clusters_hiearchical, 2)
+clusterCut
+plot(clusters_hiearchical)
+```
+
+This clustering regroups Player-1 winner together very well.
 
 \clearpage
 
