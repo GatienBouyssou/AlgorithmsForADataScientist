@@ -11,8 +11,8 @@ output:
 ---
 ```{r setup, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+knitr::opts_chunk$set(echo = FALSE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=6, fig.height=5)
 library(reticulate)
 #use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
 knitr::knit_engines$set(python.reticulate =  TRUE)
@@ -71,18 +71,18 @@ The database is scanned at each level of lattice. Additionally, Apriori uses a p
 
 ```{r}
 data("Groceries")
-class(Groceries)
+#class(Groceries)
 inspect(head(Groceries))
 ```
 
 ### On R 
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE}
 grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-summary(grocery_rules)
+grocery_rules
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 ```
 
@@ -98,13 +98,16 @@ clusterCut
 plot(clusters_hiearchical)
 ```
 
-### On Python with scikit-learn 
-
-```{python}
-data = r.Groceries
-```
 
 \clearpage
+
+# Using Frequent itemset to find rules 
+
+## Concept 
+
+
+TO DO 
+
 
 ## Example on personal data
 
@@ -127,12 +130,12 @@ This algorithm uses simple intersection operations for equivalence class cluster
 
 ```{r, eval=TRUE, echo=FALSE}
 data("Adult")
-class(Adult)
+#class(Adult)
 inspect(head(Adult,5))
 ```
 
-```{r, eval=FALSE, echo=FALSE}
-frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.1, maxlen = 100))
+```{r, eval=TRUE, echo=FALSE}
+frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -144,8 +147,8 @@ If in control method = "apriori" is used, a very simple rule induction method is
 
 ```{r}
 ## Create rules from the itemsets
-rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "apriori"))
-inspect(head(rulesAdult))
+rulesAdult <- ruleInduction(frequentItemsAdult, confidence = 0.95, control = list(method = "apriori"))
+inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 5))
 ```
 
 If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
@@ -153,7 +156,22 @@ If in control method = "ptree" is used, the transactions are counted into a pref
 ```{r}
 ## Create rules from the itemsets
 rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "ptree"))
-inspect(head(rulesAdult))
+inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 5))
+```
+
+
+NOW THE BIG QUESTION ??? 
+
+How to win money ?
+
+```{r}
+frequentItemsAdultGain <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 200))
+rulesAdult <- ruleInduction(frequentItemsAdultGain, confidence = 0.15, control = list(method = "apriori"))
+rulesAdult <- subset(rulesAdult, rhs %pin% "capital-gain=High")
+```
+```{r}
+rulesAdult
+inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
 ```
 
 \clearpage
@@ -199,7 +217,7 @@ inspect(head(tennis,5))
 
 The associations rules for Player-1 winning : 
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE}
 tennis_rules_winning <- apriori(tennis, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
@@ -210,7 +228,7 @@ inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
 
 The associations rules for Player-1 loosing : 
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE}
 tennis_rules_loosing <- apriori(tennis, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
@@ -221,7 +239,7 @@ inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
 
 All the rules with Result as association : 
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE}
 tennis_rules <- apriori(tennis, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
 ```
 
