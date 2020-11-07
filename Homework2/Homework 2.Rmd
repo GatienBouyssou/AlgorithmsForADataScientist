@@ -786,4 +786,24 @@ fviz_cluster(fuzzyclust, ellipse.type = "norm", repel = TRUE, palette = "jco", g
 
 # Choosing the best algorithm ?
 
-TO-DO
+Applying a clustering algorithm is much easier than selecting the best one. Each type offers pros and cons that must be considered if you’re striving for a tidy cluster structure.
+
+clustering is an essential step in the arrangement of a correct and throughout data model. To fulfill an analysis, the volume of information should be sorted out according to the commonalities. The main question is, what commonality parameter provides the best results – and what is implicated under “the best” definition at all.
+
+# Four Basic Algorithms And How To Choose One
+
+1. Clusterization, based on the computation of distances between the objects of the whole dataset, is called connectivity-based, or hierarchical. Depending on the “direction” of the algorithm, it can unite or, inversely, divide the array of information – the names agglomerative and divisive appeared from this exact variation. The most popular and reasonable type is the agglomerative one, where you start by inputting the number of data points, that then are subsequently united into larger and larger clusters, until the limit is reached
+
+2. Centroid-based clustering, from my experience, is the most frequently occurred model thanks to its comparative simplicity. The model is aimed at classifying each object of the dataset to the particular cluster. The number of clusters (k) is chosen randomly, which is probably the greatest “weakness” of the method. This k-means algorithm is especially popular in machine learning thanks to the alikeness with k-nearest neighbors (kNN) method.
+
+The k-means algorithm is, basically, a simplified version of the EM principle. They both require manual input of clusters number, and that’s the main intricacy the methods bear. Apart from that, the principles of computing (either for GMM or k-means) are simple: the approximate range of cluster is specified gradually with each new iteration
+
+3. Expectation-maximization algorithm, at the same time, allows avoiding those complications while providing an even higher level of accuracy. Simply put, it calculates the relation probability of each dataset point to all the clusters we’ve specified. The main “tool” that is used for this clusterization model is the Gaussian Mixture Models (GMM) – the assumption that the points of the dataset generally follow the Gaussian distribution. 
+
+4. Finally, density-based clustering comes. The name comprises the main point of the model – to divide the dataset into clusters the counter inputs the ε parameter, the “neighborhood” distance. If the object is located within the circle (sphere) of the ε radius, it, therefore, relates to the cluster.
+
+# Measures for comparing clustering algorithms
+
+1. Internal measures, which uses intrinsic information in the data to assess the quality of the clustering. Internal measures include the connectivity, the silhouette coefficient and the Dunn index 
+
+2. Stability measures, a special version of internal measures, which evaluates the consistency of a clustering result by comparing it with the clusters obtained after each column is removed, one at a time.
