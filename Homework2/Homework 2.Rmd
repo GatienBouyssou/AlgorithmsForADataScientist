@@ -788,9 +788,9 @@ fviz_cluster(fuzzyclust, ellipse.type = "norm", repel = TRUE, palette = "jco", g
 
 Applying a clustering algorithm is much easier than selecting the best one. Each type offers pros and cons that must be considered if you’re striving for a tidy cluster structure.
 
-clustering is an essential step in the arrangement of a correct and throughout data model. To fulfill an analysis, the volume of information should be sorted out according to the commonalities. The main question is, what commonality parameter provides the best results – and what is implicated under “the best” definition at all.
+Clustering is an essential step in the arrangement of a correct and throughout data model. To fulfill an analysis, the volume of information should be sorted out according to the commonalities. The main question is, what commonality parameter provides the best results and what is implicated under “the best” definition at all.
 
-# Four Basic Algorithms And How To Choose One
+## Four Basic Algorithms And How To Choose One
 
 1. Clusterization, based on the computation of distances between the objects of the whole dataset, is called connectivity-based, or hierarchical. Depending on the “direction” of the algorithm, it can unite or, inversely, divide the array of information – the names agglomerative and divisive appeared from this exact variation. The most popular and reasonable type is the agglomerative one, where you start by inputting the number of data points, that then are subsequently united into larger and larger clusters, until the limit is reached.
 
@@ -808,7 +808,7 @@ Example - K-Means algorithm
 
 Example - DBSCAN algorithm 
 
-# Measures for comparing clustering algorithms
+## Measures for comparing clustering algorithms
 
 1. Internal measures, which uses intrinsic information in the data to assess the quality of the clustering. Internal measures include the connectivity, the silhouette coefficient and the Dunn index 
 

@@ -88,18 +88,6 @@ grocery_rules
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 ```
 
-```{r}
-#A DEVELOPPER
-d <- dissimilarity(grocery_rules,method = "Jaccard")
-pam <- pam(d, k = 5)
-pam$clustering
-
-clusters_hiearchical <- hclust(d, method = "complete")
-clusterCut <- cutree(clusters_hiearchical, 3)
-clusterCut
-plot(clusters_hiearchical)
-```
-
 
 \clearpage
 
@@ -113,7 +101,7 @@ TO DO
 
 ## Example on personal data
 
-We cal also use the ruleInduction method to find closed frequent itemset. 
+We can also use the ruleInduction method to find closed frequent itemset. 
 
 ruleInduction has as attribute a method function.
 
@@ -186,6 +174,14 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
 
 TO DO 
 
+### Jaccard distance
+
+A direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$. A good choice is the Jaccard distance defined as :
+
+$$d(X_i, X_j) = \frac{|X_i \cap X_j|}{|X_i \cup X_j|}$$
+
+The distance simply is the number of items that Xi and Xj have in common divided by the number of unique items in both sets.
+
 ### Example on tennis data
 
 ```{r}
@@ -247,7 +243,7 @@ inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
 All the rules with Result as association : 
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
+tennis_rules <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.1, confidence = 0.4))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -256,20 +252,55 @@ inspect(head(sort(tennis_rules, by = "lift", decreasing=TRUE), 5))
 ```
 
 
-Cluster the results : 
 
-```{r}
+##### Cluster the items 
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
 inspect(tennis_rules)
 
-d <- dissimilarity(tennis_rules,method = "Jaccard")
+d <- dissimilarity(tennisTransactions1,method = "Jaccard", which = "items")
 clusters_hiearchical <- hclust(d, method = "complete")
-clusterCut <- cutree(clusters_hiearchical, 2)
-clusterCut
 plot(clusters_hiearchical)
+```
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
+assign <- cutree(clusters_hiearchical, k=2)
+inspect(tennisTransactions1[assign == 1])
+```
+
+##### Cluster the rules 
+
+- With Jaccard measure : 
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
+inspect(tennis_rules)
+
+d <- dissimilarity(tennis_rules,method = "Jaccard", which = "associations")
+clusters_hiearchical <- hclust(d, method = "complete")
+plot(clusters_hiearchical)
+```
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
+assign <- cutree(clusters_hiearchical, k=2)
+inspect(tennis_rules[assign == 1])
 ```
 
 This clustering regroups Player-1 winner together very well.
 
+
+- With affinity measure : 
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
+d <- dissimilarity(tennis_rules,method = "affinity", which = "associations")
+clusters_hiearchical <- hclust(d, method = "complete")
+plot(clusters_hiearchical)
+```
+
+
+```{r fig.height=5, fig.width=6, fig.align = "center"}
+assign <- cutree(clusters_hiearchical, k=2)
+inspect(tennis_rules[assign == 1])
+```
 
 ## The CLIQUE algorithm
 
@@ -376,7 +407,7 @@ inspect(head(tennisTransactions2,4))
 tennisTransactionsTrain <- tennisTransactions2[train,]
 tennisTransactionsTest <- tennisTransactions2[-train,]
 
-classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.1, conf = 0.6, verbose = TRUE)
+classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4, verbose = TRUE)
 ```
 
 ```{r}
