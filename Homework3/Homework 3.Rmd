@@ -9,6 +9,7 @@ output:
     toc: yes
     toc_depth: 6
 ---
+
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = FALSE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
@@ -17,7 +18,7 @@ library(reticulate)
 #use_python("/Library/Frameworks/Python.framework/Versions/3.6/bin/python3", required = T)
 knitr::knit_engines$set(python.reticulate =  TRUE)
 #py_install("matplotlib")
-#py_install("scikit-learn")
+#py_install("MLxtend")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -41,45 +42,43 @@ library(caret)
 
 There are parameters controlling the number of rules to be generated.
 
-For A => B :
 
 ## Support
 
 Support is an indication of how frequently the itemset appears in the dataset.
 
-$$Support = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction}} = P(A \cap B)$$
+$$Support(A→B) = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction}} = P(A \cap B)$$
 
 ## Confidence
 
 Confidence is an indication of how often the rule has been found to be true.
 
-$$Confidence = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)}$$
+$$Confidence(A→B) = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)} = \frac{P_A(B)}{P(A)^2}$$
 
 ## Lift
 
 Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
 
-$$Lift = \frac{P(A \cap B)}{P(A) *P(B)}$$
+$$Lift(A→B) = \frac{P(A \cap B)}{P(A) *P(B)}$$
 
 ## Leverage
 
-$levarage(A→B)=support(A→B)−support(A)×support(B)$
+The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent. 
 
-The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent. Therefore, if
+$$levarage(A→B)= P(A \cap B) − P(A)×P(B)$$
+Therefore, if A and B independent : 
 
-$support(A→C)=support(A)×support(C) $
-
-then A and C are independent.
+$levarage(A→B)= 0$
 
 ## Conviction
 
-$conviction(A → B)=\frac{1−support(B)}{1−confidence(A→B)}$
-
-or
-
-$conviction(A → C)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$
-
 The conviction correspond to the frequency of items that are not B in the transaction over the frequency of B that don't contain A among all the transcations with B. Therefore, if A and B are independent the conviction should be equal to 1. When the confidence tends toward 1 the conviction tends toward infinity. It would mean that A and B are higly dependant.
+
+$$conviction(A → B)=\frac{P(A)*P(\bar{B})}{P(A \cap \bar{B})}$$
+
+or  : 
+
+$$conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 
 \clearpage
 
@@ -120,7 +119,7 @@ inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 TO DO
 
 
-## Example on personal data
+## Example on Adult data
 
 We call also use the ruleInduction method to find closed frequent itemset.
 
@@ -180,17 +179,22 @@ frequentItemsAdultGain <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 2
 rulesAdult <- ruleInduction(frequentItemsAdultGain, confidence = 0.15, control = list(method = "apriori"))
 rulesAdult <- subset(rulesAdult, rhs %pin% "capital-gain=High")
 ```
+
+
 ```{r}
 rulesAdult
 inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
 ```
+
+
+## Example on mushroom data
 
 ### With python and scikit-learn
 
 
 This database contains a lot of mushrooms with a set of characteristics. Each mushroom is classified either as edible or poisonous. The database has been found in kaggle and is available here : https://www.kaggle.com/uciml/mushroom-classification.
 
-```python
+```{python}
 import pandas as pd
 import urllib
 import matplotlib.pyplot as plt
@@ -198,27 +202,24 @@ import numpy as np
 import os
 from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
 from mlxtend.preprocessing import TransactionEncoder
-```
 
-
-```python
-mush_data = pd.read_csv('./dataPython/mushrooms.csv')
+mush_data = pd.read_csv('./datapython/mushrooms.csv')
 ```
 
 First, we want to have an overview of the data.
 
-```python
+```{python}
 mush_data.head()
 ```
 As we can see, each column contains values that are single characters. Their meaning is given by the file values_name.txt.
 
-```python
+```{python}
 len(mush_data)
 ```
 
 Now, we want to know the data repartition for each columns.
 
-```python
+```{python}
 for column in mush_data.columns:
     print("\n" + column)
     print(mush_data[column].value_counts())
@@ -226,22 +227,22 @@ for column in mush_data.columns:
 
 As you can see the there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
 
-```python
+```{python}
 mush_data = mush_data[mush_data["stalk-root"] != '?']
 ```
 
 
-```python
+```{python}
 len(mush_data)
 ```
 
-```python
+```{python}
 mush_data['class'].value_counts()
 ```
 
 Even without the discarded lines the dataset still have plenty of data and the class label is almost balanced.
 
-```python
+```{python}
 def sepCurrentValFromNewVal(stringNewOldValues):
     currentVal = []
     newVal = []
@@ -254,9 +255,9 @@ def sepCurrentValFromNewVal(stringNewOldValues):
 ```
 
 
-```python
+```{python}
 mapColumnValName = {}
-with open("./dataPython/values_name.txt", "r") as file:
+with open("./datapython/values_name.txt", "r") as file:
     line = file.readline()
     while line != "":
         line = line.replace(' ', "").replace("\n", "")
@@ -267,19 +268,19 @@ mapColumnValName['cap-shape']
 ```
 
 
-```python
+```{python}
 for column, ONValues in mapColumnValName.items():
     mush_data[column] = mush_data[column].replace(ONValues[0], ONValues[1])
 mush_data.head()
 ```
 
 
-```python
+```{python}
 train_data = mush_data.values
 ```
 
 
-```python
+```{python}
 te = TransactionEncoder()
 te_ary = te.fit(train_data).transform(train_data)
 print(te.columns_)
@@ -288,58 +289,58 @@ len(df.columns)
 ```
 
 
-```python
+```{python}
 frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
 frequent_itemsets['length'] = frequent_itemsets['itemsets'].apply(lambda x: len(x))
 frequent_itemsets
 ```
 
-```python
+```{python}
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
 ```
 
-```python
+```{python}
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("poisonous")]
 ```
 
 
-```python
+```{python}
 assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.9)
 ```
 
 
-```python
+```{python}
 assos_rule[assos_rule['antecedents'].astype(str).str.contains("edible")]
 ```
 
 
-```python
+```{python}
 frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
 ```
 
 
-```python
+```{python}
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
 ```
 
 
-```python
+```{python}
 assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
 ```
 
 
-```python
+```{python}
 assos_rule[assos_rule['consequents'].astype(str).str.contains("edible")]
 ```
 
 
 
-```python
+```{python}
 assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.6)
 ```
 
 
-```python
+```{python}
 assos_rule[assos_rule['consequents'].astype(str).str.contains("edible")]
 ```
 
@@ -390,9 +391,9 @@ tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
   c(-Inf,0, median(tennisTransactions[[ "UFE.1"]][tennisTransactions[[ "UFE.1"]]>0]),
   Inf)), labels = c("Low", "High"))
 
-tennis[["Result"]] <- as.factor(tennis[["Result"]])
+tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
 
-tennis <- as(tennis, "transactions")
+tennisTransactions1 <- as(tennisTransactions, "transactions")
 
 inspect(head(tennisTransactions1,5))
 ```
