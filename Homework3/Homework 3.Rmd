@@ -23,13 +23,15 @@ knitr::knit_engines$set(python.reticulate =  TRUE)
 ```{r rpackages,eval=TRUE,echo=FALSE}
 #install.packages("fpc")
 #install.packages("arules")
-#install.packages("arulesViz")
+#install.packages("arulesCBA")
 library(magrittr)
 library(knitr)
+library(arulesCBA)
 library(rmarkdown)
 library(arules)
 library(arulesViz)
 library(cluster)
+library(caret)
 ```
 
 
@@ -184,41 +186,44 @@ TO DO
 
 ## Example on tennis data
 
+```{r}
+id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
+tennisData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
+```
+
 ### On R 
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
-id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
-tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
-tennis <- tennis[,3:7]
-tennis <- data.frame(tennis)
+tennisTransactions <- tennisData[,3:7]
+tennisTransactions <- data.frame(tennisTransactions)
 
-tennis[["ACE.1"]] <- ordered(cut(tennis[[ "ACE.1"]],
-  c(-Inf,0, median(tennis[[ "ACE.1"]][tennis[[ "ACE.1"]]>0]),
+tennisTransactions[["ACE.1"]] <- ordered(cut(tennisTransactions[[ "ACE.1"]],
+  c(-Inf,0, median(tennisTransactions[[ "ACE.1"]][tennisTransactions[[ "ACE.1"]]>0]),
   Inf)), labels = c("None", "Low", "High"))
 
-tennis[["ACE.2"]] <- ordered(cut(tennis[[ "ACE.2"]],
-  c(-Inf,0, median(tennis[[ "ACE.2"]][tennis[[ "ACE.2"]]>0]),
+tennisTransactions[["ACE.2"]] <- ordered(cut(tennisTransactions[[ "ACE.2"]],
+  c(-Inf,0, median(tennisTransactions[[ "ACE.2"]][tennisTransactions[[ "ACE.2"]]>0]),
   Inf)), labels = c("None", "Low", "High"))
 
-tennis[["UFE.2"]] <- ordered(cut(tennis[[ "UFE.2"]],
-  c(-Inf,0, median(tennis[[ "UFE.2"]][tennis[[ "UFE.2"]]>0]),
+tennisTransactions[["UFE.2"]] <- ordered(cut(tennisTransactions[[ "UFE.2"]],
+  c(-Inf,0, median(tennisTransactions[[ "UFE.2"]][tennisTransactions[[ "UFE.2"]]>0]),
   Inf)), labels = c("Low", "High"))
 
-tennis[["UFE.1"]] <- ordered(cut(tennis[[ "UFE.1"]],
-  c(-Inf,0, median(tennis[[ "UFE.1"]][tennis[[ "UFE.1"]]>0]),
+tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
+  c(-Inf,0, median(tennisTransactions[[ "UFE.1"]][tennisTransactions[[ "UFE.1"]]>0]),
   Inf)), labels = c("Low", "High"))
 
-tennis[["Result"]] <- as.factor(tennis[["Result"]])
+tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
   
-tennis <- as(tennis, "transactions")
+tennisTransactions1 <- as(tennisTransactions, "transactions")
 
-inspect(head(tennis,5))
+inspect(head(tennisTransactions1,5))
 ```
 
 The associations rules for Player-1 winning : 
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_winning <- apriori(tennis, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
+tennis_rules_winning <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -229,7 +234,7 @@ inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
 The associations rules for Player-1 loosing : 
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_loosing <- apriori(tennis, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
+tennis_rules_loosing <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -240,7 +245,7 @@ inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
 All the rules with Result as association : 
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules <- apriori(tennis, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
+tennis_rules <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -262,6 +267,71 @@ plot(clusters_hiearchical)
 ```
 
 This clustering regroups Player-1 winner together very well.
+
+
+\clearpage
+
+# Classification and associations rules 
+
+## CBA Algorithm 
+
+## From classification to associations rules 
+
+```{r}
+tennisClassifier <- tennisData
+
+tennisClassifier[["ACE.1"]] <- as.numeric(tennisClassifier[["ACE.1"]])
+
+tennisClassifier[["ACE.2"]] <- as.numeric(tennisClassifier[["ACE.2"]])
+
+tennisClassifier[["UFE.2"]] <- as.numeric(tennisClassifier[["UFE.2"]])
+
+tennisClassifier[["UFE.1"]] <- as.numeric(tennisClassifier[["UFE.1"]])
+
+tennisClassifier[["Result"]] <- as.factor(tennisClassifier[["Result"]])
+
+# test and train set
+n = dim(tennisClassifier)[1]
+n2 = n*(3/4)
+set.seed(1234)
+train = sample(c(1:n), replace = F)[1:n2]
+tennisTest = tennisClassifier[-train, ]
+tennisTrain = tennisClassifier[train, ]
+
+#Learn a classifier using automatic default discretization
+classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.1, conf=0.6)
+
+# inspect the rule base
+inspect(rules(classifier))
+```
+
+```{r}
+# make predictions
+classifier.prediction = predict(classifier, tennisTest)
+classifier.confusion_matrix = table(classifier.prediction, true = tennisTest$Result)
+classifier.confusion_matrix
+```
+
+
+## From associations rules to classification 
+
+```{r}
+#Learn classifier from transactions
+tennisTransactions2 <- prepareTransactions(Result ~ ., tennisTransactions, disc.method = "mdlp")
+
+tennisTransactionsTrain <- tennisTransactions2[train,]
+tennisTransactionsTest <- tennisTransactions2[-train,]
+
+classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.1, conf = 0.6, verbose = TRUE)
+```
+
+```{r}
+# make predictions
+classifier.prediction = predict(classifier, tennisTransactionsTest)
+classifier.confusion_matrix = table(classifier.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
+
+classifier.confusion_matrix
+```
 
 \clearpage
 
