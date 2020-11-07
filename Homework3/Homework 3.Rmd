@@ -41,7 +41,7 @@ library(caret)
 
 There are parameters controlling the number of rules to be generated.
 
-For A => B : 
+For A => B :
 
 ## Support
 
@@ -49,22 +49,43 @@ Support is an indication of how frequently the itemset appears in the dataset.
 
 $$Support = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction}} = P(A \cap B)$$
 
-## Confidence 
+## Confidence
 
 Confidence is an indication of how often the rule has been found to be true.
 
 $$Confidence = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)}$$
 
-## Lift 
+## Lift
 
 Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
 
 $$Lift = \frac{P(A \cap B)}{P(A) *P(B)}$$
+
+## Leverage
+
+$levarage(A→B)=support(A→B)−support(A)×support(B)$
+
+The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent. Therefore, if
+
+$support(A→C)=support(A)×support(C) $
+
+then A and C are independent.
+
+## Conviction
+
+$conviction(A → B)=\frac{1−support(B)}{1−confidence(A→B)}$
+
+or
+
+$conviction(A → C)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$
+
+The conviction correspond to the frequency of items that are not B in the transaction over the frequency of B that don't contain A among all the transcations with B. Therefore, if A and B are independent the conviction should be equal to 1. When the confidence tends toward 1 the conviction tends toward infinity. It would mean that A and B are higly dependant.
+
 \clearpage
 
 # Apriori algorithm
 
-## Definition 
+## Definition
 
 Apriori searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
 The database is scanned at each level of lattice. Additionally, Apriori uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
@@ -77,7 +98,7 @@ data("Groceries")
 inspect(head(Groceries))
 ```
 
-### On R 
+### On R
 
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
@@ -91,22 +112,22 @@ inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 
 \clearpage
 
-# Using Frequent itemset to find rules 
+# Using Frequent itemset to find rules
 
-## Concept 
+## Concept
 
 
-TO DO 
+TO DO
 
 
 ## Example on personal data
 
-We can also use the ruleInduction method to find closed frequent itemset. 
+We call also use the ruleInduction method to find closed frequent itemset.
 
 ruleInduction has as attribute a method function.
 
 
-Closed Frequent itemsets : 
+Closed Frequent itemsets :
 
 An itemset X is a closed frequent itemset in set S if X is both closed and frequent in S.
 
@@ -130,7 +151,7 @@ frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
 
 ```{r, eval=TRUE, echo=FALSE}
 #inspect(head(frequentItemsAdult,5))
-itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency") 
+itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency")
 ```
 
 If in control method = "apriori" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using Apriori with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow (e.g., for itemsets with many elements or very low support).
@@ -150,7 +171,7 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 5))
 ```
 
 
-NOW THE BIG QUESTION ??? 
+NOW THE BIG QUESTION ???
 
 How to win money ?
 
@@ -164,15 +185,173 @@ rulesAdult
 inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
 ```
 
+### With python and scikit-learn
+
+
+This database contains a lot of mushrooms with a set of characteristics. Each mushroom is classified either as edible or poisonous. The database has been found in kaggle and is available here : https://www.kaggle.com/uciml/mushroom-classification.
+
+```python
+import pandas as pd
+import urllib
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
+from mlxtend.preprocessing import TransactionEncoder
+```
+
+
+```python
+mush_data = pd.read_csv('./dataPython/mushrooms.csv')
+```
+
+First, we want to have an overview of the data.
+
+```python
+mush_data.head()
+```
+As we can see, each column contains values that are single characters. Their meaning is given by the file values_name.txt.
+
+```python
+len(mush_data)
+```
+
+Now, we want to know the data repartition for each columns.
+
+```python
+for column in mush_data.columns:
+    print("\n" + column)
+    print(mush_data[column].value_counts())
+```
+
+As you can see the there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
+
+```python
+mush_data = mush_data[mush_data["stalk-root"] != '?']
+```
+
+
+```python
+len(mush_data)
+```
+
+```python
+mush_data['class'].value_counts()
+```
+
+Even without the discarded lines the dataset still have plenty of data and the class label is almost balanced.
+
+```python
+def sepCurrentValFromNewVal(stringNewOldValues):
+    currentVal = []
+    newVal = []
+    arrayNOvalues = stringNewOldValues.split(",")
+    for NOValues in arrayNOvalues:
+        NO = NOValues.split('=')
+        currentVal.append(NO[1])
+        newVal.append(NO[0])
+    return [currentVal, newVal]
+```
+
+
+```python
+mapColumnValName = {}
+with open("./dataPython/values_name.txt", "r") as file:
+    line = file.readline()
+    while line != "":
+        line = line.replace(' ', "").replace("\n", "")
+        valuesNamesForColumn = line.split(':')
+        mapColumnValName[valuesNamesForColumn[0]] = sepCurrentValFromNewVal(valuesNamesForColumn[1])
+        line = file.readline()
+mapColumnValName['cap-shape']
+```
+
+
+```python
+for column, ONValues in mapColumnValName.items():
+    mush_data[column] = mush_data[column].replace(ONValues[0], ONValues[1])
+mush_data.head()
+```
+
+
+```python
+train_data = mush_data.values
+```
+
+
+```python
+te = TransactionEncoder()
+te_ary = te.fit(train_data).transform(train_data)
+print(te.columns_)
+df = pd.DataFrame(te_ary, columns=te.columns_)
+len(df.columns)
+```
+
+
+```python
+frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
+frequent_itemsets['length'] = frequent_itemsets['itemsets'].apply(lambda x: len(x))
+frequent_itemsets
+```
+
+```python
+frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
+```
+
+```python
+frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("poisonous")]
+```
+
+
+```python
+assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.9)
+```
+
+
+```python
+assos_rule[assos_rule['antecedents'].astype(str).str.contains("edible")]
+```
+
+
+```python
+frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
+```
+
+
+```python
+frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
+```
+
+
+```python
+assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+```
+
+
+```python
+assos_rule[assos_rule['consequents'].astype(str).str.contains("edible")]
+```
+
+
+
+```python
+assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.6)
+```
+
+
+```python
+assos_rule[assos_rule['consequents'].astype(str).str.contains("edible")]
+```
+
+
+
 \clearpage
 
-# Frequent pattern-based cluster analysis
+# Clustering with Apriori algorithm as dissimilarity measure
 
-## Clustering with Apriori algorithm as dissimilarity measure 
+## Concept
 
-### Concept 
-
-TO DO 
+TO DO
 
 ### Jaccard distance
 
@@ -189,7 +368,7 @@ id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennisData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
 ```
 
-#### On R 
+#### On R
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 tennisTransactions <- tennisData[,3:7]
@@ -211,14 +390,14 @@ tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
   c(-Inf,0, median(tennisTransactions[[ "UFE.1"]][tennisTransactions[[ "UFE.1"]]>0]),
   Inf)), labels = c("Low", "High"))
 
-tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
-  
-tennisTransactions1 <- as(tennisTransactions, "transactions")
+tennis[["Result"]] <- as.factor(tennis[["Result"]])
+
+tennis <- as(tennis, "transactions")
 
 inspect(head(tennisTransactions1,5))
 ```
 
-The associations rules for Player-1 winning : 
+The associations rules for Player-1 winning :
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_winning <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
@@ -229,7 +408,7 @@ tennis_rules_winning
 inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
 ```
 
-The associations rules for Player-1 loosing : 
+The associations rules for Player-1 loosing :
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_loosing <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
@@ -240,7 +419,7 @@ tennis_rules_loosing
 inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
 ```
 
-All the rules with Result as association : 
+All the rules with Result as association :
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.1, confidence = 0.4))
@@ -251,9 +430,7 @@ tennis_rules
 inspect(head(sort(tennis_rules, by = "lift", decreasing=TRUE), 5))
 ```
 
-
-
-##### Cluster the items 
+##### Cluster the items
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
 inspect(tennis_rules)
@@ -268,9 +445,9 @@ assign <- cutree(clusters_hiearchical, k=2)
 inspect(tennisTransactions1[assign == 1])
 ```
 
-##### Cluster the rules 
+##### Cluster the rules
 
-- With Jaccard measure : 
+- With Jaccard measure :
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
 inspect(tennis_rules)
@@ -288,7 +465,7 @@ inspect(tennis_rules[assign == 1])
 This clustering regroups Player-1 winner together very well.
 
 
-- With affinity measure : 
+- With affinity measure :
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
 d <- dissimilarity(tennis_rules,method = "affinity", which = "associations")
@@ -314,13 +491,13 @@ ENtropy-based CLUStering
 
 ## Classification based on Association
 
-### CBA Algorithm 
+### CBA Algorithm
 
 Implementation the CBA algorithm with the M1 or M2 pruning strategy introduced by Liu, et al. (1998).
 
 Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size. Then either the M1 or M2 algorithm are used to perform database coverage pruning and to determin the number of rules to use and the default class.
 
-TO DO DEFINITION 
+TO DO DEFINITION
 
 ### Example on tennis data
 
@@ -329,7 +506,7 @@ TO DO DEFINITION
 With Random Forest, the accuracy rate was 0.6931818.\newline
 With Logistic regression it was 0.7667.
 
-#### From classification to associations rules 
+#### From classification to associations rules
 
 ```{r}
 tennisClassifier <- tennisData
@@ -398,7 +575,7 @@ model.fmesure
 ```
 
 
-#### From associations rules to classification 
+#### From associations rules to classification
 
 ```{r}
 #Learn classifier from transactions
@@ -458,9 +635,3 @@ model.fmesure
 # Evaluation
 
 Compare the algorithms
-
-
-
-
-
-
