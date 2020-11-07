@@ -277,7 +277,6 @@ This clustering regroups Player-1 winner together very well.
 
 ENtropy-based CLUStering
 
-
 \clearpage
 
 # Frequent pattern-based classification
@@ -286,10 +285,20 @@ ENtropy-based CLUStering
 
 ### CBA Algorithm 
 
-TO DO definition
+Implementation the CBA algorithm with the M1 or M2 pruning strategy introduced by Liu, et al. (1998).
 
+Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size. Then either the M1 or M2 algorithm are used to perform database coverage pruning and to determin the number of rules to use and the default class.
 
-### From classification to associations rules 
+TO DO DEFINITION 
+
+### Example on tennis data
+
+#### Recall from Homework 1
+
+With Random Forest, the accuracy rate was 0.6931818.\newline
+With Logistic regression it was 0.7667.
+
+#### From classification to associations rules 
 
 ```{r}
 tennisClassifier <- tennisData
@@ -327,12 +336,43 @@ classifier.confusion_matrix
 ```
 
 
-### From associations rules to classification 
+The accuracy rate is :
+```{r, eval=TRUE, echo=FALSE}
+model.accuracyrate = (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,2]) / (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,1] +classifier.confusion_matrix[2,2])
+model.accuracyrate
+```
+
+The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
+```{r, eval=TRUE, echo=FALSE}
+model.sensitivity = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,2])
+model.sensitivity
+```
+
+The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
+```{r, eval=TRUE, echo=FALSE}
+model.specificity = classifier.confusion_matrix[1,1]/(classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,1])
+model.specificity
+```
+
+The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
+```{r, eval=TRUE, echo=FALSE}
+model.precision = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[2,1] + classifier.confusion_matrix[2,2])
+model.precision
+```
+
+So the F_Mesure is :
+```{r, eval=TRUE, echo=FALSE}
+model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model.precision)
+model.fmesure
+```
+
+
+#### From associations rules to classification 
 
 ```{r}
 #Learn classifier from transactions
 tennisTransactions2 <- prepareTransactions(Result ~ ., tennisTransactions, disc.method = "mdlp")
-
+inspect(head(tennisTransactions2,4))
 tennisTransactionsTrain <- tennisTransactions2[train,]
 tennisTransactionsTest <- tennisTransactions2[-train,]
 
@@ -346,6 +386,36 @@ classifier.confusion_matrix = table(classifier.prediction, response(Result ~ ACE
 
 classifier.confusion_matrix
 ```
+The accuracy rate is :
+```{r, eval=TRUE, echo=FALSE}
+model.accuracyrate = (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,2]) / (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,1] +classifier.confusion_matrix[2,2])
+model.accuracyrate
+```
+
+The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
+```{r, eval=TRUE, echo=FALSE}
+model.sensitivity = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,2])
+model.sensitivity
+```
+
+The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
+```{r, eval=TRUE, echo=FALSE}
+model.specificity = classifier.confusion_matrix[1,1]/(classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,1])
+model.specificity
+```
+
+The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
+```{r, eval=TRUE, echo=FALSE}
+model.precision = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[2,1] + classifier.confusion_matrix[2,2])
+model.precision
+```
+
+So the F_Mesure is :
+```{r, eval=TRUE, echo=FALSE}
+model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model.precision)
+model.fmesure
+```
+
 
 ## Classification based on Multiple Association Rules
 
