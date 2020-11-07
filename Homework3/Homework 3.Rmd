@@ -178,20 +178,22 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
 
 \clearpage
 
-# Clustering with Apriori algorithm as dissimilarity measure 
+# Frequent pattern-based cluster analysis
 
-## Concept 
+## Clustering with Apriori algorithm as dissimilarity measure 
+
+### Concept 
 
 TO DO 
 
-## Example on tennis data
+### Example on tennis data
 
 ```{r}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennisData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
 ```
 
-### On R 
+#### On R 
 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 tennisTransactions <- tennisData[,3:7]
@@ -269,13 +271,25 @@ plot(clusters_hiearchical)
 This clustering regroups Player-1 winner together very well.
 
 
+## The CLIQUE algorithm
+
+## The ENCLUS algorithm
+
+ENtropy-based CLUStering
+
+
 \clearpage
 
-# Classification and associations rules 
+# Frequent pattern-based classification
 
-## CBA Algorithm 
+## Classification based on Association
 
-## From classification to associations rules 
+### CBA Algorithm 
+
+TO DO definition
+
+
+### From classification to associations rules 
 
 ```{r}
 tennisClassifier <- tennisData
@@ -313,7 +327,7 @@ classifier.confusion_matrix
 ```
 
 
-## From associations rules to classification 
+### From associations rules to classification 
 
 ```{r}
 #Learn classifier from transactions
@@ -333,23 +347,10 @@ classifier.confusion_matrix = table(classifier.prediction, response(Result ~ ACE
 classifier.confusion_matrix
 ```
 
-\clearpage
-
-# Frequent pattern-based cluster analysis
-
-## The CLIQUE algorithm
-
-## The ENCLUS algorithm
-
-\clearpage
-
-# Frequent pattern-based classification
-
-## Classification based on Association
-
 ## Classification based on Multiple Association Rules
 
 ## Classification based on Predictive Association Rules
+
 
 \clearpage
 
