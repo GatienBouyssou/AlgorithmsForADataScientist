@@ -58,7 +58,7 @@ $$Confidence (A→B)= \frac{\text{Number of transaction with both A and B}}{\tex
 
 Lift is the factor by which, the co-occurence of A and B exceeds the expected probability of A and B co-occuring, had they been independent. So, higher the lift, higher the chance of A and B occurring together.
 
-$$Lift(A→B) = \frac{P(A \cap B)}{P(A) *P(B)}$$
+$$Lift(A→B) = \frac{P(A \cap B)}{P(A) × P(B)}$$
 
 ## Leverage
 
@@ -74,7 +74,7 @@ $Levarage(A→B) = 0$
 
 Conviction compares the probability that A appears without B if they were dependent with the actual frequency of the appearance of A without B. In that respect it is similar to lift, however, it contrast to lift it is a directed measure. Furthermore, conviction is monotone in confidence and lift.
 
-$$Conviction(A → B)=\frac{P(A)*P(\bar{B})}{P(A \cap \bar{B})}$$
+$$Conviction(A → B)=\frac{P(A) × P(\bar{B})}{P(A \cap \bar{B})}$$
 
 or
 
@@ -105,21 +105,47 @@ Looking at some examples of transaction :
 inspect(head(Groceries,3))
 ```
 
-Let's apply APRIORI algorithm on the dataset : 
-```{r, eval=TRUE, echo=FALSE}
-grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
+We can find the 15 most common variables.
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
+itemFrequencyPlot(Groceries, topN=15, type="absolute", main="Item Frequency")
 ```
 
+Let's apply APRIORI algorithm on the dataset : 
+```{r, eval=TRUE, echo=FALSE}
+grocery_rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.2))
+```
+
+
+\clearpage 
 
 We have a set of associations rules. 
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules
 ```
 
-We can sort them by confidence and look at the first 5 (so the 5 rules with highest confidence).
+If we look at the 3 rules with highest confidence, we have these rules : 
 ```{r, eval=TRUE, echo=FALSE}
-inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
+inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 3))
 ```
+However "whole milk" if the most frequent item in the data set and this frequence plays a role in confidence.
+So we can look at the 3 rules with highest lift (A and B occuring together), and we have these rules : 
+
+```{r, eval=TRUE, echo=FALSE}
+inspect(head(sort(grocery_rules, by = "lift", decreasing=TRUE), 3))
+```
+
+We can also look at the items which induce "soda". Then we can sort them by confidence and look at the first 3 (so the 3 rules with highest confidence).
+
+```{r, eval=TRUE, echo=FALSE}
+inspect(head(sort(subset(grocery_rules, subset = rhs %in% "soda"), by = "confidence", decreasing=TRUE), 3))
+```
+
+Looking at the confidence, we see that for a third of the people buying : 
+- bottled water and fruit/vegetable juice or 
+- sausage and shopping bags or 
+- yogurt and bottled water
+
+it also induces buying soda.
 
 \clearpage
 
@@ -146,29 +172,30 @@ data("Adult")
 class(Adult)
 ```
 
-We can look at the first transaction. 
+We can look at the first transaction to see what are the items in a transaction. 
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(Adult,1))
 ```
 
-We can find the 15 most common varaibles.
+We can find the 15 most common variables.
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency")
 ```
 
 We apply ECLAT algorithm on the data set. \newline
-This returns the most frequent itemsets along with their support. 
+This returns the most frequent itemsets along with their support.\newline
+Let's look at 3 of these itemsets : 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8}
 frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
 inspect(head(frequentItemsAdult,3))
 ```
 
-We can also find the rules from the most frequent itemset. 
+We can also find the rules from the most frequent itemsets. \newline
+We use the ruleInduction function from R. We can set the method with the argument "method".
 
 If in control method = "APRIORI" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using APRIORI with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow.
 
 ```{r, fig.height = 6, fig.width = 8}
-## Create rules from the itemsets
 rulesAdult <- ruleInduction(frequentItemsAdult, confidence = 0.85, control = list(method = "apriori"))
 inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 ```
@@ -176,7 +203,7 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
 
 
-Thanks to the implementation of ECLAT algorithm, we can find the rules with a specific given result. \newline
+We can also find the rules with a specific given result. \newline
 For example, let's answer the question : \newline
 How to be rich ?
 
@@ -195,6 +222,9 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 ```
 
 We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss. 
+
+
+TO DO : difference between ECLAT and APRIORI.
 
 \clearpage
 
@@ -536,14 +566,24 @@ clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
 
-If we cut the dendogramm in two clusters. We can look at the first cluster.
-```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
+If we cut the dendogramm in two clusters. We can look at the first cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
+```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
 assign <- cutree(clusters_hiearchical, k=2)
+inspect(head(tennis_rules[assign == 1],5))
+```
+
+```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
+#Execute this to see the wholde cluster
 inspect(tennis_rules[assign == 1])
 ```
 
-And at the second cluster.
+And at the second cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
+```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
+inspect(head(tennis_rules[assign == 2],5))
+```
+
 ```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
+#Execute this to see the wholde cluster
 inspect(tennis_rules[assign == 2])
 ```
 
