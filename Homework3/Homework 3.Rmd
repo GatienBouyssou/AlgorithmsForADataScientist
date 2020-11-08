@@ -82,12 +82,12 @@ $$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 
 \clearpage
 
-# Apriori algorithm
+# APRIORI algorithm
 
 ## Definition
 
-Apriori searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
-The database is scanned at each level of lattice. Additionally, Apriori uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
+APRIORI searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
+The database is scanned at each level of lattice. Additionally, APRIORI uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
 
 ## Example on Groceries data on R
 
@@ -105,7 +105,7 @@ Looking at some examples of transaction :
 inspect(head(Groceries,3))
 ```
 
-Let's apply Apriori algorithm on the dataset : 
+Let's apply APRIORI algorithm on the dataset : 
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
 ```
@@ -123,19 +123,9 @@ inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 
 \clearpage
 
-# Using Frequent itemset to find rules
+# Using Frequent itemsets to find rules
 
 ## Concept
-
-
-TO DO
-
-
-## Example on personal data
-
-We call also use the ruleInduction method to find closed frequent itemset.
-
-ruleInduction has as attribute a method function.
 
 \textbf{Closed Frequent itemsets :}
 
@@ -143,8 +133,9 @@ An itemset X is a closed frequent itemset in set S if X is both closed and frequ
 
 \textbf{Eclat algorithm :}
 
-Mine frequent itemsets \newline
+It mines frequent itemsets \newline
 This algorithm uses simple intersection operations for equivalence class clustering along with bottom-up lattice traversal.
+Then looking at the most frequent itemsets, we can find rules between the items inside these itemsets.
 
 ## Example on Adult data on R
 
@@ -172,10 +163,9 @@ frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
 inspect(head(frequentItemsAdult,3))
 ```
 
-
 We can also find the rules from the most frequent itemset. 
 
-If in control method = "apriori" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using Apriori with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow.
+If in control method = "APRIORI" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using APRIORI with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow.
 
 ```{r, fig.height = 6, fig.width = 8}
 ## Create rules from the itemsets
@@ -185,8 +175,9 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 
 If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
 
-Thanks to the implementation of ECLAT algorithm, we can find the rules with a specific given result.
 
+
+Thanks to the implementation of ECLAT algorithm, we can find the rules with a specific given result. \newline
 For example, let's answer the question : \newline
 How to be rich ?
 
@@ -261,7 +252,7 @@ len(mush_data)
 mush_data['class'].value_counts()
 ```
 
-Even without the discarded lines the dataset still have plenty of data and the class label is almost balanced. Before feeding the apriori algorithm with our data, we need to use the TransactionEncoder provided by mlxtend. This class transforms our data into a matrix where :
+Even without the discarded lines the dataset still have plenty of data and the class label is almost balanced. Before feeding the APRIORI algorithm with our data, we need to use the TransactionEncoder provided by mlxtend. This class transforms our data into a matrix where :
 
 - each possible value for each feature will become a column
 - for each mushroom and each column we assign a boolean that correspond to weither or not the feature is contained by the mushroom.
@@ -355,7 +346,7 @@ frequent_itemsets['length'] = frequent_itemsets['itemsets'].apply(lambda x: len(
 frequent_itemsets
 ```
 
-Thanks to the apriori algorithm it is possible to associate some feature together.
+Thanks to the APRIORI algorithm it is possible to associate some feature together.
 
 ```{python}
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
@@ -365,9 +356,9 @@ frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("poisonous")]
 ```
 
-With the apriori algorithm, we can see some associations with the \textit{edible} feature with a support around 0.6. Also, it seems that the apriori haven't found any associations with the \textit{poisonous} feature with a support above 0.6.
+With the APRIORI algorithm, we can see some associations with the \textit{edible} feature with a support around 0.6. Also, it seems that the APRIORI haven't found any associations with the \textit{poisonous} feature with a support above 0.6.
 
-The result given by apriori will be used by the association_rules function given by mixtend.
+The result given by APRIORI will be used by the association_rules function given by mixtend.
 
 ```{python}
 assos_rule = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.9)
@@ -386,7 +377,7 @@ frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
 ```
 
-The results above obtained by fpgrowth look similar to the results obtained by the apriori algorithm. Therefore, now we can look for the rules that implies edible.
+The results above obtained by fpgrowth look similar to the results obtained by the APRIORI algorithm. Therefore, now we can look for the rules that implies edible.
 
 
 ```{python}
@@ -410,23 +401,26 @@ As we can see above if the threshold is above 0.6 the association_rules function
 
 \clearpage
 
-# Clustering with Apriori algorithm as dissimilarity measure
+# Clustering with APRIORI algorithm as dissimilarity measure
 
 ## Concept
 
-TO DO
+We can find a dissimilarity between transactions so we can compare the data. Then this dissimilarity is used as distance measure in clustering.
 
-## Jaccard dissimilarity
-
-A direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$. A good choice is the Jaccard distance defined as :
-
-$$d(X_i, X_j) = \frac{|X_i \cap X_j|}{|X_i \cup X_j|}$$
-
-The distance simply is the number of items that Xi and Xj have in common divided by the number of unique items in both sets.
+So a direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$.
 
 ## Affinity dissimilarity 
 
-TO DO 
+A good choice is the Affinity defined as :
+
+$$A(X_i, X_j)=\frac{Support(X_i,X_j)}{P(X_i) + P(X_j) - Support(X_i,X_j)} = \frac{P(X_i \cap X_j)}{P(X_i \cup X_j)}$$
+
+Here this means that affinity is the Jaccard similarity between items. \newline
+The Jaccard distance defined as :
+
+$$J(X_i, X_j) = \frac{|X_i \cap X_j|}{|X_i \cup X_j|}$$
+
+The distance simply is the number of items that $X_i$ and $X_j$ have in common divided by the number of unique items in both sets.
 
 ## Example on tennis data on R
 
@@ -556,26 +550,14 @@ inspect(tennis_rules[assign == 2])
 
 This clustering regroups Player-1 winner together and Player-2 winner together.
 
-This clustering regroups Player-1 winner together very well.
-
-We used Jaccard distance but there is also the affinity measure. However it gave worst result than Jaccard dissimilarity.
-
-
 \clearpage
 
-# Classification and association rules
+# Association Rule Classification
 
-## CBA Algorithm
+## Classification Based on Associations : CBA Algorithm
 
-Build a classifier based on association rules mined for an input dataset. 
-
-
-Implementation the CBA algorithm with the M1 or M2 pruning strategy introduced by Liu, et al. (1998).
-
-Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size. Then either the M1 or M2 algorithm are used to perform database coverage pruning and to determin the number of rules to use and the default class.
-
-TO DO DEFINITION
-
+CBA (Classification Based on Associations) Algorithm build a classifier based on association rules mined for an input dataset. 
+Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size. 
 ### Example on tennis data on R
 
 #### Recall from Homework 1
