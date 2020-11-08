@@ -176,7 +176,6 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
 
 
-
 Thanks to the implementation of ECLAT algorithm, we can find the rules with a specific given result. \newline
 For example, let's answer the question : \newline
 How to be rich ?
@@ -401,7 +400,7 @@ As we can see above if the threshold is above 0.6 the association_rules function
 
 \clearpage
 
-# Clustering with APRIORI algorithm as dissimilarity measure
+# Clustering with APRIORI algorithm
 
 ## Concept
 
