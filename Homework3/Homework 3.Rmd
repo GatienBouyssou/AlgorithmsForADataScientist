@@ -42,7 +42,6 @@ library(caret)
 
 There are parameters controlling the number of rules to be generated.
 
-
 ## Support
 
 Support is an indication of how frequently the itemset appears in the dataset.
@@ -51,7 +50,8 @@ $$Support(A→B) = \frac{\text{Number of transaction with both A and B}}{\text{T
 
 ## Confidence
 
-Confidence is an indication of how often the rule has been found to be true.
+Confidence is an indication of how often the rule has been found to be true.\newline
+This says how likely B is induced by A.
 
 $$Confidence(A→B) = \frac{\text{Number of transaction with both A and B}}{\text{Total Number of transaction with A}} = \frac{P(A \cap B)}{P(A)} = \frac{P_A(B)}{P(A)^2}$$
 
@@ -65,20 +65,20 @@ $$Lift(A→B) = \frac{P(A \cap B)}{P(A) *P(B)}$$
 
 The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent. 
 
-$$levarage(A→B)= P(A \cap B) − P(A)×P(B)$$
+$$Levarage(A→B)= P(A \cap B) − P(A)×P(B)$$
 Therefore, if A and B independent : 
 
-$levarage(A→B)= 0$
+$Levarage(A→B) = 0$
 
 ## Conviction
 
 The conviction correspond to the frequency of items that are not B in the transaction over the frequency of B that don't contain A among all the transcations with B. Therefore, if A and B are independent the conviction should be equal to 1. When the confidence tends toward 1 the conviction tends toward infinity. It would mean that A and B are higly dependant.
 
-$$conviction(A → B)=\frac{P(A)*P(\bar{B})}{P(A \cap \bar{B})}$$
+$$Conviction(A → B)=\frac{P(A)*P(\bar{B})}{P(A \cap \bar{B})}$$
 
 or  : 
 
-$$conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
+$$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 
 \clearpage
 
@@ -89,25 +89,37 @@ $$conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 Apriori searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
 The database is scanned at each level of lattice. Additionally, Apriori uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
 
-## Example on Groceries data
+## Example on Groceries data on R
 
+The Groceries data set contains 30 days of real-world point-of-sale transaction data from a typical local grocery outlet. The data set contains 9835 transactions and the items are aggregated to 169 categories.
+
+We can see the class of the dataset is : 
 ```{r}
 data("Groceries")
-#class(Groceries)
-inspect(head(Groceries))
+class(Groceries)
 ```
 
-### On R
+Looking at some examples of transaction :
 
+```{r}
+inspect(head(Groceries,3))
+```
+
+Let's apply Apriori algorithm on the dataset : 
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules <- apriori(Groceries, parameter = list(support = 0.03, confidence = 0.2))
 ```
 
+
+We have a set of associations rules. 
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules
-inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 ```
 
+We can sort them by confidence and look at the first 5 (so the 5 rules with highest confidence).
+```{r, eval=TRUE, echo=FALSE}
+inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
+```
 
 \clearpage
 
@@ -115,81 +127,80 @@ inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 5))
 
 ## Concept
 
-
-TO DO
-
-
-## Example on Adult data
-
 We call also use the ruleInduction method to find closed frequent itemset.
 
 ruleInduction has as attribute a method function.
 
-
-Closed Frequent itemsets :
+\textbf{Closed Frequent itemsets :}
 
 An itemset X is a closed frequent itemset in set S if X is both closed and frequent in S.
 
-
-Eclat algorithm :
+\textbf{Eclat algorithm :}
 
 Mine frequent itemsets \newline
 This algorithm uses simple intersection operations for equivalence class clustering along with bottom-up lattice traversal.
 
-### On R
+## Example on Adult data on R
+
+The Adult data set from R contains 48842 observations on the 15 variables (age, workclass, ...).
 
 ```{r, eval=TRUE, echo=FALSE}
 data("Adult")
-#class(Adult)
-inspect(head(Adult,5))
+class(Adult)
 ```
 
+We can look at the first transaction. 
 ```{r, eval=TRUE, echo=FALSE}
-frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
+inspect(head(Adult,1))
 ```
 
-```{r, eval=TRUE, echo=FALSE}
-#inspect(head(frequentItemsAdult,5))
+We can find the 15 most common varaibles.
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
 itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency")
 ```
 
-If in control method = "apriori" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using Apriori with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow (e.g., for itemsets with many elements or very low support).
+We apply ECLAT algorithm on the data set. \newline
+This returns the most frequent itemsets along with their support. 
+```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8}
+frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
+inspect(head(frequentItemsAdult,3))
+```
 
-```{r}
+
+We can also find the rules from the most frequent itemset. 
+
+If in control method = "apriori" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using Apriori with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow.
+
+```{r, fig.height = 6, fig.width = 8}
 ## Create rules from the itemsets
-rulesAdult <- ruleInduction(frequentItemsAdult, confidence = 0.95, control = list(method = "apriori"))
-inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 5))
+rulesAdult <- ruleInduction(frequentItemsAdult, confidence = 0.85, control = list(method = "apriori"))
+inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 ```
 
 If in control method = "ptree" is used, the transactions are counted into a prefix tree and then the rules are selectively generated using the counts in the tree. This is usually faster than the above approach.
 
-```{r}
-## Create rules from the itemsets
-rulesAdult <- ruleInduction(frequentItemsAdult, Adult, confidence = 0.95, control = list(method = "ptree"))
-inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 5))
-```
+Thanks to the implementation of ECLAT algorithm, we can find the rules with a specific given result.
 
+For example, let's answer the question : \newline
+How to be rich ?
 
-NOW THE BIG QUESTION ???
-
-How to win money ?
-
-```{r}
+```{r, fig.height = 6, fig.width = 8}
 frequentItemsAdultGain <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 200))
 rulesAdult <- ruleInduction(frequentItemsAdultGain, confidence = 0.15, control = list(method = "apriori"))
 rulesAdult <- subset(rulesAdult, rhs %pin% "capital-gain=High")
 ```
 
-
+We take the 3 best rules according to lift.  
 ```{r}
 rulesAdult
-inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 14))
+inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 ```
 
+We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss. 
 
-## Example on mushroom data
+\clearpage
 
-### With python and scikit-learn
+## Example on mushroom data on python with scikit-learn
 
 
 This database contains a lot of mushrooms with a set of characteristics. Each mushroom is classified either as edible or poisonous. The database has been found in kaggle and is available here : https://www.kaggle.com/uciml/mushroom-classification.
@@ -354,7 +365,7 @@ assos_rule[assos_rule['consequents'].astype(str).str.contains("edible")]
 
 TO DO
 
-### Jaccard distance
+## Jaccard dissimilarity
 
 A direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$. A good choice is the Jaccard distance defined as :
 
@@ -362,15 +373,21 @@ $$d(X_i, X_j) = \frac{|X_i \cap X_j|}{|X_i \cup X_j|}$$
 
 The distance simply is the number of items that Xi and Xj have in common divided by the number of unique items in both sets.
 
-### Example on tennis data
+## Affinity dissimilarity 
+
+TO DO 
+
+## Example on tennis data on R
+
+We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on : the number of aces won by each player, and, the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics. \newline
 
 ```{r}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennisData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
+head(tennisData)
 ```
 
-#### On R
-
+We can transform the tennis data set into a transaction data set. 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 tennisTransactions <- tennisData[,3:7]
 tennisTransactions <- data.frame(tennisTransactions)
@@ -394,11 +411,17 @@ tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
 tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
 
 tennisTransactions1 <- as(tennisTransactions, "transactions")
-
-inspect(head(tennisTransactions1,5))
 ```
 
-The associations rules for Player-1 winning :
+
+We can look at the 3 first transactions.
+```{r}
+inspect(head(tennisTransactions1,3))
+```
+
+We can restrict the rules to the result rhs="Result=1" which means Player-1 winner.
+
+The associations rules for Player-1 winning are :
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_winning <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
@@ -409,6 +432,11 @@ tennis_rules_winning
 inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
 ```
 
+These rules look correct : either a player-1 winning make a lot of aces and few unforced errors or the player-2 make few aces.
+
+
+We can also restrict the rules to the result rhs="Result=0" which means Player-1 loosing.
+
 The associations rules for Player-1 loosing :
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -417,9 +445,13 @@ tennis_rules_loosing <- apriori(tennisTransactions1, appearance = list (default=
 
 ```{r, eval=TRUE, echo=FALSE}
 tennis_rules_loosing
-inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 5))
+inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 3))
 ```
 
+These rules look correct : either player-1 is loosing because player-2 makes a lot of aces or because he does a lot of unforced errors or player-2 makes a lot of aces.
+
+
+Now let's look at all the associations rules leading to "Result". \newline
 All the rules with Result as association :
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -431,68 +463,62 @@ tennis_rules
 inspect(head(sort(tennis_rules, by = "lift", decreasing=TRUE), 5))
 ```
 
-##### Cluster the items
+Firstly let's look at the clustering of items 
+
+### Cluster the items
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
-inspect(tennis_rules)
-
 d <- dissimilarity(tennisTransactions1,method = "Jaccard", which = "items")
-clusters_hiearchical <- hclust(d, method = "complete")
+clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
 
-```{r fig.height=5, fig.width=6, fig.align = "center"}
-assign <- cutree(clusters_hiearchical, k=2)
-inspect(tennisTransactions1[assign == 1])
-```
+We can see two clusters on the dendogramm. One contains Result=1 and the other contains Result=0. \newline
+Moreover in the cluster with the branch Result=1, we can also see that the number of aces made by player-1 is high and the number of unforced errors is low. Also in this cluster player-2 made few or none aces. \newline
+In the other cluster, it is the opposite. Player-1 makes few or none aces whereas player-2 makes a lot.
 
-##### Cluster the rules
+So it seems that this clustering manage to cluster data linked to the result together.
+
+
+Now let's try to cluster the rules.
+
+\clearpage
+
+### Cluster the rules
 
 - With Jaccard measure :
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
-inspect(tennis_rules)
-
 d <- dissimilarity(tennis_rules,method = "Jaccard", which = "associations")
-clusters_hiearchical <- hclust(d, method = "complete")
+clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
 
-```{r fig.height=5, fig.width=6, fig.align = "center"}
+If we cut the dendogramm in two clusters. We can look at the first cluster.
+```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
 assign <- cutree(clusters_hiearchical, k=2)
 inspect(tennis_rules[assign == 1])
 ```
 
-This clustering regroups Player-1 winner together very well.
-
-
-- With affinity measure :
-
-```{r fig.height=5, fig.width=6, fig.align = "center"}
-d <- dissimilarity(tennis_rules,method = "affinity", which = "associations")
-clusters_hiearchical <- hclust(d, method = "complete")
-plot(clusters_hiearchical)
+And at the second cluster.
+```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
+inspect(tennis_rules[assign == 2])
 ```
 
+This clustering regroups Player-1 winner together and Player-2 together.
 
-```{r fig.height=5, fig.width=6, fig.align = "center"}
-assign <- cutree(clusters_hiearchical, k=2)
-inspect(tennis_rules[assign == 1])
-```
 
-## The CLIQUE algorithm
+We used Jaccard distance but there is also the affinity measure. However it gave worst result than Jaccard dissimilarity.
 
-## The ENCLUS algorithm
-
-ENtropy-based CLUStering
 
 \clearpage
 
-# Frequent pattern-based classification
+# Classification and association rules
 
-## Classification based on Association
+## CBA Algorithm
 
-### CBA Algorithm
+Build a classifier based on association rules mined for an input dataset. 
+
 
 Implementation the CBA algorithm with the M1 or M2 pruning strategy introduced by Liu, et al. (1998).
 
@@ -500,14 +526,16 @@ Candidate classification association rules (CARs) are mined with the standard AP
 
 TO DO DEFINITION
 
-### Example on tennis data
+### Example on tennis data on R
 
 #### Recall from Homework 1
 
 With Random Forest, the accuracy rate was 0.6931818.\newline
 With Logistic regression it was 0.7667.
 
-#### From classification to associations rules
+#### Classification using chi2 discretization
+
+CBA can take as input a classic non-transaction dataset as tennis. We just have to choose the discretization method in parameter.
 
 ```{r}
 tennisClassifier <- tennisData
@@ -524,14 +552,14 @@ tennisClassifier[["Result"]] <- as.factor(tennisClassifier[["Result"]])
 
 # test and train set
 n = dim(tennisClassifier)[1]
-n2 = n*(3/4)
+n2 = n*(5/6)
 set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
 tennisTest = tennisClassifier[-train, ]
 tennisTrain = tennisClassifier[train, ]
 
 #Learn a classifier using automatic default discretization
-classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.1, conf=0.6)
+classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.05, conf=0.4)
 
 # inspect the rule base
 inspect(rules(classifier))
@@ -576,16 +604,21 @@ model.fmesure
 ```
 
 
-#### From associations rules to classification
+#### Direct classification from homemade transactions 
+
+We can also use the transactions we created before. \newline
+ACE.1 and ACE.2 take for value either None, or Low or High. \newline
+UFE.1 and UFE.2 take for value either Low or High. \newline
 
 ```{r}
-#Learn classifier from transactions
-tennisTransactions2 <- prepareTransactions(Result ~ ., tennisTransactions, disc.method = "mdlp")
-inspect(head(tennisTransactions2,4))
-tennisTransactionsTrain <- tennisTransactions2[train,]
-tennisTransactionsTest <- tennisTransactions2[-train,]
+#Build the classifier from transactions
+tennisTransactionsTrain <- tennisTransactions1[train,]
+tennisTransactionsTest <- tennisTransactions1[-train,]
 
-classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4, verbose = TRUE)
+#classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4)
+classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.001, conf = 0.4)
+# inspect the rule base
+inspect(head(rules(classifier),4))
 ```
 
 ```{r}
@@ -600,6 +633,8 @@ The accuracy rate is :
 model.accuracyrate = (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,2]) / (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,1] +classifier.confusion_matrix[2,2])
 model.accuracyrate
 ```
+So the accuracy rate is better with our homemade transaction. It makes sense because discretization of integers is difficult to handle.
+
 
 The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
 ```{r, eval=TRUE, echo=FALSE}
@@ -625,14 +660,4 @@ model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model
 model.fmesure
 ```
 
-
-## Classification based on Multiple Association Rules
-
-## Classification based on Predictive Association Rules
-
-
-\clearpage
-
-# Evaluation
-
-Compare the algorithms
+This classification is also as good as logistic regression. It gives very good result.
