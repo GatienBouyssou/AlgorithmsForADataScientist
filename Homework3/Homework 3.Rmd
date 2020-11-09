@@ -463,15 +463,15 @@ We use a dataset from the Wimbledon tennis tournament for Women in 2013. We will
 
 ```{r}
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
-tennisData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
-tennisData <- tennisData[,3:7]
-tennisData <- data.frame(tennisData)
-head(tennisData)
+tennis.data <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = T)
+tennis.data <- tennis.data[,3:7]
+tennis.data <- data.frame(tennis.data)
+head(tennis.data)
 ```
 
 We can transform the tennis data set into a transaction data set. 
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
-tennisTransactions <- tennisData
+tennisTransactions <- tennis.data
 
 tennisTransactions[["ACE.1"]] <- ordered(cut(tennisTransactions[[ "ACE.1"]],
   c(-Inf,0, median(tennisTransactions[[ "ACE.1"]][tennisTransactions[[ "ACE.1"]]>0]),
@@ -491,13 +491,13 @@ tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
 
 tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
 
-tennisTransactions1 <- as(tennisTransactions, "transactions")
+tennis.transactions <- as(tennisTransactions, "transactions")
 ```
 
 
 We can look at the 3 first transactions.
 ```{r}
-inspect(head(tennisTransactions1,3))
+inspect(head(tennis.transactions,3))
 ```
 
 We can restrict the rules to the result rhs="Result=1" which means Player-1 winner.
@@ -505,12 +505,12 @@ We can restrict the rules to the result rhs="Result=1" which means Player-1 winn
 The associations rules for Player-1 winning are :
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_winning <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
+tennis.rules_winning <- apriori(tennis.transactions, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_winning
-inspect(head(sort(tennis_rules_winning, by = "lift", decreasing=TRUE), 5))
+tennis.rules_winning
+inspect(head(sort(tennis.rules_winning, by = "lift", decreasing=TRUE), 5))
 ```
 
 These rules look correct : either a player-1 winning make a lot of aces and few unforced errors or the player-2 make few aces.
@@ -521,12 +521,12 @@ We can also restrict the rules to the result rhs="Result=0" which means Player-1
 The associations rules for Player-1 loosing :
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_loosing <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
+tennis.rules_loosing <- apriori(tennis.transactions, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules_loosing
-inspect(head(sort(tennis_rules_loosing, by = "lift", decreasing=TRUE), 3))
+tennis.rules_loosing
+inspect(head(sort(tennis.rules_loosing, by = "lift", decreasing=TRUE), 3))
 ```
 
 These rules look correct : either player-1 is loosing because player-2 makes a lot of aces or because he does a lot of unforced errors or player-2 makes a lot of aces.
@@ -536,12 +536,12 @@ Now let's look at all the associations rules leading to "Result". \newline
 All the rules with Result as association :
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules <- apriori(tennisTransactions1, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
+tennis.rules <- apriori(tennis.transactions, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.2, confidence = 0.4))
 ```
 
 ```{r, eval=TRUE, echo=FALSE}
-tennis_rules
-inspect(head(sort(tennis_rules, by = "lift", decreasing=TRUE), 5))
+tennis.rules
+inspect(head(sort(tennis.rules, by = "lift", decreasing=TRUE), 5))
 ```
 
 Firstly let's look at the clustering of items 
@@ -549,7 +549,7 @@ Firstly let's look at the clustering of items
 ### Cluster the items
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
-d <- dissimilarity(tennisTransactions1,method = "Jaccard", which = "items")
+d <- dissimilarity(tennis.transactions,method = "Jaccard", which = "items")
 clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
@@ -568,7 +568,7 @@ Now let's try to cluster the rules.
 ### Cluster the rules
 
 ```{r fig.height=5, fig.width=6, fig.align = "center"}
-d <- dissimilarity(tennis_rules,method = "Jaccard", which = "associations")
+d <- dissimilarity(tennis.rules,method = "Jaccard", which = "associations")
 clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
@@ -576,22 +576,22 @@ plot(clusters_hiearchical)
 If we cut the dendogramm in two clusters. We can look at the first cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
 ```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
 assign <- cutree(clusters_hiearchical, k=2)
-inspect(head(tennis_rules[assign == 1],5))
+inspect(head(tennis.rules[assign == 1],5))
 ```
 
 ```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
 #Execute this to see the wholde cluster
-inspect(tennis_rules[assign == 1])
+inspect(tennis.rules[assign == 1])
 ```
 
 And at the second cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
 ```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
-inspect(head(tennis_rules[assign == 2],5))
+inspect(head(tennis.rules[assign == 2],5))
 ```
 
 ```{r , eval =FALSE, fig.height=5, fig.width=6, fig.align = "center"}
 #Execute this to see the wholde cluster
-inspect(tennis_rules[assign == 2])
+inspect(tennis.rules[assign == 2])
 ```
 
 This clustering regroups Player-1 winner together and Player-2 winner together.
@@ -617,7 +617,7 @@ CBA can take as input a classic non-transaction dataset as tennis. We just have 
 chi2 discretization = TO DO
 
 ```{r}
-tennisClassifier <- tennisData
+tennisClassifier <- tennis.data
 
 tennisClassifier[["ACE.1"]] <- as.numeric(tennisClassifier[["ACE.1"]])
 
@@ -638,49 +638,51 @@ tennisTest = tennisClassifier[-train, ]
 tennisTrain = tennisClassifier[train, ]
 
 #Learn a classifier using automatic default discretization
-classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.05, conf=0.4)
-classifier
+classifierData <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.05, conf=0.4)
+classifierData
+```
 
+```{r}
 # inspect the rule base
-inspect(rules(classifier))
+inspect(rules(classifierData))
 ```
 
 ```{r}
 # make predictions
-classifier.prediction = predict(classifier, tennisTest)
-classifier.confusion_matrix = table(classifier.prediction, true = tennisTest$Result)
-classifier.confusion_matrix
+classifierData.prediction = predict(classifierData, tennisTest)
+classifierData.confusion_matrix = table(classifierData.prediction, true = tennisTest$Result)
+classifierData.confusion_matrix
 ```
 
 
 The accuracy rate is :
 ```{r, eval=TRUE, echo=FALSE}
-model.accuracyrate = (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,2]) / (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,1] +classifier.confusion_matrix[2,2])
-model.accuracyrate
+classifierData.accuracyrate = (classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[2,2]) / (classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[1,2] + classifierData.confusion_matrix[2,1] +classifierData.confusion_matrix[2,2])
+classifierData.accuracyrate
 ```
 
 The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
 ```{r, eval=TRUE, echo=FALSE}
-model.sensitivity = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,2])
-model.sensitivity
+classifierData.sensitivity = classifierData.confusion_matrix[2,2]/(classifierData.confusion_matrix[1,2] + classifierData.confusion_matrix[2,2])
+classifierData.sensitivity
 ```
 
 The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
 ```{r, eval=TRUE, echo=FALSE}
-model.specificity = classifier.confusion_matrix[1,1]/(classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,1])
-model.specificity
+classifierData.specificity = classifierData.confusion_matrix[1,1]/(classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[2,1])
+classifierData.specificity
 ```
 
 The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
 ```{r, eval=TRUE, echo=FALSE}
-model.precision = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[2,1] + classifier.confusion_matrix[2,2])
-model.precision
+classifierData.precision = classifierData.confusion_matrix[2,2]/(classifierData.confusion_matrix[2,1] + classifierData.confusion_matrix[2,2])
+classifierData.precision
 ```
 
 So the F_Mesure is :
 ```{r, eval=TRUE, echo=FALSE}
-model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model.precision)
-model.fmesure
+classifierData.fmesure = (2*classifierData.precision*classifierData.sensitivity)/(classifierData.sensitivity + classifierData.precision)
+classifierData.fmesure
 ```
 
 
@@ -692,53 +694,56 @@ UFE.1 and UFE.2 take for value either Low or High. \newline
 
 ```{r}
 #Build the classifier from transactions
-tennisTransactionsTrain <- tennisTransactions1[train,]
-tennisTransactionsTest <- tennisTransactions1[-train,]
+tennisTransactionsTrain <- tennis.transactions[train,]
+tennisTransactionsTest <- tennis.transactions[-train,]
 
-classifier <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4)
-classifier
+classifierTransactions <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4)
+classifierTransactions
+```
+
+```{r}
 # inspect the rule base
-inspect(head(rules(classifier),4))
+inspect(head(rules(classifierTransactions),4))
 ```
 
 ```{r}
 # make predictions
-classifier.prediction = predict(classifier, tennisTransactionsTest)
-classifier.confusion_matrix = table(classifier.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
+classifierTransactions.prediction = predict(classifierTransactions, tennisTransactionsTest)
+classifierTransactions.confusion_matrix = table(classifierTransactions.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
 
-classifier.confusion_matrix
+classifierTransactions.confusion_matrix
 ```
 
 The accuracy rate is :
 ```{r, eval=TRUE, echo=FALSE}
-model.accuracyrate = (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,2]) / (classifier.confusion_matrix[1,1] + classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,1] +classifier.confusion_matrix[2,2])
-model.accuracyrate
+classifierTransactions.accuracyrate = (classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[2,2]) / (classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[1,2] + classifierTransactions.confusion_matrix[2,1] +classifierTransactions.confusion_matrix[2,2])
+classifierTransactions.accuracyrate
 ```
 So the accuracy rate is better with our homemade transaction. It makes sense because discretization of integers is difficult to handle.
 
 
 The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
 ```{r, eval=TRUE, echo=FALSE}
-model.sensitivity = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[1,2] + classifier.confusion_matrix[2,2])
-model.sensitivity
+classifierTransactions.sensitivity = classifierTransactions.confusion_matrix[2,2]/(classifierTransactions.confusion_matrix[1,2] + classifierTransactions.confusion_matrix[2,2])
+classifierTransactions.sensitivity
 ```
 
 The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
 ```{r, eval=TRUE, echo=FALSE}
-model.specificity = classifier.confusion_matrix[1,1]/(classifier.confusion_matrix[1,1] + classifier.confusion_matrix[2,1])
-model.specificity
+classifierTransactions.specificity = classifierTransactions.confusion_matrix[1,1]/(classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[2,1])
+classifierTransactions.specificity
 ```
 
 The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
 ```{r, eval=TRUE, echo=FALSE}
-model.precision = classifier.confusion_matrix[2,2]/(classifier.confusion_matrix[2,1] + classifier.confusion_matrix[2,2])
-model.precision
+classifierTransactions.precision = classifierTransactions.confusion_matrix[2,2]/(classifierTransactions.confusion_matrix[2,1] + classifierTransactions.confusion_matrix[2,2])
+classifierTransactions.precision
 ```
 
 So the F_Mesure is :
 ```{r, eval=TRUE, echo=FALSE}
-model.fmesure = (2*model.precision*model.sensitivity)/(model.sensitivity + model.precision)
-model.fmesure
+classifierTransactions.fmesure = (2*classifierTransactions.precision*classifierTransactions.sensitivity)/(classifierTransactions.sensitivity + classifierTransactions.precision)
+classifierTransactions.fmesure
 ```
 
 This classification is also as good as logistic regression. It gives very good result.
@@ -746,14 +751,16 @@ This classification is also as good as logistic regression. It gives very good r
 #### Classification using rules 
 
 ```{r}
-classifier_rules <- CBA_ruleset(Result ~ .,tennis_rules)
+#Build the classifier from rules
+classifierRules <- CBA_ruleset(Result ~ . ,tennis.rules)
+classifierRules
 ```
 
 ```{r}
 # make predictions
-classifier.prediction = predict(classifier_rules, tennis_rules)
-classifier.confusion_matrix = table(classifier.prediction,response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennis_rules))
-classifier.confusion_matrix
+classifierRules.prediction = predict(classifierRules, tennisTransactionsTest)
+classifierRules.confusion_matrix = table(classifierRules.prediction,response(Result ~ ., tennisTransactionsTest))
+classifierRules.confusion_matrix
 ```
 
 ## Regularized Class Association Rules for Multi-class Problems : RCAR Algorithm 
@@ -765,16 +772,15 @@ TO DO
 ### Example on tenis data on R
 
 ```{r}
-classifier = RCAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data= tennisTrain, lambda = NULL, alpha = 1, disc.method = "chi2")
-classifier
+classifierRCAR = RCAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data= tennisTrain, lambda = NULL, alpha = 1, disc.method = "chi2")
+classifierRCAR
 ```
 
 ```{r}
 # make predictions
-classifier.prediction = predict(classifier, tennisTransactionsTest)
-classifier.confusion_matrix = table(classifier.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
-
-classifier.confusion_matrix
+classifierRCAR.prediction = predict(classifierRCAR, tennisTransactionsTest)
+classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
+classifierRCAR.confusion_matrix
 ```
 
 ## First Order Inductive Learner : FOIL Algorithm
@@ -797,7 +803,7 @@ Following Xiaoxin and Han (2003), we classify new examples by
 data(Glass)
 str(Glass)
 response(Type ~ ., Glass)
-classifier <- FOIL(Type ~ ., data= Glass, max_len = 3, min_gain = .7, best_k = 5,disc.method = "chi2")
+classifierFOIL <- FOIL(Type ~ ., data= Glass, max_len = 3, min_gain = .7, best_k = 5, disc.method = "chi2")
 ```
 
 ## Classification Based on Multiple Class-association Rules : CMAR Algorithm
@@ -807,16 +813,16 @@ data("iris")
 # install and compile CMAR
 install_LUCS_KDD_CMAR()
 # build a classifier, inspect rules and make predictions
-cl <- CMAR(Species ~ ., iris, support = .2, confidence = .8, verbose = TRUE)
-cl
+classifierCMAR <- CMAR(Species ~ ., iris, support = .2, confidence = .8, verbose = TRUE)
+classifierCMAR
 ```
 
 ## Classification based on Predictive Association Rules : CPAR Algorithm
 
 ```{r}
-CPAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, best_k = 5, data= tennisTransactionsTrain, support = 0.1, confidence = 0.5,disc.method = "mdlp", verbose = FALSE)
+classifierCPAR <- CPAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, best_k = 5, data= tennisTransactionsTrain, support = 0.1, confidence = 0.5,disc.method = "mdlp", verbose = FALSE)
+classifierCPAR
 ```
-
 
 ## Classification by Aggregating Emerging Patterns : CAEP Algorithm 
 
