@@ -59,29 +59,32 @@ A method called Hopkins statistic is used to assess the clustering tendency in a
 
 For D, a data set : \newline
 
-<ul>
-<li> Sample n point from D ($p_1$, ..., $p_n$) </li>
-<li> For all $p_i \in D$, compute the distance to the nearest neighbor $x_{i} </li>
-<li> Generate ($random_D$) from a random uniform distribution with n points ($q_1$,..., $q_n$) with the same variation as D. </li>
-<li> For all $q_i \in random_D$, compute the distance to the nearest neighbor $y_{i}$ </li>
-<li> Calculate the Hopkins statistic (H). It is the mean of the nearest neighbor distances in $random_D$ divided by the sum of the mean nearest neighbor distances in D and $random_D$. </li>
-$$H = \frac{\Sigma_i^n y_i}{\Sigma_i^n X_i + \Sigma_i^n y_i}$$
-</ul>
 
-If H is about 0.5, if means that the sum along D and $random_D$ are very close so that the data D is uniformly distributed.
-It is the null hypothesis, meaning that the data set D is uniformly distributed (no meaningful clusters) \newline
+- Sample n point from D ($p_1$, ..., $p_n$) 
+   - For all $p_i \in D$, compute the distance to the nearest neighbor $x_{i}$ 
+ - Generate ($random_D$) from a random uniform distribution with n points ($q_1$,..., $q_n$) with the same variation as D. 
+   - For all $q_i \in random_D$, compute the distance to the nearest neighbor $y_{i}$ 
+- Calculate the Hopkins statistic (H). It is the mean of the nearest neighbor distances in $random_D$ divided by the sum of the mean nearest neighbor distances in D and $random_D$. 
+
+
+$$H = \frac{\Sigma_i^n y_i}{\Sigma_i^n X_i + \Sigma_i^n y_i}$$
+
+
+If H is about 0.5, it means that the sum along D and $random_D$ are very close so that the data D is uniformly distributed  (no meaningful clusters).\newline
+It is called the null hypothesis. \newline
 
 Otherwise we have the Alternative hypothesis: the data set D is not uniformly distributed (contains meaningful clusters).
 
 #### Visually
 
-There is an algorithm of the visual assessment of cluster tendency (VAT) approach (Bezdek and Hathaway, 2002).
+There is an algorithm for visual assessment of cluster tendency (VAT) : it is the approach by Bezdek and Hathaway, 2002.
 
-<ul>
-<li> Compute the dissimilarity matrix using the Euclidean distance measure </li>
-<li> Reorder the DM so that similar objects are close to one another. It is now called the ODM. </li>
-<li> Display the ODM as an ordered dissimilarity image (ODI) (with some libraries). </li>
-</ul>
+
+
+ - Compute the dissimilarity matrix using the Euclidean distance measure 
+ - Reorder the DM so that similar objects are close to one another. It is now called the ODM. 
+ - Display the ODM as an ordered dissimilarity image (ODI) (with some libraries). 
+
 
 Computing the visual form gives us colored squares along the diagonal. The VAT detects the clustering tendency in a visual form by counting them.
 
@@ -154,12 +157,12 @@ Determining the optimal number of clusters in a data set is fundamental because,
 
 The Elbow method looks at the total within-cluster sum of squares over the number of clusters.
 
-<ul>
-<li> Compute the clustering algorithm chosen with k going from 1 to 10 for example. </li>
-<li> Calculate the within-cluster sum of squares for each k </li>
-<li> Plot the curve of WSS according to k </li>
-<li> The location of a bend (knee) in the plot is generally considered as an indicator of the appropriate number of clusters. </li>
-</ul>
+
+ - Compute the clustering algorithm chosen with k going from 1 to 10 for example. 
+ - Calculate the within-cluster sum of squares for each k 
+ - Plot the curve of WSS according to k 
+ - The location of a bend (knee) in the plot is generally considered as an indicator of the appropriate number of clusters. 
+
 
 An alternative is the Silhouette method.
 
@@ -167,29 +170,28 @@ An alternative is the Silhouette method.
 
 Average silhouette method computes the average silhouette of observations for different values of k. Then k is chosen if it maximizes the average silhouette.
 
-<ul>
-<li> Compute the clustering algorithm chosen with k going from 1 to 10 for example. </li>
-<li> Calculate the average silhouette coefficients of observations for each k </li>
-<li> Plot the curve of AVG.S according to k </li>
-<li> The location of the maximum is considered as the appropriate number of clusters. </li>
-</ul>
+
+ - Compute the clustering algorithm chosen with k going from 1 to 10 for example. 
+ - Calculate the average silhouette coefficients of observations for each k 
+ - Plot the curve of AVG.S according to k 
+ - The location of the maximum is considered as the appropriate number of clusters. 
+
 
 ### Gap statistic method
 
 The gap statistic compares the total within intra-cluster variation for different values of k with their expected values under null reference. We choose k when it maximizes the gap statistic so that the clustering structure is far away from the random uniform distribution of points.
 
-<ul>
-<li> Compute the clustering algorithm chosen with k going from 1 to 10 for example.</li>
-<li> Calculate the within-cluster sum of squares for each k $W_k$ </li>
-<li> Generate B reference data sets with a random uniform distribution. </li>
-<ul>
-<li> Compute the clustering algorithm chosen on these reference data sets with k going from 1 to $k_max$.</li>
-<li> Calculate the within-cluster sum of squares for each k $W_kb$
-</ul>
-<li> Compute the gap : $$Gap(k) = \frac{1}{B} \Sigma_{b=1}^B log(W_{kb}) - log(W_k)$$ </li>
-<li> Compute the standard deviation of the statistics $s_k$. </li>
-<li> Choose the smallest k such that the gap statistic is within one standard deviation of the gap at k+1. $$Gap(k+1) > Gap(k) - s_{k+1}$$ </li>
-</ul>
+
+- Compute the clustering algorithm chosen with k going from 1 to 10 for example.
+- Calculate the within-cluster sum of squares for each k $W_k$ 
+- Generate B reference data sets with a random uniform distribution. 
+  - Compute the clustering algorithm chosen on these reference data sets with k going from 1 to $k_max$.
+  - Calculate the within-cluster sum of squares for each k $W_kb$
+  
+- Compute the gap : $$Gap(k) = \frac{1}{B} \Sigma_{b=1}^B log(W_{kb}) - log(W_k)$$ 
+- Compute the standard deviation of the statistics $s_k$. 
+- Choose the smallest k such that the gap statistic is within one standard deviation of the gap at k+1. $$Gap(k+1) > Gap(k) - s_{k+1}$$ 
+
 
 \clearpage
 
@@ -495,16 +497,16 @@ It minimizes the total within-cluster variance. At each step the pair of cluster
 
 ### P-value
 
-<ul>
-<li> Generate bootstraps samples </li>
-<li> Compute hierarchical clustering on each bootstrap copy </li>
-<li> Compute for each cluster :
-  <ul>
-  <li>The bootstrap probability (BP) value : frequency that the cluster is identified in bootstrap copies.</li>
-  <li>The approximately unbiased (AU) probability values (p-values) by multiscale bootstrap resampling. Clusters with p-value above 95% are considered to be strongly supported by data. </li>
-  </ul>
-  </li>
-</ul>
+
+ - Generate bootstraps samples 
+ - Compute hierarchical clustering on each bootstrap copy 
+ - Compute for each cluster :
+  
+   - The bootstrap probability (BP) value : frequency that the cluster is identified in bootstrap copies.
+   - The approximately unbiased (AU) probability values (p-values) by multiscale bootstrap resampling. Clusters with p-value above 95% are considered to be strongly supported by data. 
+  
+  
+
 
 
 ### Examples
