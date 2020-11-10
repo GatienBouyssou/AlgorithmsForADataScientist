@@ -49,7 +49,7 @@ library(fpc)
 ### Why assessing clustering tendency ?
 
 Clustering can create clusters even if there are no meaningful cluster. \newline
-Clustering tendency assessment methods are used to evaluate the validity of clustering analysis. It means evaluate if there are meaningful clusters in the data.
+Clustering tendency assessment methods are used to evaluate the validity of clustering analysis. It means evaluating if there are meaningful clusters in the data.
 
 ### Methods
 
@@ -60,30 +60,29 @@ A method called Hopkins statistic is used to assess the clustering tendency in a
 For D, a data set : \newline
 
 
-- Sample n point from D ($p_1$, ..., $p_n$) 
-   - For all $p_i \in D$, compute the distance to the nearest neighbor $x_{i}$ 
- - Generate ($random_D$) from a random uniform distribution with n points ($q_1$,..., $q_n$) with the same variation as D. 
-   - For all $q_i \in random_D$, compute the distance to the nearest neighbor $y_{i}$ 
-- Calculate the Hopkins statistic (H). It is the mean of the nearest neighbor distances in $random_D$ divided by the sum of the mean nearest neighbor distances in D and $random_D$. 
+- Sample n points from D ($p_1$, ..., $p_n$)
+   - For all $p_i \in D$, compute the distance to the nearest neighbour $x_{i}$
+ - Generate ($random_D$) from a random uniform distribution with n points ($q_1$,..., $q_n$) with the same variation as D.
+   - For all $q_i \in random_D$, compute the distance to the nearest neighbour $y_{i}$
+- Calculate the Hopkins statistic (H). It is the mean of the nearest neighbour distances in $random_D$ divided by the sum of the mean nearest neighbour distances in D and $random_D$.
 
 
 $$H = \frac{\Sigma_i^n y_i}{\Sigma_i^n X_i + \Sigma_i^n y_i}$$
 
 
-If H is about 0.5, it means that the sum along D and $random_D$ are very close so that the data D is uniformly distributed  (no meaningful clusters).\newline
+If H is about 0.5, it means that the sum along D and $random_D$ are very close so that the data D is uniformly distributed (no meaningful clusters).\newline
 It is called the null hypothesis. \newline
 
-Otherwise we have the Alternative hypothesis: the data set D is not uniformly distributed (contains meaningful clusters).
+Otherwise, we have the Alternative hypothesis: the data set D is not uniformly distributed (contains meaningful clusters).
 
 #### Visually
 
 There is an algorithm for visual assessment of cluster tendency (VAT) : it is the approach by Bezdek and Hathaway, 2002.
 
 
-
- - Compute the dissimilarity matrix using the Euclidean distance measure 
- - Reorder the DM so that similar objects are close to one another. It is now called the ODM. 
- - Display the ODM as an ordered dissimilarity image (ODI) (with some libraries). 
+ - Compute the dissimilarity matrix using the Euclidean distance measure
+ - Reorder the DM so that similar objects are close to one another. It is now called the ODM.
+ - Display the ODM as an ordered dissimilarity image (ODI) (with some libraries).
 
 
 Computing the visual form gives us colored squares along the diagonal. The VAT detects the clustering tendency in a visual form by counting them.
@@ -108,7 +107,7 @@ We evaluate it by looking at the distances between clusters' centers or with the
 
 #### Connectivity
 
-Connectivity corresponds to what extent items are placed in the same cluster as their nearest neighbors in the data space.
+Connectivity corresponds to what extent items are placed in the same cluster as their nearest neighbours in the data space.
 
 #### Average silhouette
 
@@ -133,7 +132,7 @@ A negative $S_i$ means the observation is probably placed in the wrong cluster.
 
 ##### Average silhouette
 
-The average silhouette is the mean of all silhouette coefficients. It is used to evaluate a clustering.
+The average silhouette is the mean of all silhouette coefficients. It is used to evaluate the result made by a clustering algorithm.
 
 #### Dunn index
 
@@ -158,23 +157,23 @@ Determining the optimal number of clusters in a data set is fundamental because,
 The Elbow method looks at the total within-cluster sum of squares over the number of clusters.
 
 
- - Compute the clustering algorithm chosen with k going from 1 to 10 for example. 
- - Calculate the within-cluster sum of squares for each k 
- - Plot the curve of WSS according to k 
- - The location of a bend (knee) in the plot is generally considered as an indicator of the appropriate number of clusters. 
+ - Compute the clustering algorithm chosen with k going from 1 to 10 for example.
+ - Calculate the within-cluster sum of squares for each k
+ - Plot the curve of WSS according to k
+ - The location of a bend (knee) in the plot is generally considered as an indicator of the appropriate number of clusters.
 
 
 An alternative is the Silhouette method.
 
 ### Average silhouette method
 
-Average silhouette method computes the average silhouette of observations for different values of k. Then k is chosen if it maximizes the average silhouette.
+Average silhouette method computes the average silhouette of observations for different values of k. Then, k is chosen if it maximizes the average silhouette.
 
 
- - Compute the clustering algorithm chosen with k going from 1 to 10 for example. 
- - Calculate the average silhouette coefficients of observations for each k 
- - Plot the curve of AVG.S according to k 
- - The location of the maximum is considered as the appropriate number of clusters. 
+ - Compute the clustering algorithm chosen with k going from 1 to 10 for example.
+ - Calculate the average silhouette coefficients of observations for each k
+ - Plot the curve of AVG.S according to k
+ - The location of the maximum is considered as the appropriate number of clusters.
 
 
 ### Gap statistic method
@@ -183,23 +182,23 @@ The gap statistic compares the total within intra-cluster variation for differen
 
 
 - Compute the clustering algorithm chosen with k going from 1 to 10 for example.
-- Calculate the within-cluster sum of squares for each k $W_k$ 
-- Generate B reference data sets with a random uniform distribution. 
+- Calculate the within-cluster sum of squares for each k $W_k$
+- Generate B reference data sets with a random uniform distribution.
   - Compute the clustering algorithm chosen on these reference data sets with k going from 1 to $k_max$.
   - Calculate the within-cluster sum of squares for each k $W_kb$
-  
-- Compute the gap : $$Gap(k) = \frac{1}{B} \Sigma_{b=1}^B log(W_{kb}) - log(W_k)$$ 
-- Compute the standard deviation of the statistics $s_k$. 
-- Choose the smallest k such that the gap statistic is within one standard deviation of the gap at k+1. $$Gap(k+1) > Gap(k) - s_{k+1}$$ 
+
+- Compute the gap : $$Gap(k) = \frac{1}{B} \Sigma_{b=1}^B log(W_{kb}) - log(W_k)$$
+- Compute the standard deviation of the statistics $s_k$.
+- Choose the smallest k such that the gap statistic is within one standard deviation of the gap at k+1. $$Gap(k+1) > Gap(k) - s_{k+1}$$
 
 
 \clearpage
 
 # Principal Components Analysis
 
-The goal of PCA is to identify which features in the dataset explain the most variability.
+The goal of PCA is to identify which features, in the dataset, explain the most variability.
 
-Principal Component Analysis, or PCA, is a dimensionality-reduction method that is often used to reduce the dimensionality of large data sets, by transforming a large set of variables into a smaller one that still contains most of the information in the large set.
+Principal Component Analysis, or PCA, is a dimensionality-reduction method that is often used to reduce the dimensionality of large data sets, by transforming a large set of variables into a small one that still contains most of the information from the large set.
 
 ## Different kinds of PCA
 
@@ -207,13 +206,13 @@ Principal Component Analysis, or PCA, is a dimensionality-reduction method that 
 
 To process the feature extraction, we need to associate eighenvectors and eighenvalues to each feature of our dataset. For that, we will follow those steps one by one :
 
-- First, put your label column asside and keep all the independant features (the rest)
-- For each feature substract the mean of that column from each entry
+- First, put your class label column asside and keep all the independant features (the rest)
+- For each remaining columns substract the mean of that column from each entry
 - Standardize the features if needed. This will form a new matrix S
 - Transpose this matrix and multiply it by itself ($ S^t S $). This is a new matrix.
 - Compute the eigenvectors and the eigenvalues of this new matrix and deduce its eigendecomposition $PDP^{-1}$ where P contains all the eigenvectors and D all the eigenvalues on the diagonal. Each eighenvalue is associated to a eighenvector (the first eighenvalue is associated to first column).
 - Sort the eigenvalues. Change P based on the new order given to the eigenvalues. This new matrix will be called P*
-- Then multiply S by P*. SP* is a centered and standardized version of independant features.
+- Then multiply S by P\*. SP\* is a centered and standardized version of independant features.
 
 Now that we have all the eighenvectors and eighenvalues corresponding to our features, we can determine how much features we want to keep.
 
@@ -317,7 +316,7 @@ According to the Cumulative Proportion of Variance Explained (CPVE), we can see 
 
 ### K-means
 
-The objective of clustering is to distinct groups from the datatest. With k-means we want to distinct k groups. The algorithm will assign each observation to exactly one of the cluster. It optimizes the groups by minimizing the within-cluster variation such that the sum of the with-cluster variations across all the clusters is the smallest possible.
+The objective of clustering is to distinct groups from the datatest. With k-means, we want to distinct k groups. The algorithm will assign each observation to exactly one of the cluster. It optimizes the groups by minimizing the within-cluster variation such that the sum of the with-cluster variations across all the clusters is the smallest possible.
 
 #### Within-cluster variation (squared Euclidean distance)
 
@@ -344,7 +343,7 @@ According to this graph, we should choose k=2 (it makes sense since we have Heal
 fviz_nbclust(genematrix, kmeans, method = "wss") + geom_vline(xintercept = 2, linetype = 2)
 ```
 
-Then applying kmeans with 2 clusters we observe that the 20 first individuals (healthy) are not in the same cluster than the 20 others (non healthy).
+Then, applying kmeans with 2 clusters we observe that the 20 first individuals (healthy) are not in the same cluster than the 20 others (non healthy).
 ```{r, eval=TRUE, echo=FALSE}
 km <- kmeans(genematrix, centers = 2, nstart = 10)
 km$cluster
@@ -391,7 +390,7 @@ plt.title("Sum of the squared distances")
 plt.show()
 ```
 
-Using the values and the graph we can determine using the elbow method that 2 is the optimal number of cluster since it is the spot were the curve is bending.
+Using the values and the graph, we can determine using the elbow method that 2 is the optimal number of clusters since it is the spot where the curve is bending.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
@@ -415,7 +414,7 @@ from sklearn.metrics import silhouette_score, davies_bouldin_score
 davies_bouldin_score(tissu_dataset, km)
 ```
 
-The dunn index strengthen the idea that the value are well classified. If they were not well classified the dunn index would have been close to 0.
+The dunn index strengthen the idea that the values are well classified. If they were not well classified the dunn index would have been close to 0.
 
 ### K-medoids algorithm
 
@@ -498,14 +497,14 @@ It minimizes the total within-cluster variance. At each step the pair of cluster
 ### P-value
 
 
- - Generate bootstraps samples 
- - Compute hierarchical clustering on each bootstrap copy 
+ - Generate bootstraps samples
+ - Compute hierarchical clustering on each bootstrap copy
  - Compute for each cluster :
-  
+
    - The bootstrap probability (BP) value : frequency that the cluster is identified in bootstrap copies.
-   - The approximately unbiased (AU) probability values (p-values) by multiscale bootstrap resampling. Clusters with p-value above 95% are considered to be strongly supported by data. 
-  
-  
+   - The approximately unbiased (AU) probability values (p-values) by multiscale bootstrap resampling. Clusters with p-value above 95% are considered to be strongly supported by data.
+
+
 
 
 
@@ -585,7 +584,7 @@ It means that observations are well clustered but the distinction between cluste
 
 ##### On Python with scikit-learn
 
-Thanks to hierarchical clusterting we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph. \newline
+Thanks to hierarchical clustering we will be able to remove some useless features and to simplify the dataset. This will allow us to easily display the data thanks to a graph. \newline
 
 Feature Agglomeration begin with each element as its own cluster and recursively merges them to make larger clusters In argument, it can take a linkage (complete, ward, single, average) and an affinity as distance.
 
@@ -724,7 +723,7 @@ plt.xlabel('Number of clusters')
 plt.show()
 ```
 
-First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. We see a bend around 2 so it shoulc be 2. Moreover there is only 2 different labels : deceased = 1 or deceased = 0.
+First of all, we can see on this graph that it is not that simple to determine the optimal number of clusters. We see a bend around 2 so it should be 2. Moreover, there is only 2 different labels : deceased = 1 or deceased = 0.
 
 ```{python, eval=TRUE, echo=FALSE, fig.height = 4, fig.width = 5, fig.align = "center"}
 from sklearn.cluster import KMeans, FeatureAgglomeration
@@ -748,7 +747,7 @@ The dunn index is :
 davies_bouldin_score(corona_dataset, predicted_labels)
 ```
 
-According to the silhouette score the average distance between clusters is small but better than the tissue dataset. Moreover thanks to the dunn index we can conclude that the diameter of the cluster is 2 times bigger than the separation intra clusters.
+According to the silhouette score the average distance between clusters is small but better than the tissue dataset. Moreover, thanks to the dunn index we can conclude that the diameter of the cluster is 2 times bigger than the separation intra clusters.
 
 ## Fuzzy Clustering
 
@@ -798,7 +797,7 @@ Clustering is an essential step in the arrangement of a correct and throughout d
 
 Example - Hierarchical clustering algorithm
 
-2. Centroid-based clustering, is the most frequently occurred model thanks to its comparative simplicity. The model is aimed at classifying each object of the dataset to the particular cluster. The number of clusters (k) is chosen randomly, which is probably the greatest “weakness” of the method. This k-means algorithm is especially popular in machine learning thanks to the alikeness with k-nearest neighbors (kNN) method.
+2. Centroid-based clustering, is the most frequently occurred model thanks to its comparative simplicity. The model is aimed at classifying each object of the dataset to the particular cluster. The number of clusters (k) is chosen randomly, which is probably the greatest “weakness” of the method. This k-means algorithm is especially popular in machine learning thanks to the alikeness with k-nearest neighbours (kNN) method.
 
 Example - K-Means algorithm
 
@@ -806,12 +805,12 @@ Example - K-Means algorithm
 
 Example - K-Means algorithm
 
-4. Finally, density-based clustering comes. The name comprises the main point of the model – to divide the dataset into clusters the counter inputs the ε parameter, the “neighborhood” distance. If the object is located within the circle (sphere) of the ε radius, it, therefore, relates to the cluster.
+4. Finally, density-based clustering comes. The name comprises the main point of the model – to divide the dataset into clusters the counter inputs the ε parameter, the “neighbourhood” distance. If the object is located within the circle (sphere) of the ε radius, it, therefore, relates to the cluster.
 
-Example - DBSCAN algorithm 
+Example - DBSCAN algorithm
 
 ## Measures for comparing clustering algorithms
 
-1. Internal measures, which uses intrinsic information in the data to assess the quality of the clustering. Internal measures include the connectivity, the silhouette coefficient and the Dunn index 
+1. Internal measures, which uses intrinsic information in the data to assess the quality of the clustering. Internal measures include the connectivity, the silhouette coefficient and the Dunn index
 
 2. Stability measures, a special version of internal measures, which evaluates the consistency of a clustering result by comparing it with the clusters obtained after each column is removed, one at a time.
