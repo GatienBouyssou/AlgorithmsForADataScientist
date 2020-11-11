@@ -21,7 +21,6 @@ knitr::knit_engines$set(python.reticulate =  TRUE)
 
 #install_LUCS_KDD_CMAR(force = FALSE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/CMAR/cmar.tgz")
 #install_LUCS_KDD_CPAR(force = TRUE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/FOIL_PRM_CPAR/foilPrmCpar.tgz")
-
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
@@ -29,7 +28,9 @@ knitr::knit_engines$set(python.reticulate =  TRUE)
 #install.packages("arules")
 #install.packages("arulesCBA")
 #install.packages("mlbench")
+#install.packages("rJava")
 library(mlbench)
+library(rJava)
 library(magrittr)
 library(knitr)
 library(arulesCBA)
@@ -821,29 +822,29 @@ TO DO
 ### Example on tennis data on R
 
 ```{r}
-data("iris")
+classifierRCAR = RCAR(Result ~ ., data= tennisTrain, parameter = list(support = 0.01, confidence = 0.3), alpha = 1, disc.method = "chi2")
+classifierRCAR
+```
+```{r}
+# make predictions
+classifierRCAR.prediction = predict(classifierRCAR, tennisTest)
+classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = tennisTest$Result)
+classifierRCAR.confusion_matrix
+```
 
-# test and train set
-n = dim(tennis.transactions)[1]
-n2 = n*(5/6)
-set.seed(1234)
-train = sample(c(1:n), replace = F)[1:n2]
-irisTrain <- iris[train,]
-irisTest <- iris[-train,]
+### Example on mushrooms data on R
 
-
-classifierRCAR = RCAR(Species ~ ., data= irisTrain, parameter = list(support = 0.01, confidence = 0.3), alpha = 1, disc.method = "chi2")
+```{r}
+classifierRCAR = RCAR()
 classifierRCAR
 ```
 
 ```{r}
 # make predictions
-classifierRCAR.prediction = predict(classifierRCAR, irisTest)
-classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = irisTest$Species)
+classifierRCAR.prediction = predict(classifierRCAR, )
+classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = )
 classifierRCAR.confusion_matrix
 ```
-
-The accuracy rate is 0.87.
 
 ## First Order Inductive Learner : FOIL Algorithm
 
@@ -885,9 +886,13 @@ FROM THIS POINT IT DOESN'T WORK AT ALL
 TO DO 
 
 ### Example on R
+```{r}
+LUCS_KDD(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTrain, method = "CMAR")
+```
 
 ```{r eval=FALSE, include=FALSE}
-classifierCMAR <- CMAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2,  data= tennisTransactionsTrain)
+options(java.parameters = "-Xmx1024m")
+classifierCMAR <- CMAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2,  data= tennisTransactionsTrain, support = 0.1, confidence = 0.5,disc.method = "mdlp", verbose = FALSE)
 classifierCMAR
 ```
 
