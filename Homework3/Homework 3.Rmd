@@ -20,19 +20,15 @@ knitr::knit_engines$set(python.reticulate =  TRUE)
 #py_install("scikit-learn")
 
 #install_LUCS_KDD_CMAR(force = FALSE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/CMAR/cmar.tgz")
-#install_LUCS_KDD_CPAR(force = TRUE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/FOIL_PRM_CPAR/foilPrmCpar.tgz")
+#install_LUCS_KDD_CPAR(force = FALSE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/FOIL_PRM_CPAR/foilPrmCpar.tgz")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
-#install.packages("fpc")
-#install.packages("arules")
-#install.packages("arulesCBA")
-#install.packages("mlbench")
 #install.packages("rJava")
+
 library(mlbench)
 library(rJava)
 library(magrittr)
-library(knitr)
 library(rmarkdown)
 library(arules)
 library(arulesCBA)
@@ -617,81 +613,8 @@ explication Pruning M1 and M2 techniques = TO DO
 With Random Forest, the accuracy rate was 0.6931818.\newline
 With Logistic regression it was 0.7667.
 
-#### Classification using data set and chi2 discretization
-
 CBA can take as input a classic non-transaction dataset as tennis. We just have to choose the discretization method in parameter. \newline
-
-chi2 discretization = TO DO
-
-```{r}
-tennisClassifier <- tennis.data
-
-tennisClassifier[["ACE.1"]] <- as.numeric(tennisClassifier[["ACE.1"]])
-
-tennisClassifier[["ACE.2"]] <- as.numeric(tennisClassifier[["ACE.2"]])
-
-tennisClassifier[["UFE.2"]] <- as.numeric(tennisClassifier[["UFE.2"]])
-
-tennisClassifier[["UFE.1"]] <- as.numeric(tennisClassifier[["UFE.1"]])
-
-tennisClassifier[["Result"]] <- as.factor(tennisClassifier[["Result"]])
-
-# test and train set
-n = dim(tennisClassifier)[1]
-n2 = n*(5/6)
-set.seed(1234)
-train = sample(c(1:n), replace = F)[1:n2]
-tennisTest = tennisClassifier[-train, ]
-tennisTrain = tennisClassifier[train, ]
-
-#Learn a classifier using automatic default discretization
-classifierData <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTrain, disc.method = "chi2", supp = 0.05, conf=0.4)
-classifierData
-```
-
-```{r}
-# inspect the rule base
-inspect(rules(classifierData))
-```
-
-```{r}
-# make predictions
-classifierData.prediction = predict(classifierData, tennisTest)
-classifierData.confusion_matrix = table(classifierData.prediction, true = tennisTest$Result)
-classifierData.confusion_matrix
-```
-
-
-The accuracy rate is :
-```{r, eval=TRUE, echo=FALSE}
-classifierData.accuracyrate = (classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[2,2]) / (classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[1,2] + classifierData.confusion_matrix[2,1] +classifierData.confusion_matrix[2,2])
-classifierData.accuracyrate
-```
-
-The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
-```{r, eval=TRUE, echo=FALSE}
-classifierData.sensitivity = classifierData.confusion_matrix[2,2]/(classifierData.confusion_matrix[1,2] + classifierData.confusion_matrix[2,2])
-classifierData.sensitivity
-```
-
-The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
-```{r, eval=TRUE, echo=FALSE}
-classifierData.specificity = classifierData.confusion_matrix[1,1]/(classifierData.confusion_matrix[1,1] + classifierData.confusion_matrix[2,1])
-classifierData.specificity
-```
-
-The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
-```{r, eval=TRUE, echo=FALSE}
-classifierData.precision = classifierData.confusion_matrix[2,2]/(classifierData.confusion_matrix[2,1] + classifierData.confusion_matrix[2,2])
-classifierData.precision
-```
-
-So the F_Mesure is :
-```{r, eval=TRUE, echo=FALSE}
-classifierData.fmesure = (2*classifierData.precision*classifierData.sensitivity)/(classifierData.sensitivity + classifierData.precision)
-classifierData.fmesure
-```
-
+However discretization of integers is difficult so we did the transactions set ourselves.
 
 #### Classification using homemade transactions 
 
@@ -702,20 +625,20 @@ UFE.1 and UFE.2 take for value either Low or High. \newline
 ```{r}
 # test and train set
 n = dim(tennis.transactions)[1]
-n2 = n*(5/6)
+n2 = n*(4/5)
 set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
 tennisTransactionsTrain <- tennis.transactions[train,]
 tennisTransactionsTest <- tennis.transactions[-train,]
 
 #Build the classifier from transactions
-classifierTransactions <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.4)
+classifierTransactions <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.6)
 classifierTransactions
 ```
 
 ```{r}
 # inspect the rule base
-inspect(head(rules(classifierTransactions),4))
+inspect(head(sort(rules(classifierTransactions),by="confidence"),4))
 ```
 
 ```{r}
@@ -731,34 +654,9 @@ The accuracy rate is :
 classifierTransactions.accuracyrate = (classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[2,2]) / (classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[1,2] + classifierTransactions.confusion_matrix[2,1] +classifierTransactions.confusion_matrix[2,2])
 classifierTransactions.accuracyrate
 ```
-So the accuracy rate is better with our homemade transaction. It makes sense because discretization of integers is difficult to handle.
+So the accuracy rate is good.
 
-
-The sensitivity is the percentage of true output giving Player1-winner among the population of true Player1-winner :
-```{r, eval=TRUE, echo=FALSE}
-classifierTransactions.sensitivity = classifierTransactions.confusion_matrix[2,2]/(classifierTransactions.confusion_matrix[1,2] + classifierTransactions.confusion_matrix[2,2])
-classifierTransactions.sensitivity
-```
-
-The specificity is the percentage of true output giving Player2-winner (= Player1-looser) among the population of true Player2-winner:
-```{r, eval=TRUE, echo=FALSE}
-classifierTransactions.specificity = classifierTransactions.confusion_matrix[1,1]/(classifierTransactions.confusion_matrix[1,1] + classifierTransactions.confusion_matrix[2,1])
-classifierTransactions.specificity
-```
-
-The precision is the percentage of true output giving Player1-winner among all the outputs giving Player1-winner (even if not winner) :
-```{r, eval=TRUE, echo=FALSE}
-classifierTransactions.precision = classifierTransactions.confusion_matrix[2,2]/(classifierTransactions.confusion_matrix[2,1] + classifierTransactions.confusion_matrix[2,2])
-classifierTransactions.precision
-```
-
-So the F_Mesure is :
-```{r, eval=TRUE, echo=FALSE}
-classifierTransactions.fmesure = (2*classifierTransactions.precision*classifierTransactions.sensitivity)/(classifierTransactions.sensitivity + classifierTransactions.precision)
-classifierTransactions.fmesure
-```
-
-This classification is also as good as logistic regression. It gives very good result.
+This classification is also almost as good as logistic regression.
 
 #### Classification using rules 
 
@@ -824,15 +722,28 @@ TO DO
 
 ### Example on tennis data on R
 
+The elastic net mixing parameter for alpha = 1 is the lasso penalty (default RCAR), and for alpha = 0 it is the ridge penalty.
+
 ```{r}
-classifierRCAR = RCAR(Result ~ ., data= tennisTrain, parameter = list(support = 0.01, confidence = 0.3), alpha = 1, disc.method = "chi2")
+classifierRCAR = RCAR(Result ~ ., data= tennisTransactionsTrain, parameter = list(support = 0.05, confidence = 0.5), alpha = 0, disc.method = "mdlp")
 classifierRCAR
 ```
 ```{r}
+# inspect the rule base
+inspect(head(sort(rules(classifierRCAR),by="conf"),4))
+```
+
+```{r eval=TRUE, include=FALSE}
 # make predictions
-classifierRCAR.prediction = predict(classifierRCAR, tennisTest)
-classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = tennisTest$Result)
+classifierRCAR.prediction = predict(classifierRCAR, tennisTransactionsTest)
+classifierRCAR.confusion_matrix = table(classifierRCAR.prediction,  response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest) )
 classifierRCAR.confusion_matrix
+```
+
+The accuracy rate is :
+```{r, eval=TRUE, echo=FALSE}
+classifierRCAR.accuracyrate = (classifierRCAR.confusion_matrix[1,1] + classifierRCAR.confusion_matrix[2,2]) / (classifierRCAR.confusion_matrix[1,1] + classifierRCAR.confusion_matrix[1,2] + classifierRules.confusion_matrix[2,1] +classifierRCAR.confusion_matrix[2,2])
+classifierRCAR.accuracyrate
 ```
 
 ### Example on mushrooms data on R
@@ -842,17 +753,6 @@ mush_data <-py$mush_data
 mush_data[['class']] <-as.factor(mush_data[['class']])
 ```
 
-```{r eval=FALSE, include=FALSE}
-classifierRCAR = RCAR()
-classifierRCAR
-```
-
-```{r eval=FALSE, include=FALSE}
-# make predictions
-classifierRCAR.prediction = predict(classifierRCAR, )
-classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = )
-classifierRCAR.confusion_matrix
-```
 
 ## First Order Inductive Learner : FOIL Algorithm
 
@@ -870,24 +770,43 @@ We classify new examples by
 
 ### Example on tennis data on R
 
-```{r eval=FALSE, include=FALSE}
-classifierFOIL <- FOIL(Result~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data= tennisTrain, max_len = 4, min_gain = 0.01, best_k = 5, disc.method = "ameva", family = "binomial")
+We can use our homemade transactions as input data in FOIL algorithms.
+
+```{r eval=TRUE, include=FALSE}
+tennisTransactions2 <- tennisTransactions
+colnames(tennisTransactions2) = c("Species","ACE.1","ACE.2","UFE.1","UFE.2")
+
+# test and train set
+n = dim(tennisTransactions2)[1]
+n2 = n*(5/6)
+set.seed(1234)
+train = sample(c(1:n), replace = F)[1:n2]
+tennisTest2 = tennisTransactions2[-train, ]
+tennisTrain2 = tennisTransactions2[train, ]
+
+classifierFOIL <- FOIL(Species~ ., data= tennisTrain2, max_len = 2, min_gain = .4, best_k = 5, disc.method = "mdlp")
 classifierFOIL
 ```
 
-```{r eval=FALSE, include=FALSE}
-data('iris')
-str(iris)
-
-classifierFOIL <- FOIL(Species~ ., data= iris, max_len = 3, min_gain = .1, best_k = 5, disc.method = "chi2", family = "binomial")
-classifierFOIL
+```{r}
+# inspect the rule base
+inspect(head(sort(rules(classifierFOIL),by="laplace"),5))
 ```
-```{r eval=FALSE, include=FALSE}
+
+```{r eval=TRUE, include=FALSE}
 # make predictions
-classifierFOIL.prediction = predict(classifierFOIL, irisTest)
-classifierFOIL.confusion_matrix = table(classifierFOIL.prediction, true = irisTest$Species)
+classifierFOIL.prediction = predict(classifierFOIL, tennisTest2)
+classifierFOIL.confusion_matrix = table(classifierFOIL.prediction, true = tennisTest2$Species)
 classifierFOIL.confusion_matrix
 ```
+
+The accuracy rate is :
+```{r, eval=TRUE, echo=FALSE}
+classifierFOIL.accuracyrate = (classifierFOIL.confusion_matrix[1,1] + classifierFOIL.confusion_matrix[2,2]) / (classifierFOIL.confusion_matrix[1,1] + classifierFOIL.confusion_matrix[1,2] + classifierFOIL.confusion_matrix[2,1] +classifierFOIL.confusion_matrix[2,2])
+classifierFOIL.accuracyrate
+```
+
+The accuracy rate is once again very good.
 
 ## Classification Based on Multiple Class-association Rules : CMAR Algorithm
 
@@ -896,10 +815,6 @@ classifierFOIL.confusion_matrix
 TO DO 
 
 ### Example on R
-
-```{r eval=FALSE, include=FALSE}
-LUCS_KDD(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTrain, method = "CMAR")
-```
 
 ```{r eval=FALSE, include=FALSE}
 options(java.parameters = "-Xmx1024m")
