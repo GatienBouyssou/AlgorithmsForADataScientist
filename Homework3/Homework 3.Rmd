@@ -33,9 +33,9 @@ library(mlbench)
 library(rJava)
 library(magrittr)
 library(knitr)
-library(arulesCBA)
 library(rmarkdown)
 library(arules)
+library(arulesCBA)
 library(arulesViz)
 library(cluster)
 library(caret)
@@ -516,7 +516,6 @@ inspect(head(sort(tennis.rules_winning, by = "lift", decreasing=TRUE), 5))
 
 These rules look correct : either a player-1 winning make a lot of aces and few unforced errors or the player-2 make few aces.
 
-
 We can also restrict the rules to the result rhs="Result=0" which means Player-1 loosing.
 
 The associations rules for Player-1 loosing :
@@ -605,8 +604,11 @@ This clustering regroups Player-1 winner together and Player-2 winner together.
 
 ### Concept
 
-CBA (Classification Based on Associations) Algorithm build a classifier based on association rules mined for an input dataset. 
-Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size. 
+CBA (Classification Based on Associations) Algorithm build a classifier based on association rules mined for an input dataset.  \newline
+Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size.  \newline
+It uses either M1 or M2 pruning strategy.
+
+explication Pruning M1 and M2 techniques = TO DO
 
 ### Example on tennis data on R
 
@@ -618,6 +620,7 @@ With Logistic regression it was 0.7667.
 #### Classification using data set and chi2 discretization
 
 CBA can take as input a classic non-transaction dataset as tennis. We just have to choose the discretization method in parameter. \newline
+
 chi2 discretization = TO DO
 
 ```{r}
@@ -762,7 +765,7 @@ This classification is also as good as logistic regression. It gives very good r
 CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
 
 
-With the method "first" : 
+With the method "first" : TO DO explain "first" method
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -785,7 +788,7 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-With the method "majority" : 
+With the method "majority" : TO DO explain "majority" method
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -834,16 +837,17 @@ classifierRCAR.confusion_matrix
 
 ### Example on mushrooms data on R
 
-```{r}
-mush_data <-read.csv('./dataPython/mushrooms.csv')
+```{r eval=FALSE, include=FALSE}
+mush_data <-py$mush_data
+mush_data[['class']] <-as.factor(mush_data[['class']])
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 classifierRCAR = RCAR()
 classifierRCAR
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # make predictions
 classifierRCAR.prediction = predict(classifierRCAR, )
 classifierRCAR.confusion_matrix = table(classifierRCAR.prediction, true = )
@@ -854,34 +858,36 @@ classifierRCAR.confusion_matrix
 
 ### Concept 
 
-FOIL (Quinlan and Cameron-Jones, 1995) learns rules and then use them as a classifier following Xiaoxin and Han (2003).
+FOIL learns rules and then use them as a classifier. \newline
 For each class, we find the positive and negative examples and lean the rules using FOIL. Then the rules for all classes are combined and sorted by Laplace accuracy on the training data.
 
-Following Xiaoxin and Han (2003), we classify new examples by
+TO DO : Laplace accuracy ??? definition
+
+We classify new examples by
 1. select all the rules whose bodies are satisfied by the example;
 2. from the rules select the best k rules per class (highest expected Laplace accuracy);
-3. averagetheexpectedLaplaceaccuracyperclassandchoosetheclasswiththehighestaverage.
+3. average the expected Laplace accuracy per class and choose the class with the highest average.
 
 ### Example on tennis data on R
 
-```{r}
+```{r eval=FALSE, include=FALSE}
+classifierFOIL <- FOIL(Result~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data= tennisTrain, max_len = 4, min_gain = 0.01, best_k = 5, disc.method = "ameva", family = "binomial")
+classifierFOIL
+```
+
+```{r eval=FALSE, include=FALSE}
 data('iris')
 str(iris)
 
-classifierFOIL <- FOIL(Species~ ., data= iris, max_len = 3, min_gain = .1, best_k = 5, disc.method = "chi2")
+classifierFOIL <- FOIL(Species~ ., data= iris, max_len = 3, min_gain = .1, best_k = 5, disc.method = "chi2", family = "binomial")
 classifierFOIL
 ```
-```{r}
+```{r eval=FALSE, include=FALSE}
 # make predictions
 classifierFOIL.prediction = predict(classifierFOIL, irisTest)
 classifierFOIL.confusion_matrix = table(classifierFOIL.prediction, true = irisTest$Species)
 classifierFOIL.confusion_matrix
 ```
-
-
-
-
-FROM THIS POINT IT DOESN'T WORK AT ALL 
 
 ## Classification Based on Multiple Class-association Rules : CMAR Algorithm
 
@@ -890,7 +896,8 @@ FROM THIS POINT IT DOESN'T WORK AT ALL
 TO DO 
 
 ### Example on R
-```{r}
+
+```{r eval=FALSE, include=FALSE}
 LUCS_KDD(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTrain, method = "CMAR")
 ```
 
@@ -912,12 +919,4 @@ TO DO
 classifierCPAR <- CPAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, best_k = 5, data= tennisTransactionsTrain)
 classifierCPAR
 ```
-
-## Classification by Aggregating Emerging Patterns : CAEP Algorithm 
-
-No implementation in R
-
-## A Lazy Approach to Associative Classification : L Algorithm
-
-No implementation in R
 
