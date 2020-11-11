@@ -835,6 +835,10 @@ classifierRCAR.confusion_matrix
 ### Example on mushrooms data on R
 
 ```{r}
+mush_data <-read.csv('./dataPython/mushrooms.csv')
+```
+
+```{r}
 classifierRCAR = RCAR()
 classifierRCAR
 ```
