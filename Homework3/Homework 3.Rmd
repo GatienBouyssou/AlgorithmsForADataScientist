@@ -718,7 +718,7 @@ The best classification using CBA is the classification using rules with majorit
 
 ### Concept
 
-TO DO
+Regularized Class Association Rules (RCAR) is an algorithm which produces rules based classifier in a categorical data space. The main goal of RCAR algorithm is to build classifiers which are as accurate as the state of the art algorithms, while improving the interpretability and allowing end-users to maintain and understand its outcome easily and without statistical modeling background.
 
 ### Example on tennis data on R
 
@@ -812,7 +812,8 @@ The accuracy rate is once again very good.
 
 ### Concept
 
-TO DO 
+CMAR selects a small set of high confidence, highly related rules and analyzes the correlation among those rules. To avoid bias, we develop a new technique, called weighted χ2 , which derives a good measure on how strong the rule is under both conditional support and class distribution. An extensive performance study shows that CMAR in general has higher prediction accuracy than CBA.
+
 
 ### Example on R
 
@@ -826,7 +827,7 @@ classifierCMAR
 
 ### Concept
 
-TO DO 
+CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of \already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies. 
 
 ### Example on R
 
