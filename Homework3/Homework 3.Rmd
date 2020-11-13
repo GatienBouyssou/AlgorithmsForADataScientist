@@ -65,11 +65,11 @@ $$Lift(A→B) = \frac{P(A \cap B)}{P(A) × P(B)}$$
 
 ## Leverage
 
-The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent. 
+The leverage compares the frequency of A and B appearing together and the frequency that would be expected if A and B were independent.
 
 $$Levarage(A→B)= P(A \cap B) − P(A)×P(B)$$
 
-Therefore, if A and B independent : 
+Therefore, if A and B independent :
 
 $Levarage(A→B) = 0$
 
@@ -82,6 +82,48 @@ $$Conviction(A → B)=\frac{P(A) × P(\bar{B})}{P(A \cap \bar{B})}$$
 or
 
 $$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
+
+## Jaccard Index
+
+$Jaccard(A, B) = \frac{P(A \cap B)}{P(A)+P(B)-P(A \cap B)}$
+
+or
+
+$Jaccard(A, B) = \frac{P(A \cap B)}{P(A \cup B)}$
+
+We can notice that : $0 \le Jaccard(A, B) \le 1$
+
+With the Jaccard measure if A and B are not similar at all, then, Jaccard(A, B) will be equal to 0 because . When $P(A \cap B)$ increase then $P(A \cup B)$ decrease assuming that P(A) and P(B) are constant. So, if $P(A \cap B)$ increase should Jaccard(A, B) as well. The closer Jaccard(A, B) comes to 1 the more similar A and B.
+
+## Loevinger
+
+$Loevinger(A, B) = 1- \frac{P(A \cap \neg{B})}{P(A)P(\neg{B})}$
+
+When A and B are independent $P(A \cap \neg{B}) = P(A) * P(\neg{B})$
+
+So, $Loevinger(A, B) = 0$
+
+When A and B are dependent $P(A \cap \neg{B})$ should tend towards 0 and $Loevinger(A, B)$ towards 1.
+
+## Laplace
+
+$Laplace(A,B) = \frac{N_{AB}+1}{N_{A}+2}$
+
+With Laplace when the A and B are independent $N_{AB} = 0$ and :
+
+$Laplace(A,B) = \frac{1}{N_{A}+2} \approx 0$ when  $N_{A}$ is big.
+
+On the other end, when A and B are dependent the Laplace formula should tend towards 1.
+
+## Rule interest
+
+$RI(A,B) = P(A)(P(A|B)P(B))$
+
+or
+
+$RI(A,B) = P(A \cap B) - P(A)P(B)$
+
+If A and B are independent then $P(A \cap B) = P(A) * P(B)$ and $RI(A,B) = 0$
 
 \clearpage
 
@@ -96,7 +138,7 @@ The database is scanned at each level of lattice. Additionally, APRIORI uses a p
 
 The Groceries data set contains 30 days of real-world point-of-sale transaction data from a typical local grocery outlet. The data set contains 9835 transactions and the items are aggregated to 169 categories.
 
-We can see the class of the dataset is : 
+We can see the class of the dataset is :
 ```{r}
 data("Groceries")
 class(Groceries)
@@ -113,25 +155,25 @@ We can find the 15 most common variables.
 itemFrequencyPlot(Groceries, topN=15, type="absolute", main="Item Frequency")
 ```
 
-Let's apply APRIORI algorithm on the dataset : 
+Let's apply APRIORI algorithm on the dataset :
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.2))
 ```
 
 
-\clearpage 
+\clearpage
 
-We have a set of associations rules. 
+We have a set of associations rules.
 ```{r, eval=TRUE, echo=FALSE}
 grocery_rules
 ```
 
-If we look at the 3 rules with highest confidence, we have these rules : 
+If we look at the 3 rules with highest confidence, we have these rules :
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 3))
 ```
 However "whole milk" if the most frequent item in the data set and this frequence plays a role in confidence.
-So we can look at the 3 rules with highest lift (A and B occuring together), and we have these rules : 
+So we can look at the 3 rules with highest lift (A and B occuring together), and we have these rules :
 
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(grocery_rules, by = "lift", decreasing=TRUE), 3))
@@ -143,9 +185,9 @@ We can also look at the items which induce "soda". Then we can sort them by conf
 inspect(head(sort(subset(grocery_rules, subset = rhs %in% "soda"), by = "confidence", decreasing=TRUE), 3))
 ```
 
-Looking at the confidence, we see that for a third of the people buying : 
-- bottled water and fruit/vegetable juice or 
-- sausage and shopping bags or 
+Looking at the confidence, we see that for a third of the people buying :
+- bottled water and fruit/vegetable juice or
+- sausage and shopping bags or
 - yogurt and bottled water
 
 it also induces buying soda.
@@ -156,15 +198,21 @@ it also induces buying soda.
 
 ## Concept
 
-\textbf{Closed Frequent itemsets :}
-
-An itemset X is a closed frequent itemset in set S if X is both closed and frequent in S.
-
 \textbf{Eclat algorithm :}
 
 It mines frequent itemsets \newline
 This algorithm uses simple intersection operations for equivalence class clustering along with bottom-up lattice traversal.
 Then looking at the most frequent itemsets, we can find rules between the items inside these itemsets.
+
+## The different types of frequent itemsets mining
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Max itemsets} : An itemset X is a maximal frequent itemset (or max-itemset) in set S if X is  frequent,  and  there  exists  no super-itemset Y such that XY and Y is frequent in S.
+\item \textbf{Closed itemsets} : An itemset X is a closed frequent itemset in set S if X is  both closed and frequent in S.
+\item \textbf{Free or Generator itemsets} : Free itemsets are itemsets that are not included in any closure of their proper sub-set. It means that it has no subset whith the same support.
+\item \ textbf{Largest tiles} : It is the biggest are in a dataset. The area is equal to the frequency multiplyed by the size of the dataset.
+\end
+
 
 ## Example on Adult data on R
 
@@ -175,7 +223,7 @@ data("Adult")
 class(Adult)
 ```
 
-We can look at the first transaction to see what are the items in a transaction. 
+We can look at the first transaction to see what are the items in a transaction.
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(Adult,1))
 ```
@@ -187,7 +235,7 @@ itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency")
 
 We apply ECLAT algorithm on the data set. \newline
 This returns the most frequent itemsets along with their support.\newline
-Let's look at 3 of these itemsets : 
+Let's look at 3 of these itemsets :
 ```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8}
 frequentItemsAdult <- eclat (Adult, parameter = list(supp = 0.01, maxlen = 100))
 inspect(head(frequentItemsAdult,3))
@@ -217,14 +265,14 @@ rulesAdult <- subset(rulesAdult, rhs %pin% "capital-gain=High")
 ```
 
 
-We take the 3 best rules according to lift.  
+We take the 3 best rules according to lift.
 
 ```{r}
 rulesAdult
 inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 ```
 
-We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss. 
+We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss.
 
 
 TO DO : difference between ECLAT and APRIORI.
@@ -441,7 +489,7 @@ We can find a dissimilarity between transactions so we can compare the data. The
 
 So a direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$.
 
-## Affinity dissimilarity 
+## Affinity dissimilarity
 
 A good choice is the Affinity defined as :
 
@@ -466,7 +514,7 @@ tennis.data <- data.frame(tennis.data)
 head(tennis.data)
 ```
 
-We can transform the tennis data set into a transaction data set. 
+We can transform the tennis data set into a transaction data set.
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 tennisTransactions <- tennis.data
 
@@ -540,7 +588,7 @@ tennis.rules
 inspect(head(sort(tennis.rules, by = "lift", decreasing=TRUE), 5))
 ```
 
-Firstly let's look at the clustering of items 
+Firstly let's look at the clustering of items
 
 ### Cluster the items
 
@@ -616,7 +664,7 @@ With Logistic regression it was 0.7667.
 CBA can take as input a classic non-transaction dataset as tennis. We just have to choose the discretization method in parameter. \newline
 However discretization of integers is difficult so we did the transactions set ourselves.
 
-#### Classification using homemade transactions 
+#### Classification using homemade transactions
 
 We can also use the transactions we created before to train the classifier. \newline
 ACE.1 and ACE.2 take for value either None, or Low or High. \newline
@@ -658,7 +706,7 @@ So the accuracy rate is good.
 
 This classification is also almost as good as logistic regression.
 
-#### Classification using rules 
+#### Classification using rules
 
 CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
 
@@ -710,11 +758,11 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-### Conclusion 
+### Conclusion
 
 The best classification using CBA is the classification using rules with majority method.
 
-## Regularized Class Association Rules for Multi-class Problems : RCAR Algorithm 
+## Regularized Class Association Rules for Multi-class Problems : RCAR Algorithm
 
 ### Concept
 
@@ -756,7 +804,7 @@ mush_data[['class']] <-as.factor(mush_data[['class']])
 
 ## First Order Inductive Learner : FOIL Algorithm
 
-### Concept 
+### Concept
 
 FOIL learns rules and then use them as a classifier. \newline
 For each class, we find the positive and negative examples and lean the rules using FOIL. Then the rules for all classes are combined and sorted by Laplace accuracy on the training data.
@@ -827,7 +875,7 @@ classifierCMAR
 
 ### Concept
 
-CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of \already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies. 
+CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of \already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
 
 ### Example on R
 
@@ -835,4 +883,3 @@ CPAR inherits the basic idea of FOIL in rule generation and integrates the featu
 classifierCPAR <- CPAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, best_k = 5, data= tennisTransactionsTrain)
 classifierCPAR
 ```
-
