@@ -274,8 +274,12 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 
 We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss.
 
+Difference between ECLAT and APRIORI:
 
-TO DO : difference between ECLAT and APRIORI.
+- Apriori algorithm is a classical algorithm used to mining the frequent item sets in a given dataset.
+- Coming to Eclat algorithm also mining the frequent itemsets but in vertical manner and it follows the depth first search of a graph.
+- As per the speed,Eclat is fast than the Apriori algorithm.
+- Apriori works on larger datasets where as Eclat algorithm works on smaller datasets.
 
 \clearpage
 
@@ -650,7 +654,10 @@ CBA (Classification Based on Associations) Algorithm build a classifier based on
 Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size.  \newline
 It uses either M1 or M2 pruning strategy.
 
-explication Pruning M1 and M2 techniques = TO DO
+Explication pruning M1 and M2 techniques so, either the M1 or M2 algorithm are used to perform database coverage pruning and to determine the number of rules to use and the default class.
+
+M1 is the naive version of the algorithm. 
+M2 is the improved version of the algorithm.
 
 ### Example on tennis data on R
 
@@ -709,7 +716,7 @@ This classification is also almost as good as logistic regression.
 CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
 
 
-With the method "first" : TO DO explain "first" method
+With the method "first" : The first method depicts the firsst value which is the running time of method M1.
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -732,7 +739,7 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-With the method "majority" : TO DO explain "majority" method
+With the method "majority" : The majority method depicts the second value value which is the running time of method M2.
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -807,7 +814,13 @@ mush_data[['class']] <-as.factor(mush_data[['class']])
 FOIL learns rules and then use them as a classifier. \newline
 For each class, we find the positive and negative examples and learn the rules using FOIL. Then, the rules for all classes are combined and sorted by Laplace accuracy on the training data.
 
-TO DO : Laplace accuracy ??? definition
+## Laplace accuracy
+
+Laplace accuracy is used to measure the accuracy of the rules. Given a rule r it is defined as follows:
+
+$$ LaplaceAccuracy(r)= \frac{N_{c} +1}{N_{total} + m}$$
+
+where m is the number of classes, N_{total} is the total number of examples that satisfies the rule's boday and N_{c} is the number of examples belonging to the predicted class c of the rule.
 
 We classify new examples by
 1. select all the rules whose bodies are satisfied by the example;
