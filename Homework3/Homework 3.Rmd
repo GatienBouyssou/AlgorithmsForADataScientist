@@ -301,7 +301,7 @@ mush_data = pd.read_csv('./dataPython/mushrooms.csv')
 First, we want to have an overview of the data.
 
 ```{python}
-mush_data.head()
+mush_data.head(2)
 ```
 As we can see, each column contains values that are single characters. Their meaning is given by the file values_name.txt.
 
@@ -312,9 +312,12 @@ len(mush_data)
 Now, we want to know the data repartition for each columns.
 
 ```{python}
-for column in mush_data.columns:
-    print("\n" + column)
-    print(mush_data[column].value_counts())
+# To distribution the distribution of each column
+#for column in mush_data.columns:
+#    print("\n" + column)
+#    print(mush_data[column].value_counts())
+print(mush_data["class"].value_counts())
+print(mush_data["stalk-root"].value_counts
 ```
 
 As you can see the there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
@@ -399,14 +402,13 @@ with open("./dataPython/values_name.txt", "r") as file:
         valuesNamesForColumn = line.split(':')
         mapColumnValName[valuesNamesForColumn[0]] = sepCurrentValFromNewVal(valuesNamesForColumn[1])
         line = file.readline()
-mapColumnValName['cap-shape']
 ```
 
 
 ```{python}
 for column, ONValues in mapColumnValName.items():
     mush_data[column] = mush_data[column].replace(ONValues[0], ONValues[1])
-mush_data.head()
+mush_data.head(3)
 ```
 
 ```{python}
@@ -417,7 +419,7 @@ train_data = mush_data.values
 te = TransactionEncoder()
 te_ary = te.fit(train_data).transform(train_data)
 df = pd.DataFrame(te_ary, columns=te.columns_)
-len(df.head())
+df.head(2)
 ```
 
 ```{python}
@@ -453,11 +455,7 @@ Here we are listing all the rules that are implied by edible. Of course, we need
 frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
 ```
 
-```{python}
-frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
-```
-
-The results above obtained by fpgrowth look similar to the results obtained by the APRIORI algorithm. Therefore, now we can look for the rules that implies edible.
+The results obtained by fpgrowth look similar to the results obtained by the APRIORI algorithm. Therefore, now we can look for the rules that implies edible.
 
 
 ```{python}
