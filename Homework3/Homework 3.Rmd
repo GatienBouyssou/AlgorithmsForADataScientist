@@ -75,7 +75,7 @@ $Levarage(A→B) = 0$
 
 ## Conviction
 
-Conviction compares the probability that A appears without B if they were dependent with the actual frequency of the appearance of A without B. In that respect it is similar to lift, however, it contrast to lift it is a directed measure. Furthermore, conviction is monotone in confidence and lift.
+Conviction compares the probability that A appears without B if they were dependent with the actual frequency of the appearance of A without B. If A and B are independent, then, conviction(A, B) = 1. On the other hand, when $P(A \cap B)$ tends toward $P(A)$, conviction(A,B) tends toward infinty.
 
 $$Conviction(A → B)=\frac{P(A) × P(\bar{B})}{P(A \cap \bar{B})}$$
 
@@ -93,7 +93,7 @@ $Jaccard(A, B) = \frac{P(A \cap B)}{P(A \cup B)}$
 
 We can notice that : $0 \le Jaccard(A, B) \le 1$
 
-With the Jaccard measure if A and B are not similar at all, then, Jaccard(A, B) will be equal to 0 because . When $P(A \cap B)$ increase then $P(A \cup B)$ decrease assuming that P(A) and P(B) are constant. So, if $P(A \cap B)$ increase should Jaccard(A, B) as well. The closer Jaccard(A, B) comes to 1 the more similar A and B.
+With the Jaccard measure, if A and B are not similar at all the Jaccard(A, B) will be equal to 0; Indeed, when $P(A \cap B)$ increases then $P(A \cup B)$ decrease assuming that P(A) and P(B) are constant. So, if $P(A \cap B)$ increases Jaccard(A, B) should increase as well. The closer Jaccard(A, B) comes to 1 the more similar A to B.
 
 ## Loevinger
 
@@ -132,7 +132,7 @@ If A and B are independent then $P(A \cap B) = P(A) * P(B)$ and $RI(A,B) = 0$
 ## Definition
 
 APRIORI searches for frequent itemset browsing the lattice of itemsets in breadth. \newline
-The database is scanned at each level of lattice. Additionally, APRIORI uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and not need to be considered.
+The database is scanned at each level of lattice. Additionally, APRIORI uses a pruning technique based on the properties of the itemsets, which are: If an itemset is frequent, all its sub-sets are frequent and does not need to be considered.
 
 ## Example on Groceries data on R
 
@@ -210,7 +210,7 @@ Then looking at the most frequent itemsets, we can find rules between the items 
 \item \textbf{Max itemsets} : An itemset X is a maximal frequent itemset (or max-itemset) in set S if X is  frequent,  and  there  exists  no super-itemset Y such that XY and Y is frequent in S.
 \item \textbf{Closed itemsets} : An itemset X is a closed frequent itemset in set S if X is  both closed and frequent in S.
 \item \textbf{Free or Generator itemsets} : Free itemsets are itemsets that are not included in any closure of their proper sub-set. It means that it has no subset whith the same support.
-\item \ textbf{Largest tiles} : It is the biggest are in a dataset. The area is equal to the frequency multiplyed by the size of the dataset.
+\item \ textbf{Largest tiles} : It is the itemset with the biggest area in a dataset. The area is equal to the frequency multiplied by the size of the dataset.
 \end
 
 
@@ -244,7 +244,7 @@ inspect(head(frequentItemsAdult,3))
 We can also find the rules from the most frequent itemsets. \newline
 We use the ruleInduction function from R. We can set the method with the argument "method".
 
-If in control method = "APRIORI" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using APRIORI with the minimal support found in itemsets. And in a second step all rules which do not stem from one of the itemsets are removed. This procedure will be in many cases very slow.
+If in control method = "APRIORI" is used, a very simple rule induction method is used. All rules are mined from the transactions data set using APRIORI with the minimal support found in itemsets. Then, all rules which do not stem from one of the itemsets are removed. The drawback of this procedure is that it is very slow in many cases.
 
 ```{r, fig.height = 6, fig.width = 8}
 rulesAdult <- ruleInduction(frequentItemsAdult, confidence = 0.85, control = list(method = "apriori"))
@@ -320,7 +320,7 @@ print(mush_data["class"].value_counts())
 print(mush_data["stalk-root"].value_counts
 ```
 
-As you can see the there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
+We can't print the distribution for each column because it would take too much place. We have just displayed two features. As you can see, there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
 
 ```{python}
 mush_data = mush_data[mush_data["stalk-root"] != '?']
@@ -366,9 +366,9 @@ Columns : & pungent & almond & anise & none  \\
 \end{tabular}
 \end{table}
 
-The mushroom dataset contains characters values. In order to have columns that are bit more intelligible we will replace the character values by their full name.
+The mushroom dataset contains character values. In order to have columns that are a bit more intelligible, we will replace the character values by their full name.
 
-This function above split for one feature the one character values from the full name values. It returns two arrays with each type of values.
+This function bellow split for one feature the character values from the full name values. It returns two arrays with each type of values.
 
 ```{python}
 def sepCurrentValFromNewVal(stringNewOldValues):
@@ -391,7 +391,7 @@ into that dictionary :
 {'cap-shape' : [['b', 'c', 'x', 'f', 'k', 's'],
  ['bell', 'conical', 'convex', 'flat', 'knobbed', 'sunken']]}
 
-Then, we will replace the values in the first array by the values of the second one for a given column.
+Then, we will replace the values in the first array by the values of the second one for a given feature.
 
 ```{python}
 mapColumnValName = {}
@@ -438,7 +438,7 @@ frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("poisonous")]
 ```
 
-With the APRIORI algorithm, we can see some associations with the \textit{edible} feature with a support around 0.6. Also, it seems that the APRIORI haven't found any associations with the \textit{poisonous} feature with a support above 0.6.
+With the APRIORI algorithm, we can see some associations containing the \textit{edible} feature with a support around 0.6. Also, it seems that the APRIORI haven't found any associations with the \textit{poisonous} feature with a support above 0.6.
 
 The result given by APRIORI will be used by the association_rules function given by mixtend.
 
@@ -449,7 +449,7 @@ assos_rule = association_rules(frequent_itemsets, metric="confidence", min_thres
 ```{python}
 assos_rule[assos_rule['antecedents'].astype(str).str.contains("edible")]
 ```
-Here we are listing all the rules that are implied by edible. Of course, we need to know the rules where edible is implied (ie the rules where edible is contained by the consequents column). But before searching for those rules, we are going to try out another algorithm, named fpgrowth, to see if we can obtain different results.
+Here we are listing all the rules that are implied by edible. We need to know the rules where edible is implied (ie the rules where edible is contained by the consequents column). But before searching for those rules, we are going to try out another algorithm, named fpgrowth, to see if we can obtain different results.
 
 ```{python}
 frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
@@ -597,10 +597,10 @@ plot(clusters_hiearchical)
 ```
 
 We can see two clusters on the dendogramm. One contains Result=1 and the other contains Result=0. \newline
-Moreover in the cluster with the branch Result=1, we can also see that the number of aces made by player-1 is high and the number of unforced errors is low. Also in this cluster player-2 made few or none aces. \newline
+Moreover, in the cluster with the branch Result=1, we can also see that the number of aces made by player-1 is high and the number of unforced errors is low. Also, in this cluster player-2 made few or none aces. \newline
 In the other cluster, it is the opposite. Player-1 makes few or none aces whereas player-2 makes a lot.
 
-So it seems that this clustering manage to cluster data linked to the result together.
+So, it seems that this clustering manage to cluster data linked to the result together.
 
 
 Now let's try to cluster the rules.
@@ -615,7 +615,7 @@ clusters_hiearchical <- hclust(d, method = "ward.D2")
 plot(clusters_hiearchical)
 ```
 
-If we cut the dendogramm in two clusters. We can look at the first cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
+If we cut the dendogramm in two clusters. We can look at the first cluster. (We only print 5 items from the cluster, look at the code for the whole cluster)
 ```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
 assign <- cutree(clusters_hiearchical, k=2)
 inspect(head(tennis.rules[assign == 1],5))
@@ -626,7 +626,7 @@ inspect(head(tennis.rules[assign == 1],5))
 inspect(tennis.rules[assign == 1])
 ```
 
-And at the second cluster. (We only print 5 items from the cluster, look at the code for the wole cluster)
+And at the second cluster. (We only print 5 items from the cluster, look at the code for the whole cluster)
 ```{r , eval =TRUE, fig.height=5, fig.width=6, fig.align = "center"}
 inspect(head(tennis.rules[assign == 2],5))
 ```
@@ -660,7 +660,7 @@ With Random Forest, the accuracy rate was 0.6931818.\newline
 With Logistic regression it was 0.7667.
 
 CBA can take as input a classic non-transaction dataset as tennis. We just have to choose the discretization method in parameter. \newline
-However discretization of integers is difficult so we did the transactions set ourselves.
+However, discretization of integers is difficult so we did the transactions set ourselves.
 
 #### Classification using homemade transactions
 
@@ -805,7 +805,7 @@ mush_data[['class']] <-as.factor(mush_data[['class']])
 ### Concept
 
 FOIL learns rules and then use them as a classifier. \newline
-For each class, we find the positive and negative examples and lean the rules using FOIL. Then the rules for all classes are combined and sorted by Laplace accuracy on the training data.
+For each class, we find the positive and negative examples and learn the rules using FOIL. Then, the rules for all classes are combined and sorted by Laplace accuracy on the training data.
 
 TO DO : Laplace accuracy ??? definition
 
@@ -873,7 +873,7 @@ classifierCMAR
 
 ### Concept
 
-CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of \already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
+CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of "already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
 
 ### Example on R
 
