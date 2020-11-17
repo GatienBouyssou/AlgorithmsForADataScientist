@@ -81,6 +81,8 @@ $$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 
 ## Coverage
 
+The coverage of an association rule is the number of instances for which it predicts correctly.
+ 
 $$Coverage (A,B) = \frac{P(A \cap B) - P(A \cap \bar{B})}{P(A \cap B)}$$
 
 ## Jaccard Index
@@ -166,7 +168,7 @@ inspect(head(Groceries,3))
 ```
 
 We can find the 15 most common variables.
-```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
+```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 7, fig.align = "center"}
 itemFrequencyPlot(Groceries, topN=15, type="absolute", main="Item Frequency")
 ```
 
@@ -242,7 +244,7 @@ inspect(head(Adult,1))
 ```
 
 We can find the 15 most common variables.
-```{r, eval=TRUE, echo=FALSE, fig.height = 6, fig.width = 8, fig.align = "center"}
+```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 7, fig.align = "center"}
 itemFrequencyPlot(Adult, topN=15, type="absolute", main="Item Frequency")
 ```
 
@@ -287,11 +289,11 @@ inspect(head(sort(rulesAdult, by = "lift", decreasing=TRUE), 3))
 
 We see a pattern for people with a high capital gain : they have often a large income, work over-time and have no capital loss.
 
-Difference between ECLAT and APRIORI:
+Differences between ECLAT and APRIORI:
 
 - Apriori algorithm is a classical algorithm used to mining the frequent item sets in a given dataset.
 - Coming to Eclat algorithm also mining the frequent itemsets but in vertical manner and it follows the depth first search of a graph.
-- As per the speed,Eclat is fast than the Apriori algorithm.
+- As per the speed,Eclat is faster than the Apriori algorithm.
 - Apriori works on larger datasets where as Eclat algorithm works on smaller datasets.
 
 \clearpage
@@ -558,6 +560,8 @@ The associations rules for Player-1 winning are :
 tennis.rules_winning <- apriori(tennis.transactions, appearance = list (default="lhs",rhs="Result=1"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
+These are the 5 rules with highest lift.
+
 ```{r, eval=TRUE, echo=FALSE}
 tennis.rules_winning
 inspect(head(sort(tennis.rules_winning, by = "lift", decreasing=TRUE), 5))
@@ -573,6 +577,7 @@ The associations rules for Player-1 loosing :
 tennis.rules_loosing <- apriori(tennis.transactions, appearance = list (default="lhs",rhs="Result=0"), parameter = list(support = 0.15, confidence = 0.3))
 ```
 
+These are the 3 rules with highest lift.
 ```{r, eval=TRUE, echo=FALSE}
 tennis.rules_loosing
 inspect(head(sort(tennis.rules_loosing, by = "lift", decreasing=TRUE), 3))
@@ -588,6 +593,7 @@ All the rules with Result as association :
 tennis.rules <- apriori(tennis.transactions, appearance = list (default="lhs",rhs=list("Result=0","Result=1")), parameter = list(support = 0.1, confidence = 0.4))
 ```
 
+These are the 5 rules with highest lift.
 ```{r, eval=TRUE, echo=FALSE}
 tennis.rules
 inspect(head(sort(tennis.rules, by = "lift", decreasing=TRUE), 5))
@@ -662,6 +668,8 @@ Explication pruning M1 and M2 techniques so, either the M1 or M2 algorithm are u
 M1 is the naive version of the algorithm. 
 M2 is the improved version of the algorithm.
 
+M1 is not always the right choice for pruning the mined rules. It traverses the dataset multiple times and keeps rules in memory so this may not be the optimal solution for very large datasets.
+
 ### Example on tennis data on R
 
 #### Recall from Homework 1
@@ -691,11 +699,13 @@ classifierTransactions <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = ten
 classifierTransactions
 ```
 
+The 4 rules with highest confidence are :
 ```{r}
 # inspect the rule base
 inspect(head(sort(rules(classifierTransactions),by="confidence"),4))
 ```
 
+We have the following confusion matrix :
 ```{r}
 # make predictions
 classifierTransactions.prediction = predict(classifierTransactions, tennisTransactionsTest)
@@ -717,7 +727,7 @@ This classification is also almost as good as logistic regression.
 CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
 
 
-With the method "first" : The "first" method depicts the first value which is the running time of method M1.
+With the method "first" for "first found rule": 
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -726,6 +736,7 @@ classifierRules <- CBA_ruleset(Result ~ . ,tennis.rules, method ="first")
 classifierRules
 ```
 
+We have the following confusion matrix :
 ```{r}
 # make predictions
 classifierRules.prediction = predict(classifierRules, tennisTransactionsTest)
@@ -739,8 +750,11 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-With the method "majority" : The "majority" method depicts the second value which is the running time of method M2.
+With the method "majority" :
 
+Majority selection of the class label requires selecting a group of good quality rules matching the case to be classified, and assigning the appropriate class with \textbf{simple majority voting} among selected rules. 
+
+Let's look at the method behind CBA_ruleset with "majority" as classification method : 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
 #Build the classifier from rules
@@ -748,6 +762,7 @@ classifierRules <- CBA_ruleset(Result ~ . ,tennis.rules, method ="majority", wei
 classifierRules
 ```
 
+We have the following confusion matrix :
 ```{r}
 # make predictions
 classifierRules.prediction = predict(classifierRules, tennisTransactionsTest, type = c("class", "score"))
@@ -766,6 +781,8 @@ classifierRules.accuracyrate
 
 The best classification using CBA is the classification using rules with majority method.
 
+\clearpage
+
 ## Regularized Class Association Rules for Multi-class Problems : RCAR Algorithm
 
 ### Concept
@@ -776,15 +793,21 @@ Regularized Class Association Rules (RCAR) is an algorithm which produces rules 
 
 The elastic net mixing parameter for alpha = 1 is the lasso penalty (default RCAR), and for alpha = 0 it is the ridge penalty.
 
+RCAR uses logistic regression.
+
+Let's look at the method behind RCAR : 
 ```{r}
 classifierRCAR = RCAR(Result ~ ., data= tennisTransactionsTrain, parameter = list(support = 0.05, confidence = 0.5), alpha = 0, disc.method = "mdlp")
 classifierRCAR
 ```
+
+The 4 rules with highest confidence are : 
 ```{r}
 # inspect the rule base
 inspect(head(sort(rules(classifierRCAR),by="conf"),4))
 ```
 
+We have the following confusion matrix :
 ```{r eval=TRUE, include=FALSE}
 # make predictions
 classifierRCAR.prediction = predict(classifierRCAR, tennisTransactionsTest)
@@ -798,13 +821,9 @@ classifierRCAR.accuracyrate = (classifierRCAR.confusion_matrix[1,1] + classifier
 classifierRCAR.accuracyrate
 ```
 
-### Example on mushrooms data on R
+The accuracy rate is not very good.
 
-```{r eval=FALSE, include=FALSE}
-mush_data <-py$mush_data
-mush_data[['class']] <-as.factor(mush_data[['class']])
-```
-
+\clearpage
 
 ## First Order Inductive Learner : FOIL Algorithm
 
@@ -813,7 +832,7 @@ mush_data[['class']] <-as.factor(mush_data[['class']])
 FOIL learns rules and then use them as a classifier. \newline
 For each class, we find the positive and negative examples and learn the rules using FOIL. Then, the rules for all classes are combined and sorted by Laplace accuracy on the training data.
 
-## Laplace accuracy
+### Laplace accuracy
 
 Laplace accuracy is used to measure the accuracy of the rules. Given a rule r it is defined as follows:
 
@@ -830,6 +849,7 @@ We classify new examples by
 
 We can use our homemade transactions as input data in FOIL algorithms.
 
+Let's look at the method behind FOIL : 
 ```{r eval=TRUE, include=FALSE}
 tennisTransactions2 <- tennisTransactions
 colnames(tennisTransactions2) = c("Species","ACE.1","ACE.2","UFE.1","UFE.2")
@@ -862,17 +882,15 @@ classifierFOIL.accuracyrate = (classifierFOIL.confusion_matrix[1,1] + classifier
 classifierFOIL.accuracyrate
 ```
 
-The accuracy rate is once again very good.
+The accuracy rate is better than the one from RCAR and is enough good.
+
+\clearpage
 
 ## Classification Based on Multiple Class-association Rules : CMAR Algorithm
-
-### Concept
 
 CMAR selects a small set of high confidence, highly related rules and analyzes the correlation among those rules. To avoid bias, we develop a new technique, called weighted χ2 , which derives a good measure on how strong the rule is under both conditional support and class distribution. An extensive performance study shows that CMAR in general has higher prediction accuracy than CBA.
 
 ## Classification based on Predictive Association Rules : CPAR Algorithm
-
-### Concept
 
 CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: 
 
