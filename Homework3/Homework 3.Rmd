@@ -18,14 +18,10 @@ library(reticulate)
 knitr::knit_engines$set(python.reticulate =  TRUE)
 #py_install("matplotlib")
 #py_install("scikit-learn")
-
-#install_LUCS_KDD_CMAR(force = FALSE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/CMAR/cmar.tgz")
-#install_LUCS_KDD_CPAR(force = FALSE,source = "https://cgi.csc.liv.ac.uk/~frans/KDD/Software/FOIL_PRM_CPAR/foilPrmCpar.tgz")
 ```
 
 ```{r rpackages,eval=TRUE,echo=FALSE}
 #install.packages("rJava")
-
 library(mlbench)
 library(rJava)
 library(magrittr)
@@ -83,7 +79,13 @@ or
 
 $$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 
+## Coverage
+
+$$Coverage (A,B) = \frac{P(A \cap B) - P(A \cap \bar{B})}{P(A \cap B)}$$
+
 ## Jaccard Index
+
+The Jaccard coefficient assesses the distance between A and B as the fraction of cases covered by both with respect to the fraction of cases covered by A.
 
 $Jaccard(A, B) = \frac{P(A \cap B)}{P(A)+P(B)-P(A \cap B)}$
 
@@ -97,7 +99,7 @@ With the Jaccard measure, if A and B are not similar at all the Jaccard(A, B) wi
 
 ## Loevinger
 
-$Loevinger(A, B) = 1- \frac{P(A \cap \neg{B})}{P(A)P(\neg{B})}$
+$$Loevinger(A → B) = 1 - \frac{1}{Conviction(A → B)}= 1- \frac{P(A \cap \bar{B})}{P(A)P(\bar{B})}$$
 
 When A and B are independent $P(A \cap \neg{B}) = P(A) * P(\neg{B})$
 
@@ -107,23 +109,36 @@ When A and B are dependent $P(A \cap \neg{B})$ should tend towards 0 and $Loevin
 
 ## Laplace
 
-$Laplace(A,B) = \frac{N_{AB}+1}{N_{A}+2}$
+$$Laplace(A→B) = \frac{Support(A→B)+1}{P(A)+2}$$
 
-With Laplace when the A and B are independent $N_{AB} = 0$ and :
+With Laplace when the A and B are independent $Support(A→B) = 0$ and :
 
-$Laplace(A,B) = \frac{1}{N_{A}+2} \approx 0$ when  $N_{A}$ is big.
+$Laplace(A,B) = \frac{1}{P(A)+2} \approx 0$ when  $P(A)$ is big.
 
 On the other end, when A and B are dependent the Laplace formula should tend towards 1.
 
 ## Rule interest
 
-$RI(A,B) = P(A)(P(A|B)P(B))$
+$RI(A,B) = P(A)(P(A|B)-P(B))$
 
 or
 
 $RI(A,B) = P(A \cap B) - P(A)P(B)$
 
 If A and B are independent then $P(A \cap B) = P(A) * P(B)$ and $RI(A,B) = 0$
+
+
+## Least Contradiction
+
+$$LC (A,B) = \frac{P(A \cap B) - P(A \cap \bar{B})}{P(B)}$$
+
+## Tile
+
+It uses itemsets AND rows.
+
+$$ tile(X) = N_{X=1}*|X|$$
+For example : $ tile({A}) = N_{A=1}*1$ or $tile({AB}) = N_{A=1,B=1}*2$
+
 
 \clearpage
 
@@ -206,12 +221,10 @@ Then looking at the most frequent itemsets, we can find rules between the items 
 
 ## The different types of frequent itemsets mining
 
-\begin{enumerate}[noitemsep]
-\item \textbf{Max itemsets} : An itemset X is a maximal frequent itemset (or max-itemset) in set S if X is  frequent,  and  there  exists  no super-itemset Y such that XY and Y is frequent in S.
-\item \textbf{Closed itemsets} : An itemset X is a closed frequent itemset in set S if X is  both closed and frequent in S.
-\item \textbf{Free or Generator itemsets} : Free itemsets are itemsets that are not included in any closure of their proper sub-set. It means that it has no subset whith the same support.
-\item \ textbf{Largest tiles} : It is the itemset with the biggest area in a dataset. The area is equal to the frequency multiplied by the size of the dataset.
-\end
+- \textbf{Max itemsets} : An itemset X is a maximal frequent itemset (or max-itemset) in set S if X is  frequent,  and  there  exists  no super-itemset Y such that XY and Y is frequent in S.
+- \textbf{Closed itemsets} : An itemset X is a closed frequent itemset in set S if X is  both closed and frequent in S.
+- \textbf{Free or Generator itemsets} : Free itemsets are itemsets that are not included in any closure of their proper sub-set. It means that it has no subset whith the same support.
+- \textbf{Largest tiles} : It is the itemset with the biggest area in a dataset. The area is equal to the frequency multiplied by the size of the dataset.
 
 
 ## Example on Adult data on R
@@ -316,12 +329,8 @@ len(mush_data)
 Now, we want to know the data repartition for each columns.
 
 ```{python}
-# To distribution the distribution of each column
-#for column in mush_data.columns:
-#    print("\n" + column)
-#    print(mush_data[column].value_counts())
 print(mush_data["class"].value_counts())
-print(mush_data["stalk-root"].value_counts
+print(mush_data["stalk-root"].value_counts)
 ```
 
 We can't print the distribution for each column because it would take too much place. We have just displayed two features. As you can see, there is almost as much poisonous as edible mushrooms. Moreover, the dataset contains some unknown values in the column stalk-root. We are going to discard those rows to keep lines that are complete.
@@ -519,25 +528,19 @@ head(tennis.data)
 We can transform the tennis data set into a transaction data set.
 ```{r, eval=TRUE, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 tennisTransactions <- tennis.data
-
 tennisTransactions[["ACE.1"]] <- ordered(cut(tennisTransactions[[ "ACE.1"]],
   c(-Inf,0, median(tennisTransactions[[ "ACE.1"]][tennisTransactions[[ "ACE.1"]]>0]),
   Inf)), labels = c("None", "Low", "High"))
-
 tennisTransactions[["ACE.2"]] <- ordered(cut(tennisTransactions[[ "ACE.2"]],
   c(-Inf,0, median(tennisTransactions[[ "ACE.2"]][tennisTransactions[[ "ACE.2"]]>0]),
   Inf)), labels = c("None", "Low", "High"))
-
 tennisTransactions[["UFE.2"]] <- ordered(cut(tennisTransactions[[ "UFE.2"]],
   c(-Inf,0, median(tennisTransactions[[ "UFE.2"]][tennisTransactions[[ "UFE.2"]]>0]),
   Inf)), labels = c("Low", "High"))
-
 tennisTransactions[["UFE.1"]] <- ordered(cut(tennisTransactions[[ "UFE.1"]],
   c(-Inf,0, median(tennisTransactions[[ "UFE.1"]][tennisTransactions[[ "UFE.1"]]>0]),
   Inf)), labels = c("Low", "High"))
-
 tennisTransactions[["Result"]] <- as.factor(tennisTransactions[["Result"]])
-
 tennis.transactions <- as(tennisTransactions, "transactions")
 ```
 
@@ -683,7 +686,6 @@ set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
 tennisTransactionsTrain <- tennis.transactions[train,]
 tennisTransactionsTest <- tennis.transactions[-train,]
-
 #Build the classifier from transactions
 classifierTransactions <- CBA(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennisTransactionsTrain, supp = 0.05, conf = 0.6)
 classifierTransactions
@@ -698,7 +700,6 @@ inspect(head(sort(rules(classifierTransactions),by="confidence"),4))
 # make predictions
 classifierTransactions.prediction = predict(classifierTransactions, tennisTransactionsTest)
 classifierTransactions.confusion_matrix = table(classifierTransactions.prediction, response(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, tennisTransactionsTest))
-
 classifierTransactions.confusion_matrix
 ```
 
@@ -716,11 +717,10 @@ This classification is also almost as good as logistic regression.
 CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
 
 
-With the method "first" : The first method depicts the firsst value which is the running time of method M1.
+With the method "first" : The "first" method depicts the first value which is the running time of method M1.
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
-
 #Build the classifier from rules
 classifierRules <- CBA_ruleset(Result ~ . ,tennis.rules, method ="first")
 classifierRules
@@ -739,11 +739,10 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-With the method "majority" : The majority method depicts the second value value which is the running time of method M2.
+With the method "majority" : The "majority" method depicts the second value which is the running time of method M2.
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
-
 #Build the classifier from rules
 classifierRules <- CBA_ruleset(Result ~ . ,tennis.rules, method ="majority", weights = "lift")
 classifierRules
@@ -834,7 +833,6 @@ We can use our homemade transactions as input data in FOIL algorithms.
 ```{r eval=TRUE, include=FALSE}
 tennisTransactions2 <- tennisTransactions
 colnames(tennisTransactions2) = c("Species","ACE.1","ACE.2","UFE.1","UFE.2")
-
 # test and train set
 n = dim(tennisTransactions2)[1]
 n2 = n*(5/6)
@@ -842,7 +840,6 @@ set.seed(1234)
 train = sample(c(1:n), replace = F)[1:n2]
 tennisTest2 = tennisTransactions2[-train, ]
 tennisTrain2 = tennisTransactions2[train, ]
-
 classifierFOIL <- FOIL(Species~ ., data= tennisTrain2, max_len = 2, min_gain = .4, best_k = 5, disc.method = "mdlp")
 classifierFOIL
 ```
@@ -873,24 +870,12 @@ The accuracy rate is once again very good.
 
 CMAR selects a small set of high confidence, highly related rules and analyzes the correlation among those rules. To avoid bias, we develop a new technique, called weighted χ2 , which derives a good measure on how strong the rule is under both conditional support and class distribution. An extensive performance study shows that CMAR in general has higher prediction accuracy than CBA.
 
-
-### Example on R
-
-```{r eval=FALSE, include=FALSE}
-options(java.parameters = "-Xmx1024m")
-classifierCMAR <- CMAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2,  data= tennisTransactionsTrain, support = 0.1, confidence = 0.5,disc.method = "mdlp", verbose = FALSE)
-classifierCMAR
-```
-
 ## Classification based on Predictive Association Rules : CPAR Algorithm
 
 ### Concept
 
-CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: (1) CPAR generates a much smaller set of highquality predictive rules directly from the dataset; (2) to avoid generating redundant rules, CPAR generates each rule by considering the set of "already generated" rules; and (3) when predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
+CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: 
 
-### Example on R
-
-```{r eval=FALSE, include=FALSE}
-classifierCPAR <- CPAR(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, best_k = 5, data= tennisTransactionsTrain)
-classifierCPAR
-```
+-  CPAR generates a much smaller set of highquality predictive rules directly from the dataset; 
+-  To avoid generating redundant rules, CPAR generates each rule by considering the set of "already generated" rules; and 
+-  When predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
