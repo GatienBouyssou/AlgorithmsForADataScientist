@@ -82,7 +82,7 @@ $$Conviction(A → B)=\frac{1 - P(B)}{1- \frac{P(A \cap B)}{P(A)}}$$
 ## Coverage
 
 The coverage of an association rule is the number of instances for which it predicts correctly.
- 
+
 $$Coverage (A,B) = \frac{P(A \cap B) - P(A \cap \bar{B})}{P(A \cap B)}$$
 
 ## Jaccard Index
@@ -97,17 +97,17 @@ $Jaccard(A, B) = \frac{P(A \cap B)}{P(A \cup B)}$
 
 We can notice that : $0 \le Jaccard(A, B) \le 1$
 
-With the Jaccard measure, if A and B are not similar at all the Jaccard(A, B) will be equal to 0; Indeed, when $P(A \cap B)$ increases then $P(A \cup B)$ decrease assuming that P(A) and P(B) are constant. So, if $P(A \cap B)$ increases Jaccard(A, B) should increase as well. The closer Jaccard(A, B) comes to 1 the more similar A to B.
+With the Jaccard measure, if A and B are not similar at all the Jaccard(A, B) will be equal to 0. When $P(A \cap B)$ increases then $P(A \cup B)$ decrease assuming that P(A) and P(B) are constant. So, if $P(A \cap B)$ increases Jaccard(A, B) should increase as well. The closer Jaccard(A, B) comes to 1 the more similar A to B.
 
 ## Loevinger
 
 $$Loevinger(A → B) = 1 - \frac{1}{Conviction(A → B)}= 1- \frac{P(A \cap \bar{B})}{P(A)P(\bar{B})}$$
 
-When A and B are independent $P(A \cap \neg{B}) = P(A) * P(\neg{B})$
+When A and B are independent $P(A \cap \bar{B}) = P(A) * P(\bar{B})$
 
 So, $Loevinger(A, B) = 0$
 
-When A and B are dependent $P(A \cap \neg{B})$ should tend towards 0 and $Loevinger(A, B)$ towards 1.
+When A and B are dependent $P(A \cap \bar{B})$ should tend towards 0 and $Loevinger(A, B)$ towards 1.
 
 ## Laplace
 
@@ -139,7 +139,7 @@ $$LC (A,B) = \frac{P(A \cap B) - P(A \cap \bar{B})}{P(B)}$$
 It uses itemsets AND rows.
 
 $$ tile(X) = N_{X=1}*|X|$$
-For example : $ tile({A}) = N_{A=1}*1$ or $tile({AB}) = N_{A=1,B=1}*2$
+For example : $tile({A}) = N_{A=1}*1$ or $tile({AB}) = N_{A=1,B=1}*2$
 
 
 \clearpage
@@ -189,14 +189,14 @@ If we look at the 3 rules with highest confidence, we have these rules :
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(grocery_rules, by = "confidence", decreasing=TRUE), 3))
 ```
-However "whole milk" if the most frequent item in the data set and this frequence plays a role in confidence.
-So we can look at the 3 rules with highest lift (A and B occuring together), and we have these rules :
+However, "whole milk" if the most frequent item in the data set and this frequence plays a role in confidence.
+So, we can look at the 3 rules with the highest lift (A and B occuring together), and we have these rules :
 
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(grocery_rules, by = "lift", decreasing=TRUE), 3))
 ```
 
-We can also look at the items which induce "soda". Then we can sort them by confidence and look at the first 3 (so the 3 rules with highest confidence).
+We can also look at the items which induce "soda". Then, we can sort them by confidence and look at the first 3 (so the 3 rules with highest confidence).
 
 ```{r, eval=TRUE, echo=FALSE}
 inspect(head(sort(subset(grocery_rules, subset = rhs %in% "soda"), by = "confidence", decreasing=TRUE), 3))
@@ -219,7 +219,7 @@ it also induces buying soda.
 
 It mines frequent itemsets \newline
 This algorithm uses simple intersection operations for equivalence class clustering along with bottom-up lattice traversal.
-Then looking at the most frequent itemsets, we can find rules between the items inside these itemsets.
+Then, looking at the most frequent itemsets, we can find rules between the items inside these itemsets.
 
 ## The different types of frequent itemsets mining
 
@@ -293,8 +293,8 @@ Differences between ECLAT and APRIORI:
 
 - Apriori algorithm is a classical algorithm used to mining the frequent item sets in a given dataset.
 - Coming to Eclat algorithm also mining the frequent itemsets but in vertical manner and it follows the depth first search of a graph.
-- As per the speed,Eclat is faster than the Apriori algorithm.
-- Apriori works on larger datasets where as Eclat algorithm works on smaller datasets.
+- As per the speed, Eclat is faster than the Apriori algorithm.
+- Apriori works on larger datasets whereas Eclat algorithm works on smaller datasets.
 
 \clearpage
 
@@ -397,7 +397,7 @@ def sepCurrentValFromNewVal(stringNewOldValues):
     return [currentVal, newVal]
 ```
 
-This function goes through all the features and maps the feature's names with the character and full name values. Therefore it changes this line :
+This function goes through all the features and maps the feature's names with the character and full name values. Therefore, it changes this line :
 
 cap-shape: bell=b,conical=c,convex=x,flat=f, knobbed=k,sunken=s
 
@@ -443,7 +443,7 @@ frequent_itemsets['length'] = frequent_itemsets['itemsets'].apply(lambda x: len(
 frequent_itemsets
 ```
 
-Thanks to the APRIORI algorithm it is possible to associate some feature together.
+Thanks to the APRIORI algorithm, it is possible to associate some feature together.
 
 ```{python}
 frequent_itemsets[frequent_itemsets['itemsets'].astype(str).str.contains("edible")]
@@ -464,7 +464,7 @@ assos_rule = association_rules(frequent_itemsets, metric="confidence", min_thres
 ```{python}
 assos_rule[assos_rule['antecedents'].astype(str).str.contains("edible")]
 ```
-Here we are listing all the rules that are implied by edible. We need to know the rules where edible is implied (ie the rules where edible is contained by the consequents column). But before searching for those rules, we are going to try out another algorithm, named fpgrowth, to see if we can obtain different results.
+Here, we are listing all the rules that are implied by edible. We need to know the rules where edible is implied (ie the rules where edible is contained by the consequents column). But before searching for those rules, we are going to try out another algorithm, named fpgrowth, to see if we can obtain different results.
 
 ```{python}
 frequent_itemsets = fpgrowth(df, min_support=0.6, use_colnames=True)
@@ -498,9 +498,9 @@ As we can see above if the threshold is above 0.6 the association_rules function
 
 ## Concept
 
-We can find a dissimilarity between transactions so we can compare the data. Then this dissimilarity is used as distance measure in clustering.
+We need to find a dissimilarity between transactions to compare the data. Then, this dissimilarity is used as a distance measure in clustering.
 
-So a direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$.
+So, a direct approach to cluster itemsets is to define a distance metric between two itemsets $X_i$ and $X_j$.
 
 ## Affinity dissimilarity
 
@@ -508,7 +508,7 @@ A good choice is the Affinity defined as :
 
 $$A(X_i, X_j)=\frac{Support(X_i,X_j)}{P(X_i) + P(X_j) - Support(X_i,X_j)} = \frac{P(X_i \cap X_j)}{P(X_i \cup X_j)}$$
 
-Here this means that affinity is the Jaccard similarity between items. \newline
+Here, the affinity correspond to the Jaccard similarity between items. \newline
 The Jaccard distance defined as :
 
 $$J(X_i, X_j) = \frac{|X_i \cap X_j|}{|X_i \cup X_j|}$$
@@ -583,10 +583,10 @@ tennis.rules_loosing
 inspect(head(sort(tennis.rules_loosing, by = "lift", decreasing=TRUE), 3))
 ```
 
-These rules look correct : either player-1 is loosing because player-2 makes a lot of aces or because he does a lot of unforced errors or player-2 makes a lot of aces.
+These rules look correct : either player-1 is loosing because player-2 makes a lot of aces, or because he does a lot of unforced errors, or player-2 makes a lot of aces.
 
 
-Now let's look at all the associations rules leading to "Result". \newline
+Now, let's look at all the associations rules leading to "Result". \newline
 All the rules with Result as association :
 
 ```{r, eval=TRUE, echo=FALSE}
@@ -599,7 +599,7 @@ tennis.rules
 inspect(head(sort(tennis.rules, by = "lift", decreasing=TRUE), 5))
 ```
 
-Firstly let's look at the clustering of items
+Firstly, let's look at the clustering of items
 
 ### Cluster the items
 
@@ -616,7 +616,7 @@ In the other cluster, it is the opposite. Player-1 makes few or none aces wherea
 So, it seems that this clustering manage to cluster data linked to the result together.
 
 
-Now let's try to cluster the rules.
+Now, let's try to cluster the rules.
 
 \clearpage
 
@@ -663,12 +663,16 @@ CBA (Classification Based on Associations) Algorithm build a classifier based on
 Candidate classification association rules (CARs) are mined with the standard APRIORI algorithm. Rules are ranked by confidence, support and size.  \newline
 It uses either M1 or M2 pruning strategy.
 
-Explication pruning M1 and M2 techniques so, either the M1 or M2 algorithm are used to perform database coverage pruning and to determine the number of rules to use and the default class.
+Explication pruning M1 and M2 techniques so, either the M1 or M2 algorithm are used to :
 
-M1 is the naive version of the algorithm. 
+- perform database coverage pruning,
+- to determine the number of rules to use and
+- to determine the default class.
+
+M1 is the naive version of the algorithm.
 M2 is the improved version of the algorithm.
 
-M1 is not always the right choice for pruning the mined rules. It traverses the dataset multiple times and keeps rules in memory so this may not be the optimal solution for very large datasets.
+M1 is not always the right choice for pruning the mined rules. It iterates through the dataset multiple times and keeps rules in memory. That's why this method should not be used for very large datasets.
 
 ### Example on tennis data on R
 
@@ -724,10 +728,10 @@ This classification is also almost as good as logistic regression.
 
 #### Classification using rules
 
-CBA_ruleset creates a new object of class CBA using the provides rules as the rule base.
+CBA_ruleset creates a new object of class CBA using the rules as the rule base.
 
 
-With the method "first" for "first found rule": 
+With the method "first" for "first found rule":
 
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
@@ -752,9 +756,9 @@ classifierRules.accuracyrate
 
 With the method "majority" :
 
-Majority selection of the class label requires selecting a group of good quality rules matching the case to be classified, and assigning the appropriate class with \textbf{simple majority voting} among selected rules. 
+Majority selection of the class label requires selecting a group of good quality rules matching the case to be classified, and assigning the appropriate class with \textbf{simple majority voting} among selected rules.
 
-Let's look at the method behind CBA_ruleset with "majority" as classification method : 
+Let's look at the method behind CBA_ruleset with "majority" as classification method :
 ```{r}
 tennis.rules <- sort(tennis.rules, by = "conf")
 #Build the classifier from rules
@@ -777,9 +781,8 @@ classifierRules.accuracyrate = (classifierRules.confusion_matrix[1,1] + classifi
 classifierRules.accuracyrate
 ```
 
-### Conclusion
 
-The best classification using CBA is the classification using rules with majority method.
+\textbf{So}, the best classification using CBA is the classification using rules with majority method.
 
 \clearpage
 
@@ -795,13 +798,13 @@ The elastic net mixing parameter for alpha = 1 is the lasso penalty (default RCA
 
 RCAR uses logistic regression.
 
-Let's look at the method behind RCAR : 
+Let's look at the method behind RCAR :
 ```{r}
 classifierRCAR = RCAR(Result ~ ., data= tennisTransactionsTrain, parameter = list(support = 0.05, confidence = 0.5), alpha = 0, disc.method = "mdlp")
 classifierRCAR
 ```
 
-The 4 rules with highest confidence are : 
+The 4 rules with highest confidence are :
 ```{r}
 # inspect the rule base
 inspect(head(sort(rules(classifierRCAR),by="conf"),4))
@@ -838,18 +841,18 @@ Laplace accuracy is used to measure the accuracy of the rules. Given a rule r it
 
 $$ LaplaceAccuracy(r)= \frac{N_{c} +1}{N_{total} + m}$$
 
-where m is the number of classes, N_{total} is the total number of examples that satisfies the rule's boday and N_{c} is the number of examples belonging to the predicted class c of the rule.
+where m is the number of classes, N_{total} is the total number of examples that satisfies the rule's body and N_{c} is the number of examples belonging to the predicted class c of the rule.
 
 We classify new examples by
-1. select all the rules whose bodies are satisfied by the example;
-2. from the rules select the best k rules per class (highest expected Laplace accuracy);
+1. selecting all the rules whose bodies are satisfied by the example;
+2. from the rules, select the best k rules per class (highest expected Laplace accuracy);
 3. average the expected Laplace accuracy per class and choose the class with the highest average.
 
 ### Example on tennis data on R
 
 We can use our homemade transactions as input data in FOIL algorithms.
 
-Let's look at the method behind FOIL : 
+Let's look at the method behind FOIL :
 ```{r eval=TRUE, include=FALSE}
 tennisTransactions2 <- tennisTransactions
 colnames(tennisTransactions2) = c("Species","ACE.1","ACE.2","UFE.1","UFE.2")
@@ -892,8 +895,8 @@ CMAR selects a small set of high confidence, highly related rules and analyzes t
 
 ## Classification based on Predictive Association Rules : CPAR Algorithm
 
-CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages: 
+CPAR inherits the basic idea of FOIL in rule generation and integrates the features of associative classification in predictive rule analysis. In comparison with associative classification, CPAR has the following advantages:
 
--  CPAR generates a much smaller set of highquality predictive rules directly from the dataset; 
--  To avoid generating redundant rules, CPAR generates each rule by considering the set of "already generated" rules; and 
+-  CPAR generates a much smaller set of highquality predictive rules directly from the dataset;
+-  To avoid generating redundant rules, CPAR generates each rule by considering the set of "already generated" rules; and
 -  When predicting the class label of an example, CPAR uses the best k rules that the example satisfies.
